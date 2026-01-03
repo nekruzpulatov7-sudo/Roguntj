@@ -6,7 +6,6 @@
     <title>Rogun.tj — Магазин объявлений</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Встроенные стили для надежности */
         .dark-mode { background-color: #1a1a1a; color: white; }
         .dark-mode .product-card { background: #2d2d2d; color: white; border: 1px solid #444; }
         .dark-mode header, .dark-mode footer { background: #111; }
@@ -30,7 +29,7 @@
 
 <header>
     <div class="container header-content">
-        <h1 style="margin:0;">Rogun.tj</h1>
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0;">Rogun.tj</h1>
         <div style="display: flex; align-items: center; gap: 15px;">
             <div id="user-menu"></div> 
             <button id="theme-toggle" style="cursor:pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">🌙 Тёмная тема</button>
@@ -72,7 +71,6 @@
 </footer>
 
 <script type="module">
-    // ИСПРАВЛЕНО: Убрали точку перед /js/ для стабильности на GitHub
     import { getAds, getCurrentUser } from './js/storage.js';
 
     const adsContainer = document.getElementById('ads-container');
@@ -82,20 +80,20 @@
     const themeBtn = document.getElementById('theme-toggle');
     const catButtons = document.querySelectorAll('.cat-btn');
 
-    // 1. Меню пользователя
     function renderUserMenu() {
         const user = getCurrentUser();
         if (user) {
+            // Используем телефон для отображения имени
+            const name = user.phone || user.email.split('@')[0];
             userMenu.innerHTML = `
                 <a href="profile.html">Мои объявления</a>
-                <span style="margin-left:10px; color:#888;">| ${user.email.split('@')[0]}</span>
+                <span style="margin-left:10px; color:#888;">| ${name}</span>
             `;
         } else {
             userMenu.innerHTML = `<a href="login.html">Войти</a>`;
         }
     }
 
-    // 2. Отрисовка объявлений
     function updateAds() {
         const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
@@ -111,7 +109,6 @@
         });
 
         adsContainer.innerHTML = '';
-        
         if (filtered.length === 0) {
             adsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;">Ничего не найдено.</p>';
             return;
@@ -135,7 +132,6 @@
         });
     }
 
-    // Слушатели событий
     catButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             catButtons.forEach(b => b.classList.remove('active'));
@@ -146,13 +142,11 @@
 
     searchInput.addEventListener('input', updateAds);
     regionFilter.addEventListener('change', updateAds);
-    
     themeBtn.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         themeBtn.textContent = document.body.classList.contains('dark-mode') ? "☀️ Светлая тема" : "🌙 Тёмная тема";
     });
 
-    // Запуск
     renderUserMenu();
     updateAds();
 </script>
