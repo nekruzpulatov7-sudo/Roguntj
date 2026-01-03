@@ -6,68 +6,59 @@
     <title>Добавить объявление — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        #add-form input, #add-form select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-        #image-preview { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
-        #image-preview img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
-        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; }
-        .btn-submit:hover { background: #218838; }
-        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #555; }
-        .form-message { margin-top: 10px; font-weight: bold; text-align: center; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        #image-preview { display: flex; gap: 5px; flex-wrap: wrap; margin: 10px 0; }
+        #image-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        label { font-weight: bold; display: block; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="container">
-        <div class="header-container">
-            <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0;">Rogun.tj</h1>
-            <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: bold;">← На главную</a>
-        </div>
-    </div>
+<header class="container" style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 onclick="location.href='index.html'" style="cursor:pointer; color:#007bff;">Rogun.tj</h2>
+    <a href="index.html" style="text-decoration:none;">← Назад</a>
 </header>
 
 <main class="container">
     <form id="add-form">
-        <h2 style="text-align: center;">Новое объявление</h2>
-        
-        <label>Название товара или услуги</label>
+        <label>Что вы продаете?</label>
         <input type="text" id="title" placeholder="Например: Продаю iPhone 13" required>
         
-        <label>Цена (TJS)</label>
-        <input type="number" id="price" placeholder="Укажите цену" required>
-        
-        <label>Номер телефона</label>
-        <input type="tel" id="phone" placeholder="900112233" required>
-
-        <label>Регион</label>
-        <select id="region" required>
-            <option value="">Выберите город / район</option>
-            <option value="Рогун">Рогун</option>
-            <option value="Душанбе">Душанбе</option>
-            <option value="Худжанд">Худжанд</option>
-            <option value="Бохтар">Бохтар</option>
-            <option value="Нурек">Нурек</option>
-            <option value="Вахдат">Вахдат</option>
-        </select>
-
         <label>Категория</label>
         <select id="category" required>
             <option value="">Выберите категорию</option>
-            <option value="Продуктовый Магазин">Продукты</option>
-            <option value="Услуги и Вакансии">Услуги</option>
-            <option value="Электроника и Бытовая Техника">Электроника</option>
-            <option value="Магазин Одежда">Одежда</option>
-            <option value="Все для Дома">Все для Дома</option>
+            <option value="Продукты">🍎 Продукты питания</option>
+            <option value="Электроника">📱 Электроника и Техника</option>
+            <option value="Транспорт">🚗 Транспорт (Авто)</option>
+            <option value="Недвижимость">🏠 Недвижимость</option>
+            <option value="Одежда">👕 Одежда и Обувь</option>
+            <option value="Для дома">🛋️ Все для дома</option>
+            <option value="Услуги">🛠️ Услуги</option>
+            <option value="Работа">💼 Работа и Вакансии</option>
         </select>
 
-        <label>Добавить фото (макс. 5)</label>
-        <input type="file" id="images" multiple accept="image/*" style="border: none; padding: 10px 0;">
+        <label>Цена (TJS)</label>
+        <input type="number" id="price" required>
+
+        <label>Регион</label>
+        <select id="region" required>
+            <option value="Рогун">Рогун</option>
+            <option value="Душанбе">Душанбе</option>
+            <option value="Худжанд">Худжанд</option>
+            <option value="Вахдат">Вахдат</option>
+        </select>
+
+        <label>Ваш номер телефона</label>
+        <input type="tel" id="phone" required>
+
+        <label>Фото (макс. 5)</label>
+        <input type="file" id="images" multiple accept="image/*">
         <div id="image-preview"></div>
 
-        <div id="message" class="form-message"></div>
-        <button type="submit" class="btn-submit">Опубликовать бесплатно</button>
+        <div id="message" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
+        <button type="submit" class="btn-submit">Опубликовать</button>
     </form>
 </main>
 
@@ -77,17 +68,13 @@
     const form = document.getElementById('add-form');
     const imageInput = document.getElementById('images');
     const preview = document.getElementById('image-preview');
-
-    // Если пользователь вошел, автоматически ставим его номер
     const user = getCurrentUser();
-    if (user && user.phone) {
-        document.getElementById('phone').value = user.phone;
-    }
 
-    imageInput.addEventListener('change', () => {
+    if (user) document.getElementById('phone').value = user.phone;
+
+    imageInput.onchange = () => {
         preview.innerHTML = '';
-        const files = Array.from(imageInput.files).slice(0, 5);
-        files.forEach(file => {
+        Array.from(imageInput.files).slice(0,5).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => {
                 const img = document.createElement('img');
@@ -96,7 +83,7 @@
             };
             reader.readAsDataURL(file);
         });
-    });
+    };
 
     async function compressImage(base64) {
         return new Promise(resolve => {
@@ -105,23 +92,22 @@
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const maxWidth = 800; 
+                const maxWidth = 800;
                 const scale = maxWidth / img.width;
                 canvas.width = maxWidth;
                 canvas.height = img.height * scale;
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
         });
     }
 
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        const msgDiv = document.getElementById('message');
-        msgDiv.style.color = 'blue';
-        msgDiv.innerText = 'Публикация...';
+        const msg = document.getElementById('message');
+        msg.innerText = "Загрузка...";
 
-        const files = Array.from(imageInput.files).slice(0, 5);
+        const files = Array.from(imageInput.files).slice(0,5);
         const compressedImages = [];
 
         for (const file of files) {
@@ -130,8 +116,7 @@
                 reader.onload = ev => r(ev.target.result);
                 reader.readAsDataURL(file);
             });
-            const compressed = await compressImage(base64);
-            compressedImages.push(compressed);
+            compressedImages.push(await compressImage(base64));
         }
 
         const newAd = {
@@ -142,7 +127,7 @@
             phone: document.getElementById('phone').value,
             region: document.getElementById('region').value,
             category: document.getElementById('category').value,
-            images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190?text=Нет+фото'],
+            images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190'],
             createdAt: new Date().toLocaleDateString('ru-RU')
         };
 
@@ -151,14 +136,14 @@
         
         try {
             saveAds(ads);
-            msgDiv.style.color = 'green';
-            msgDiv.innerText = 'Успешно!';
-            setTimeout(() => window.location.href = 'index.html', 1000);
-        } catch (err) {
-            msgDiv.style.color = 'red';
-            msgDiv.innerText = 'Слишком тяжелые фото!';
+            msg.style.color = "green";
+            msg.innerText = "Готово!";
+            setTimeout(() => window.location.href = 'index.html', 800);
+        } catch(e) {
+            msg.style.color = "red";
+            msg.innerText = "Ошибка: фото слишком тяжелые!";
         }
-    });
+    };
 </script>
 </body>
 </html>

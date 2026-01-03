@@ -6,32 +6,97 @@
     <title>Вход — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Центрируем карточку входа */
-        body { background: #f4f7f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; }
-        .login-card { max-width: 400px; width: 90%; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        .login-card h2 { margin-bottom: 20px; color: #333; font-size: 24px; }
+        /* Центрирование карточки на странице */
+        body { 
+            background: #f4f7f6; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+
+        .login-card { 
+            max-width: 400px; 
+            width: 90%; 
+            padding: 35px; 
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            text-align: center; 
+            transition: 0.3s;
+        }
+
+        .login-card h2 { 
+            margin-bottom: 10px; 
+            color: #007bff; 
+            font-size: 28px; 
+            cursor: pointer;
+        }
+
+        .login-card p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
         
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: #666; font-size: 14px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 600; }
         
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: #007bff; box-shadow: 0 0 5px rgba(0,123,255,0.2); }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #eee; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+            outline: none; 
+            transition: 0.3s; 
+        }
+
+        input:focus { border-color: #007bff; background: #fcfdfe; }
         
-        .btn-send { width: 100%; padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
-        .btn-send:hover { background: #0056b3; }
+        .btn-send { 
+            width: 100%; 
+            padding: 15px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: 0.3s; 
+        }
+
+        .btn-send:hover { background: #0056b3; transform: translateY(-2px); }
+        .btn-send:active { transform: translateY(0); }
         
-        #sms-section { display: none; margin-top: 20px; }
-        .change-phone { font-size: 13px; color: #007bff; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 15px; }
+        #sms-section { display: none; }
+        
+        .change-phone { 
+            font-size: 13px; 
+            color: #007bff; 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: inline-block; 
+            margin-top: 20px; 
+        }
         .change-phone:hover { text-decoration: underline; }
+
+        /* Стиль для проверочного кода (зеленый) */
+        .btn-verify { background: #28a745; }
+        .btn-verify:hover { background: #218838; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2 onclick="window.location.href='index.html'" style="cursor:pointer">Rogun.tj</h2>
+    <h2 onclick="window.location.href='index.html'">Rogun.tj</h2>
     
     <div id="phone-section">
-        <p style="color: #777; font-size: 14px; margin-bottom: 20px;">Введите ваш номер для входа или регистрации</p>
+        <p>Введите ваш номер для входа или регистрации</p>
         <div class="input-group">
             <label>Номер телефона</label>
             <input type="tel" id="phone-input" placeholder="+992 900 00 00 00" value="+992 ">
@@ -40,12 +105,13 @@
     </div>
 
     <div id="sms-section">
-        <p style="font-size: 14px; color: #555;">Код отправлен на номер: <br><strong id="display-phone"></strong></p>
+        <p>Код отправлен на номер: <br><strong id="display-phone" style="color: #333;"></strong></p>
         <div class="input-group">
             <label>Код из СМС</label>
-            <input type="number" id="sms-input" placeholder="0 0 0 0" maxlength="4">
+            <input type="number" id="sms-input" placeholder="0 0 0 0" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
         </div>
-        <button class="btn-send" style="background: #28a745;" id="btn-verify">Войти</button>
+        <button class="btn-send btn-verify" id="btn-verify">Войти</button>
+        <br>
         <a class="change-phone" id="btn-back">← Изменить номер</a>
     </div>
 </div>
@@ -61,51 +127,61 @@
     
     let generatedCode = null;
 
-    // 1. Обработка кнопки "Получить код"
+    // Контроль префикса +992
+    phoneInput.addEventListener('input', () => {
+        if (!phoneInput.value.startsWith('+992 ')) {
+            phoneInput.value = '+992 ';
+        }
+    });
+
+    // 1. Шаг: Получение кода
     document.getElementById('btn-get-code').onclick = () => {
         const phone = phoneInput.value.trim();
         
-        // Простая проверка длины (минимум +992 и 9 цифр)
+        // Проверка: +992 (4 символа) + 9 цифр = 13
         if (phone.length < 13) {
-            alert('Пожалуйста, введите полный номер телефона (+992 XXX XX XX XX)');
+            alert('Пожалуйста, введите корректный номер (+992 и 9 цифр)');
             return;
         }
 
-        // Генерируем случайный 4-значный код
+        // Имитация генерации и отправки кода
         generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         
-        // Показываем код в алерте (имитация реального СМС)
-        alert('ВАШ ПРОВЕРОЧНЫЙ КОД: ' + generatedCode); 
+        // В реальном проекте здесь будет запрос к API СМС-шлюза
+        alert('ВАШ СМС КОД: ' + generatedCode); 
         
-        // Переключаем интерфейс на ввод кода
+        // Переход к следующему экрану
         displayPhone.innerText = phone;
         phoneSection.style.display = 'none';
         smsSection.style.display = 'block';
         smsInput.focus();
     };
 
-    // 2. Обработка кнопки "Войти"
+    // 2. Шаг: Проверка кода и вход
     document.getElementById('btn-verify').onclick = () => {
         if (smsInput.value === generatedCode) {
-            // Формируем данные пользователя
+            // Создаем объект пользователя
             const userData = {
-                id: Date.now(), // Уникальный ID на основе времени
+                id: Date.now(),
                 phone: phoneInput.value.trim(),
                 name: "Пользователь",
-                email: phoneInput.value.trim() + "@rogun.tj" // Совместимость со старым кодом
+                email: phoneInput.value.trim().replace(/\s/g, '') + "@rogun.tj",
+                joinedAt: new Date().toLocaleDateString()
             };
             
-            // Сохраняем в localStorage через твой storage.js
+            // Сохраняем через твой модуль storage.js
             setCurrentUser(userData);
             
-            alert('Вы успешно вошли на Rogun.tj!');
-            window.location.href = 'index.html'; // Переход на главную
+            alert('Добро пожаловать на Rogun.tj!');
+            window.location.href = 'index.html'; 
         } else {
-            alert('Неверный код! Попробуйте еще раз или запросите новый.');
+            alert('Неверный код! Попробуйте еще раз.');
+            smsInput.value = '';
+            smsInput.focus();
         }
     };
 
-    // 3. Возврат к вводу номера
+    // Возврат назад
     document.getElementById('btn-back').onclick = (e) => {
         e.preventDefault();
         phoneSection.style.display = 'block';
