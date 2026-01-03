@@ -6,7 +6,7 @@
     <title>Вход — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Центрирование карточки на странице */
+        /* Центрирование карточки */
         body { 
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             display: flex; 
@@ -38,6 +38,7 @@
             font-size: 32px; 
             cursor: pointer;
             letter-spacing: -1px;
+            font-weight: 800;
         }
 
         .login-card p {
@@ -66,7 +67,6 @@
         .dark-mode input { background: #2d2d4d; border-color: #3d3d5d; color: white; }
 
         input:focus { border-color: #007bff; background: white; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
-        .dark-mode input:focus { background: #35355a; }
         
         .btn-primary { 
             width: 100%; 
@@ -79,10 +79,13 @@
             cursor: pointer; 
             font-size: 16px; 
             transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .btn-primary:hover { background: #0056b3; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,123,255,0.2); }
-        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:hover { background: #0056b3; transform: translateY(-2px); }
         
         #sms-section { display: none; }
         
@@ -95,14 +98,13 @@
             margin-top: 20px; 
             font-weight: 500;
         }
-        .change-phone:hover { text-decoration: underline; }
 
-        /* Имитация уведомления СМС */
+        /* Уведомление о коде (для тестов) */
         .debug-notice {
             display: none;
-            background: #fff4e6;
-            border-left: 5px solid #fd7e14;
-            color: #856404;
+            background: #e3f2fd;
+            border-left: 5px solid #007bff;
+            color: #0d47a1;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
@@ -117,7 +119,19 @@
         }
 
         .btn-verify { background: #28a745; }
-        .btn-verify:hover { background: #218838; box-shadow: 0 8px 15px rgba(40,167,69,0.2); }
+        .btn-verify:hover { background: #218838; }
+
+        .tg-link-btn {
+            background: #0088cc;
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -126,23 +140,26 @@
     <h2 onclick="window.location.href='index.html'">Rogun<span style="color:#28a745">.tj</span></h2>
     
     <div id="debug-notice" class="debug-notice">
-        <strong>📩 Новое сообщение:</strong><br>
-        Код подтверждения Rogun.tj: <span id="visual-code" style="font-weight: 800; font-size: 18px; color: #e67e22;"></span>
+        <strong>🤖 Telegram Бот:</strong><br>
+        Нажмите кнопку "Открыть бота", чтобы получить код. Ваш тестовый код: <span id="visual-code" style="font-weight: 800; font-size: 18px; color: #007bff;"></span>
     </div>
     
     <div id="phone-section">
-        <p>Для входа или регистрации введите ваш номер телефона</p>
+        <p>Войдите, чтобы публиковать объявления и управлять профилем</p>
         <div class="input-group">
             <label>Номер телефона</label>
             <input type="tel" id="phone-input" placeholder="+992 900 00 00 00">
         </div>
-        <button class="btn-primary" id="btn-get-code">Получить код</button>
+        <button class="btn-primary" id="btn-get-code">Получить код в Telegram</button>
     </div>
 
     <div id="sms-section">
-        <p>Мы отправили код на номер: <br><strong id="display-phone" style="color: #333;"></strong></p>
+        <p>Код отправлен в Telegram на номер: <br><strong id="display-phone" style="color: #007bff;"></strong></p>
+        
+        <a id="tg-bot-link" href="#" target="_blank" class="tg-link-btn">✈️ Открыть Telegram-бота</a>
+
         <div class="input-group">
-            <label>Код из СМС</label>
+            <label>Введите 4-значный код</label>
             <input type="text" id="sms-input" placeholder="· · · ·" maxlength="4" style="text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: bold;">
         </div>
         <button class="btn-primary btn-verify" id="btn-verify">Подтвердить и войти</button>
@@ -152,7 +169,7 @@
 </div>
 
 <script type="module">
-    import { setCurrentUser, getUsers, saveUsers } from './js/storage.js';
+    import { saveCurrentUser, getUsers, saveUsers } from './js/storage.js';
 
     const phoneSection = document.getElementById('phone-section');
     const smsSection = document.getElementById('sms-section');
@@ -161,38 +178,43 @@
     const displayPhone = document.getElementById('display-phone');
     const debugNotice = document.getElementById('debug-notice');
     const visualCode = document.getElementById('visual-code');
+    const tgBotLink = document.getElementById('tg-bot-link');
     
     let generatedCode = null;
 
-    // Авто-префикс при фокусе
+    // Авто-префикс
     phoneInput.addEventListener('focus', () => {
         if (phoneInput.value === '') phoneInput.value = '+992 ';
     });
 
-    // 1. Шаг: Генерация кода
+    // 1. Получение кода
     document.getElementById('btn-get-code').onclick = () => {
         const phone = phoneInput.value.trim();
         
         if (phone.length < 13) {
-            alert('Введите полный номер телефона (+992XXXXXXXXX)');
+            alert('Введите полный номер телефона');
             return;
         }
 
-        // Генерируем код
+        // Генерация кода
         generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         
-        // Показываем "СМС"
+        // Подготовка ссылки на бота (Замените YourBot на имя вашего бота)
+        const botName = 'RogunVerifyBot'; 
+        tgBotLink.href = `https://t.me/${botName}?start=${generatedCode}`;
+        
+        // Показываем подсказку
         visualCode.innerText = generatedCode;
         debugNotice.style.display = 'block';
         
-        // Переход к СМС
+        // Интерфейс
         displayPhone.innerText = phone;
         phoneSection.style.display = 'none';
         smsSection.style.display = 'block';
         smsInput.focus();
     };
 
-    // 2. Шаг: Проверка кода
+    // 2. Проверка кода и вход
     document.getElementById('btn-verify').onclick = () => {
         if (smsInput.value === generatedCode) {
             const phone = phoneInput.value.trim();
@@ -201,47 +223,38 @@
             let user = allUsers.find(u => u.phone === phone);
             
             if (!user) {
-                // Новый пользователь
                 user = {
                     id: Date.now(),
                     phone: phone,
-                    username: phone, // По умолчанию имя — номер
+                    username: 'Пользователь ' + phone.slice(-4),
                     registered: new Date().toLocaleDateString(),
-                    role: 'seller'
+                    verified: true
                 };
                 allUsers.push(user);
                 saveUsers(allUsers);
             }
             
-            // Вход
-            setCurrentUser(user);
-            
-            alert('С возвращением на Rogun.tj!');
+            saveCurrentUser(user);
             window.location.href = 'index.html'; 
         } else {
-            alert('Неверный код! Проверьте сообщение вверху.');
+            alert('Неверный код!');
             smsInput.value = '';
-            smsInput.focus();
         }
     };
 
-    // Кнопка назад
+    // Назад
     document.getElementById('btn-back').onclick = (e) => {
         e.preventDefault();
         phoneSection.style.display = 'block';
         smsSection.style.display = 'none';
         debugNotice.style.display = 'none';
-        smsInput.value = '';
     };
 
-    // Авто-проверка при вводе 4 цифр
+    // Авто-сабмит при 4 цифрах
     smsInput.oninput = () => {
-        if (smsInput.value.length === 4) {
-            document.getElementById('btn-verify').click();
-        }
+        if (smsInput.value.length === 4) document.getElementById('btn-verify').click();
     };
 
-    // Поддержка темной темы
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
 

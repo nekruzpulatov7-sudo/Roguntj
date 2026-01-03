@@ -6,7 +6,7 @@
     <title>Rogun.tj — Магазин объявлений</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ОСНОВНОЙ КРАСИВЫЙ ФОН */
+        /* ВАШИ ОРИГИНАЛЬНЫЕ СТИЛИ */
         body { 
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             background-attachment: fixed;
@@ -17,7 +17,6 @@
             transition: background 0.5s ease;
         }
 
-        /* ТЕМНАЯ ТЕМА */
         body.dark-mode { 
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
             color: white; 
@@ -25,7 +24,6 @@
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
 
-        /* ЭФФЕКТ СТЕКЛА ДЛЯ ШАПКИ */
         header { 
             background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(12px); 
@@ -44,7 +42,6 @@
 
         .header-content { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
 
-        /* БАННЕР С РОГУНСКОЙ ГЭС */
         .hero-banner {
             width: 100%;
             height: 400px;
@@ -62,7 +59,6 @@
 
         .hero-banner h2 { font-size: 38px; font-weight: 800; margin-bottom: 15px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
-        /* СТЕКЛЯННЫЙ ПОИСК ВНУТРИ БАННЕРА */
         .search-glass-box {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px);
@@ -86,7 +82,6 @@
         .dark-mode input, .dark-mode select { background: #1f1f3a; color: white; border-color: #333; }
         input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
-        /* НОВЫЙ БЛОК КАТЕГОРИЙ (СЕТКА С ИКОНКАМИ) */
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -124,10 +119,8 @@
         .category-item span { font-size: 13px; font-weight: 600; color: #444; }
         .dark-mode .category-item span { color: #ccc; }
 
-        /* СЕТКА ОБЪЯВЛЕНИЙ */
         .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding-bottom: 40px; }
 
-        /* КАРТОЧКА */
         .product-card { 
             background: white; 
             border-radius: 18px; 
@@ -160,6 +153,16 @@
             box-shadow: 0 4px 12px rgba(40,167,69,0.3); display: flex; align-items: center; justify-content: center;
         }
         .btn-add-main:hover { background: #218838; transform: scale(1.02); }
+
+        /* СТИЛЬ ДЛЯ МОДАЛЬНОГО ОКНА ПРОВЕРКИ КОДА */
+        .modal-tg {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white; margin: 15% auto; padding: 30px; border-radius: 20px; width: 300px; text-align: center;
+        }
+        .dark-mode .modal-content { background: #1f1f3a; color: white; }
 
         @media (max-width: 768px) {
             .hero-banner { height: 350px; }
@@ -230,6 +233,16 @@
     </div>
 </section>
 
+<div id="tg-modal" class="modal-tg">
+    <div class="modal-content">
+        <h3>Подтверждение</h3>
+        <p>Введите код из Telegram:</p>
+        <input type="text" id="input-tg-code" placeholder="00000" style="width: 80%; text-align: center; margin-bottom: 15px;">
+        <button id="verify-btn" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">Войти</button>
+        <button onclick="document.getElementById('tg-modal').style.display='none'" style="background:none; border:none; color:red; display:block; margin: 10px auto; cursor:pointer;">Отмена</button>
+    </div>
+</div>
+
 <div class="container">
     <div class="categories-grid" id="category-filter-container">
         <div class="category-item active" data-cat="">
@@ -283,17 +296,38 @@
     const themeBtn = document.getElementById('theme-toggle');
     const catItems = document.querySelectorAll('.category-item');
 
-    // Отображение кнопки входа или профиля
+    let generatedCode = null; // Здесь храним код для проверки
+
+    // ЛОГИКА ТЕЛЕГРАМ-БОТА
+    function startTgAuth() {
+        generatedCode = Math.floor(10000 + Math.random() * 90000);
+        window.open(`https://t.me/RogunBot?start=${generatedCode}`, '_blank');
+        document.getElementById('tg-modal').style.display = 'block';
+    }
+
+    document.getElementById('verify-btn').onclick = function() {
+        const userEntered = document.getElementById('input-tg-code').value;
+        if (userEntered == generatedCode) {
+            alert("✅ Успешный вход!");
+            document.getElementById('tg-modal').style.display = 'none';
+            // Тут можно добавить логику входа
+        } else {
+            alert("❌ Неверный код!");
+        }
+    };
+
     function renderUserMenu() {
         const user = getCurrentUser();
         if (user) {
             userMenu.innerHTML = `<a href="profile.html" style="text-decoration:none; color:#007bff; font-weight:600;">👤 Профиль</a>`;
         } else {
-            userMenu.innerHTML = `<a href="login.html" style="text-decoration:none; color:#007bff; font-weight:600;">Войти</a>`;
+            // Заменяем обычную ссылку на кнопку с вызовом функции
+            userMenu.innerHTML = `<a href="javascript:void(0)" id="login-link" style="text-decoration:none; color:#007bff; font-weight:600;">Войти</a>`;
+            document.getElementById('login-link').onclick = startTgAuth;
         }
     }
 
-    // Главная функция фильтрации и отрисовки
+    // ВАШИ ОРИГИНАЛЬНЫЕ ФУНКЦИИ
     function updateAds() {
         const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
@@ -314,7 +348,7 @@
             adsContainer.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 80px; color: #888;">
                     <div style="font-size: 50px;">🔍</div>
-                    <p style="font-size: 18px; margin-top: 10px;">Ничего не нашли по вашему запросу</p>
+                    <p style="font-size: 18px; margin-top: 10px;">Ничего не нашли</p>
                 </div>`;
             return;
         }
@@ -339,7 +373,6 @@
         });
     }
 
-    // Обработка клика по категориям
     catItems.forEach(item => {
         item.onclick = () => {
             catItems.forEach(i => i.classList.remove('active'));
@@ -348,11 +381,9 @@
         };
     });
 
-    // Живой поиск и фильтр по регионам
     searchInput.oninput = updateAds;
     regionFilter.onchange = updateAds;
     
-    // Переключатель темы
     themeBtn.onclick = () => {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');

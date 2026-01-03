@@ -11,7 +11,10 @@
 export function getAds() {
     try {
         const data = localStorage.getItem('ads');
-        if (!data || data === "undefined" || data === "null") return [];
+        if (!data || data === "undefined" || data === "null") {
+            // Если база пуста, можно вернуть пустой массив или демо-данные
+            return []; 
+        }
         return JSON.parse(data);
     } catch (e) {
         console.error("Ошибка чтения базы объявлений:", e);
@@ -38,6 +41,8 @@ export function saveAds(ads) {
  */
 export function saveAd(newAd) {
     const ads = getAds();
+    // Генерируем ID если его нет
+    if (!newAd.id) newAd.id = Date.now();
     ads.push(newAd);
     saveAds(ads);
 }

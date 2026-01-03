@@ -12,7 +12,6 @@
             min-height: 100vh;
         }
         
-        /* Стили формы поверх базового style.css */
         .form-card { 
             background: white; 
             padding: 30px; 
@@ -53,7 +52,6 @@
             border: 2px dashed #007bff; border-radius: 15px; padding: 30px;
             cursor: pointer; background: rgba(0,123,255,0.02); transition: 0.3s;
         }
-        .photo-upload-label:hover { background: rgba(0,123,255,0.08); }
         
         #preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .preview-item { position: relative; height: 100px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; }
@@ -69,8 +67,8 @@
             width: 100%; border-radius: 14px; font-size: 18px; font-weight: 800; 
             cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(40,167,69,0.3);
         }
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(40,167,69,0.4); }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn-submit:hover { transform: translateY(-3px); }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
 
         .back-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .back-link { text-decoration: none; color: inherit; font-weight: 600; font-size: 14px; opacity: 0.7; }
@@ -80,7 +78,7 @@
 
 <header>
     <div class="header-container">
-        <h1 onclick="location.href='index.html'">Rogun<span>.tj</span></h1>
+        <h1 onclick="location.href='index.html'" style="cursor:pointer">Rogun<span>.tj</span></h1>
         <div class="back-nav">
             <a href="index.html" class="back-link">← Вернуться на главную</a>
         </div>
@@ -175,7 +173,7 @@
 
             <div class="form-group">
                 <label>Описание</label>
-                <textarea id="description" rows="5" placeholder="Опишите состояние, комплектацию или условия..." required></textarea>
+                <textarea id="description" rows="5" placeholder="Опишите состояние, комплектацию..." required></textarea>
             </div>
 
             <button type="submit" class="btn-submit" id="submit-btn">Опубликовать объявление</button>
@@ -185,11 +183,11 @@
 
 <script type="module">
     import { saveAd, getCurrentUser } from './js/storage.js';
-    import { verifyPhone } from './js/auth.js';
+    import { verifyViaTelegram } from './js/auth.js'; // Используем новую функцию из auth.js
 
     const user = getCurrentUser();
     if (!user) {
-        alert("Только зарегистрированные пользователи могут подавать объявления.");
+        alert("Для подачи объявления необходимо войти в аккаунт.");
         window.location.href = "login.html";
     }
 
@@ -200,6 +198,11 @@
     const previewContainer = document.getElementById('preview-container');
     const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
+
+    // Присваиваем номер пользователя из профиля в поле ввода
+    if (user && user.phone) {
+        phoneInput.value = user.phone;
+    }
 
     // Маска телефона +992
     phoneInput.addEventListener('input', (e) => {
@@ -226,7 +229,7 @@
         }
     });
 
-    // Фото
+    // Обработка фото
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
         if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фотографий.");
@@ -248,19 +251,21 @@
         });
     });
 
-    // Отправка
+    // Финальная отправка
     form.onsubmit = async (e) => {
         e.preventDefault();
         
-        if (phoneInput.value.length < 18) return alert("Введите корректный номер телефона.");
+        if (phoneInput.value.length < 13) return alert("Введите корректный номер телефона.");
 
-        // Верификация (вызывает SMS-модалку из auth.js)
-        const isVerified = await verifyPhone(phoneInput.value);
+        // ПРОВЕРКА ЧЕРЕЗ TELEGRAM (Если пользователь еще не верифицирован)
+        // Если вы хотите, чтобы проверка была каждый раз - оставляем так.
+        // Если только один раз при входе - можно это условие пропустить.
+        const isVerified = await verifyViaTelegram(phoneInput.value);
         if (!isVerified) return;
 
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.textContent = "Сохранение...";
+        btn.textContent = "Публикация...";
 
         const extraParams = {};
         document.querySelectorAll('.param-input').forEach(input => extraParams[input.id] = input.value);
@@ -284,7 +289,7 @@
             alert("Объявление успешно опубликовано!");
             window.location.href = "index.html";
         } catch (err) {
-            alert("Ошибка сохранения. Возможно, изображения слишком большие.");
+            alert("Ошибка: изображения слишком тяжелые. Попробуйте фото меньшего размера.");
             btn.disabled = false;
             btn.textContent = "Опубликовать объявление";
         }
