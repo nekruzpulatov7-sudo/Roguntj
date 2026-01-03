@@ -15,12 +15,10 @@
             min-height: 100vh; 
             margin: 0; 
             font-family: 'Segoe UI', Roboto, sans-serif; 
+            transition: background 0.3s;
         }
 
-        /* Стиль для темной темы, если она включена в системе */
-        @media (prefers-color-scheme: dark) {
-            body.dark-mode { background: #1a1a2e; }
-        }
+        body.dark-mode { background: #121225; }
 
         .login-card { 
             max-width: 400px; 
@@ -32,6 +30,7 @@
             text-align: center; 
             transition: 0.3s ease;
         }
+        .dark-mode .login-card { background: #1f1f3a; color: white; }
 
         .login-card h2 { 
             margin-bottom: 5px; 
@@ -47,9 +46,11 @@
             margin-bottom: 25px;
             line-height: 1.5;
         }
+        .dark-mode .login-card p { color: #aaa; }
         
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: #444; font-size: 14px; font-weight: 600; }
+        .dark-mode .input-group label { color: #ccc; }
         
         input { 
             width: 100%; 
@@ -62,8 +63,10 @@
             transition: 0.2s; 
             background: #f8fafc;
         }
+        .dark-mode input { background: #2d2d4d; border-color: #3d3d5d; color: white; }
 
         input:focus { border-color: #007bff; background: white; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
+        .dark-mode input:focus { background: #35355a; }
         
         .btn-primary { 
             width: 100%; 
@@ -94,7 +97,7 @@
         }
         .change-phone:hover { text-decoration: underline; }
 
-        /* Имитация всплывающего уведомления СМС */
+        /* Имитация уведомления СМС */
         .debug-notice {
             display: none;
             background: #fff4e6;
@@ -131,7 +134,7 @@
         <p>Для входа или регистрации введите ваш номер телефона</p>
         <div class="input-group">
             <label>Номер телефона</label>
-            <input type="tel" id="phone-input" placeholder="+992 900 00 00 00" value="+992 ">
+            <input type="tel" id="phone-input" placeholder="+992 900 00 00 00">
         </div>
         <button class="btn-primary" id="btn-get-code">Получить код</button>
     </div>
@@ -161,70 +164,68 @@
     
     let generatedCode = null;
 
-    // Авто-префикс для удобства
+    // Авто-префикс при фокусе
     phoneInput.addEventListener('focus', () => {
         if (phoneInput.value === '') phoneInput.value = '+992 ';
     });
 
-    // 1. Шаг: Генерация кода (Имитация отправки СМС)
+    // 1. Шаг: Генерация кода
     document.getElementById('btn-get-code').onclick = () => {
         const phone = phoneInput.value.trim();
         
-        // Валидация (минимум 13 символов для формата +992 000000000)
         if (phone.length < 13) {
-            alert('Введите полный номер телефона в формате +992XXXXXXXXX');
+            alert('Введите полный номер телефона (+992XXXXXXXXX)');
             return;
         }
 
-        // Генерируем случайный 4-значный код
+        // Генерируем код
         generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         
-        // Показываем "СМС" в тестовом окне
+        // Показываем "СМС"
         visualCode.innerText = generatedCode;
         debugNotice.style.display = 'block';
         
-        // Анимация перехода
+        // Переход к СМС
         displayPhone.innerText = phone;
         phoneSection.style.display = 'none';
         smsSection.style.display = 'block';
         smsInput.focus();
     };
 
-    // 2. Шаг: Проверка кода и создание/вход в профиль
+    // 2. Шаг: Проверка кода
     document.getElementById('btn-verify').onclick = () => {
         if (smsInput.value === generatedCode) {
             const phone = phoneInput.value.trim();
             const allUsers = getUsers() || [];
             
-            // Проверяем, существует ли пользователь с таким номером
             let user = allUsers.find(u => u.phone === phone);
             
             if (!user) {
-                // Если нет — создаем нового
+                // Новый пользователь
                 user = {
                     id: Date.now(),
                     phone: phone,
-                    name: "Пользователь Рогуна",
+                    username: phone, // По умолчанию имя — номер
                     registered: new Date().toLocaleDateString(),
-                    avatarColor: '#007bff'
+                    role: 'seller'
                 };
                 allUsers.push(user);
                 saveUsers(allUsers);
             }
             
-            // Сохраняем как текущего пользователя
+            // Вход
             setCurrentUser(user);
             
-            alert('Вы успешно вошли!');
+            alert('С возвращением на Rogun.tj!');
             window.location.href = 'index.html'; 
         } else {
-            alert('Неверный код! Посмотрите на оранжевое уведомление вверху карточки.');
+            alert('Неверный код! Проверьте сообщение вверху.');
             smsInput.value = '';
             smsInput.focus();
         }
     };
 
-    // Кнопка назад (если ошибся в номере)
+    // Кнопка назад
     document.getElementById('btn-back').onclick = (e) => {
         e.preventDefault();
         phoneSection.style.display = 'block';
@@ -233,12 +234,15 @@
         smsInput.value = '';
     };
 
-    // Автоматический вход при вводе 4 цифр
+    // Авто-проверка при вводе 4 цифр
     smsInput.oninput = () => {
         if (smsInput.value.length === 4) {
             document.getElementById('btn-verify').click();
         }
     };
+
+    // Поддержка темной темы
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
 
 </body>
