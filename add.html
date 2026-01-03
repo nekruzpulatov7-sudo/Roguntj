@@ -81,7 +81,9 @@
                     <option value="Рудаки">Рудаки</option>
                     <option value="Сангвор">Сангвор</option>
                     <option value="Лахш">Лахш</option>
-                    <optgroup label="Согдийская область">
+                </optgroup>
+
+                <optgroup label="Согдийская область">
                     <option value="Айни">Айни</option>
                     <option value="Ашт">Ашт</option>
                     <option value="Б.Гафуров">Б.Гафуров</option>
@@ -122,6 +124,9 @@
                 </optgroup>
             </select>
 
+            <label>Описание</label>
+            <textarea id="description" rows="4" placeholder="Напишите подробнее о товаре (состояние, торг и т.д.)"></textarea>
+
             <label>Ваш номер телефона</label>
             <input type="tel" id="phone" placeholder="+992" required>
 
@@ -143,14 +148,14 @@
     const preview = document.getElementById('image-preview');
     const phoneInput = document.getElementById('phone');
     const submitBtn = document.getElementById('submit-btn');
-    const user = getCurrentUser();
-
+    
     // 1. Проверка авторизации
+    const user = getCurrentUser();
     if (!user) {
         alert("Пожалуйста, войдите в аккаунт, чтобы добавить объявление");
         window.location.href = 'login.html';
     } else {
-        phoneInput.value = user.phone;
+        phoneInput.value = user.phone || '';
     }
 
     // 2. Предпросмотр фото
@@ -168,7 +173,7 @@
         });
     };
 
-    // 3. Функция сжатия фото
+    // 3. Функция сжатия фото (уменьшаем размер для LocalStorage)
     async function compressImage(base64) {
         return new Promise(resolve => {
             const img = new Image();
@@ -176,12 +181,12 @@
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const maxWidth = 600; 
+                const maxWidth = 500; 
                 const scale = maxWidth / img.width;
                 canvas.width = maxWidth;
                 canvas.height = img.height * scale;
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.5)); 
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); 
             };
         });
     }
@@ -193,12 +198,12 @@
         submitBtn.disabled = true;
         const msg = document.getElementById('message');
         msg.style.color = "#333";
-        msg.innerText = "Сжимаем фото и сохраняем...";
-
-        const files = Array.from(imageInput.files).slice(0, 5);
-        const compressedImages = [];
+        msg.innerText = "Загрузка...";
 
         try {
+            const files = Array.from(imageInput.files).slice(0, 5);
+            const compressedImages = [];
+
             for (const file of files) {
                 const base64 = await new Promise(r => {
                     const reader = new FileReader();
@@ -217,6 +222,7 @@
                 phone: phoneInput.value,
                 region: document.getElementById('region').value,
                 category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
                 images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190?text=Нет+фото'],
                 createdAt: new Date().toLocaleDateString('ru-RU')
             };
@@ -226,13 +232,13 @@
             saveAds(ads);
             
             msg.style.color = "green";
-            msg.innerText = "Объявление успешно опубликовано!";
-            setTimeout(() => window.location.href = 'index.html', 1200);
+            msg.innerText = "Успешно опубликовано!";
+            setTimeout(() => window.location.href = 'index.html', 1000);
 
         } catch(error) {
             console.error(error);
             msg.style.color = "red";
-            msg.innerText = "Ошибка сохранения. Возможно, память переполнена.";
+            msg.innerText = "Ошибка. Возможно, фото слишком тяжелые.";
             submitBtn.disabled = false;
         }
     };
