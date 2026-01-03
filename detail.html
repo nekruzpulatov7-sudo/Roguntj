@@ -49,6 +49,7 @@
             background: #f8fafc; border-radius: 18px; 
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
+        .dark-mode .main-img-wrapper { background: #16213e; }
         .main-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: opacity 0.3s ease; }
         
         .thumbs { display: flex; gap: 12px; margin-top: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
@@ -70,6 +71,13 @@
         .dark-mode .meta-item { color: #bbb; }
         .meta-icon { width: 20px; text-align: center; }
         
+        /* ДИНАМИЧЕСКИЕ ПАРАМЕТРЫ (Марка, Год и т.д.) */
+        .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .param-box { background: #f8fafc; padding: 10px 15px; border-radius: 12px; font-size: 14px; }
+        .dark-mode .param-box { background: rgba(255,255,255,0.05); }
+        .param-box span { color: #888; display: block; font-size: 12px; }
+        .param-box b { color: inherit; }
+
         /* КОНТАКТЫ */
         .contact-box { background: #f0f7ff; padding: 25px; border-radius: 20px; margin-top: auto; text-align: center; border: 1px solid rgba(0,123,255,0.1); }
         .dark-mode .contact-box { background: rgba(0,123,255,0.05); border-color: rgba(0,123,255,0.2); }
@@ -98,6 +106,7 @@
             .main-img-wrapper { height: 320px; }
             .detail-title { font-size: 24px; }
             .detail-price { font-size: 30px; }
+            .params-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -121,24 +130,25 @@
 
     const container = document.getElementById('product-detail');
 
-    // 1. Извлекаем ID объявления из ссылки
+    // Проверка темы при загрузке
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // 1. Извлекаем ID объявления
     const urlParams = new URLSearchParams(window.location.search);
     const adId = parseInt(urlParams.get('id'));
 
-    // 2. Ищем объявление в базе данных
+    // 2. Ищем объявление
     const allAds = getAds() || [];
     const ad = allAds.find(item => item.id === adId);
 
-    // Функция переключения фото
+    // Функция переключения фото (глобальная для onclick)
     window.changePhoto = (src, el) => {
         const mainImg = document.getElementById('main-img');
         if (!mainImg) return;
-
-        // Визуальное выделение активной миниатюры
         document.querySelectorAll('.thumbs img').forEach(img => img.classList.remove('active'));
         el.classList.add('active');
-
-        // Эффект смены
         mainImg.style.opacity = '0';
         setTimeout(() => {
             mainImg.src = src;
@@ -151,76 +161,81 @@
             <div style="text-align:center; padding: 80px 20px;">
                 <h2 style="font-size: 60px; margin:0;">🔍</h2>
                 <h2 style="color: #333; margin-top:20px;">Объявление не найдено</h2>
-                <p style="color: #777;">Возможно, оно было удалено или перемещено.</p>
-                <br>
-                <a href="index.html" style="background:#007bff; color:white; padding:15px 30px; border-radius:14px; text-decoration:none; font-weight:bold; display:inline-block;">Вернуться к поиску</a>
+                <a href="index.html" style="background:#007bff; color:white; padding:15px 30px; border-radius:14px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:20px;">На главную</a>
             </div>`;
     } else {
         renderDetail(ad);
     }
 
     function renderDetail(ad) {
-        // Проверка наличия фото
-        const images = ad.images && ad.images.length > 0 ? ad.images : ['https://via.placeholder.com/600x450?text=Фото+отсутствует'];
+        const images = ad.images && ad.images.length > 0 ? ad.images : ['https://via.placeholder.com/600x450?text=Нет+фото'];
         
         let thumbsHtml = '';
         if (images.length > 1) {
             images.forEach((img, index) => {
-                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" alt="фото ${index+1}" onclick="window.changePhoto('${img}', this)">`;
+                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="window.changePhoto('${img}', this)">`;
             });
+        }
+
+        // Рендер динамических параметров (Марка, Год и т.д.)
+        let paramsHtml = '';
+        if (ad.params) {
+            paramsHtml = '<div class="params-grid">';
+            for (const [key, value] of Object.entries(ad.params)) {
+                if (value) {
+                    paramsHtml += `
+                        <div class="param-box">
+                            <span>${key}</span>
+                            <b>${value}</b>
+                        </div>`;
+                }
+            }
+            paramsHtml += '</div>';
         }
 
         container.innerHTML = `
             <div class="detail-main">
                 <div class="detail-gallery">
                     <div class="main-img-wrapper">
-                        <img src="${images[0]}" id="main-img" class="main-img" alt="${ad.title}">
+                        <img src="${images[0]}" id="main-img" class="main-img">
                     </div>
                     <div class="thumbs">${thumbsHtml}</div>
                 </div>
                 
                 <div class="detail-info">
-                    <span class="category-tag">${ad.category}</span>
+                    <span class="category-tag">${ad.category || 'Общее'}</span>
                     <h1 class="detail-title">${ad.title}</h1>
                     <div class="detail-price">${Number(ad.price).toLocaleString()} TJS</div>
                     
+                    ${paramsHtml}
+
                     <div class="meta-list">
                         <div class="meta-item"><span class="meta-icon">📍</span> <b>Регион:</b> ${ad.region || 'Рогун'}</div>
-                        <div class="meta-item"><span class="meta-icon">📅</span> <b>Опубликовано:</b> ${ad.createdAt || 'Недавно'}</div>
-                        <div class="meta-item"><span class="meta-icon">🏷️</span> <b>ID объявления:</b> ${ad.id}</div>
+                        <div class="meta-item"><span class="meta-icon">📅</span> <b>Дата:</b> ${ad.createdAt || 'Не указана'}</div>
+                        <div class="meta-item"><span class="meta-icon">🆔</span> <b>ID:</b> ${ad.id}</div>
                     </div>
                     
                     <div class="contact-box">
                         <button class="btn-show-phone" id="btn-phone">📞 Показать номер</button>
                         <div class="phone-number" id="phone-val">
                             <a href="tel:${ad.phone}">${ad.phone}</a>
-                            <p style="font-size:12px; color:#888; margin-top:5px;">Скажите продавцу, что нашли его на Rogun.tj</p>
+                            <p style="font-size:12px; color:#888; margin-top:5px;">Скажите, что вы с Rogun.tj</p>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="description-section">
-                <h3 style="font-size: 22px; margin-bottom: 20px; font-weight: 800;">Описание товара</h3>
+                <h3 style="margin-bottom: 15px;">Описание</h3>
                 <div class="desc-text">${ad.description || 'Описание отсутствует.'}</div>
             </div>
         `;
 
-        // Логика кнопки показа телефона
-        const btnPhone = document.getElementById('btn-phone');
-        const valPhone = document.getElementById('phone-val');
-        
-        if (btnPhone) {
-            btnPhone.onclick = () => {
-                btnPhone.style.display = 'none';
-                valPhone.style.display = 'block';
-            };
-        }
-
-        // Проверка темной темы
-        if(localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
+        // Логика кнопки номера
+        document.getElementById('btn-phone').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('phone-val').style.display = 'block';
+        };
     }
 </script>
 

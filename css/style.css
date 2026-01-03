@@ -8,11 +8,12 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: #f1f3f5;
     color: #222;
     transition: background 0.3s, color 0.3s;
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 body.dark-mode {
@@ -26,10 +27,13 @@ body.dark-mode header {
 
 body.dark-mode .product-card, 
 body.dark-mode .ad-page, 
-body.dark-mode .modal-content {
+body.dark-mode .modal-content,
+body.dark-mode .dynamic-section,
+body.dark-mode .sms-content {
     background: #1e1e1e;
     color: #eee;
     box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    border-color: #333;
 }
 
 body.dark-mode input, 
@@ -88,8 +92,18 @@ nav a:hover, nav a.active {
     background: rgba(255,255,255,0.2);
 }
 
+.btn-theme {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
 /* =========================================
-   БАННЕР С РОГУНСКОЙ ГЭС (ГОРЫ, ОЗЕРО, ГЭС)
+   БАННЕР С РОГУНСКОЙ ГЭС
 ========================================= */
 .hero-section {
     width: 100%;
@@ -105,7 +119,7 @@ nav a:hover, nav a.active {
     color: white;
     text-align: center;
     text-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    border-bottom: 5px solid #28a745; /* Зеленая линия как символ энергии */
+    border-bottom: 5px solid #28a745;
 }
 
 .hero-section h2 {
@@ -119,47 +133,35 @@ nav a:hover, nav a.active {
 .hero-section p {
     font-size: 20px;
     margin-top: 15px;
-    background: rgba(0, 123, 255, 0.8); /* Фирменный синий фон для текста */
+    background: rgba(0, 123, 255, 0.8);
     padding: 8px 25px;
     border-radius: 50px;
     font-weight: 600;
 }
 
 /* =========================================
-   КНОПКИ
+   КАТЕГОРИИ И ПОИСК
 ========================================= */
-.btn {
-    background: #fff;
-    color: #007bff;
+.search-container {
+    max-width: 800px;
+    margin: -30px auto 20px;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.search-container input {
+    flex: 1;
+    padding: 15px 25px;
+    border-radius: 30px;
     border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    font-size: 16px;
+    outline: none;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    background: #f8f9fa;
-}
-
-.btn-primary {
-    background: #007bff;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #0056b3;
-}
-
-/* =========================================
-   КАТЕГОРИИ
-========================================= */
 .categories-nav {
     display: flex;
     flex-wrap: wrap;
@@ -208,6 +210,9 @@ nav a:hover, nav a.active {
     transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
 .product-card:hover {
@@ -217,74 +222,129 @@ nav a:hover, nav a.active {
 
 .product-card img {
     width: 100%;
-    height: 200px;
+    height: 190px;
     object-fit: cover;
+}
+
+.product-card .card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .product-card .price {
     font-size: 20px;
     font-weight: 800;
     color: #28a745;
-    margin: 12px 15px 5px;
+    margin-bottom: 5px;
 }
 
 .product-card .title {
     font-size: 16px;
-    margin: 5px 15px;
     font-weight: 600;
+    margin-bottom: 8px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     height: 42px;
+    color: inherit;
+    line-height: 1.3;
 }
 
-.product-card .category {
+.params-preview {
     font-size: 13px;
-    color: #777;
-    margin: 5px 15px 15px;
+    color: #6c757d;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Иконка избранного */
-.fav-icon {
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #888;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* =========================================
+   ИЗБРАННОЕ (СЕРДЕЧКО)
+========================================= */
+.fav-btn {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
     width: 36px;
     height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    z-index: 2;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    z-index: 10;
+    transition: 0.3s;
 }
 
-.fav-icon.active { color: #ff9800; }
+.fav-btn svg { width: 20px; height: 20px; color: #666; transition: 0.3s; fill: none; }
+.fav-btn.active svg { fill: #ff4757; stroke: #ff4757; animation: heartBeat 0.4s ease; }
 
-/* =========================================
-   СТРАНИЦА ОБЪЯВЛЕНИЯ (DETAIL)
-========================================= */
-.ad-page {
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
 }
 
 /* =========================================
-   ФУТЕР
+   ВЕРИФИКАЦИЯ И СМС (НОВОЕ)
 ========================================= */
-footer {
-    background: #007bff;
-    color: #fff;
-    padding: 30px 0;
+.sms-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.sms-content {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
     text-align: center;
-    margin-top: 50px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
+
+.sms-code-input {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.code-digit {
+    width: 50px;
+    height: 65px;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #e1e1e1;
+    border-radius: 12px;
+    background: #f8f9fa;
+    outline: none;
+    transition: 0.2s;
+}
+
+.code-digit:focus { border-color: #007bff; background: #fff; box-shadow: 0 0 10px rgba(0,123,255,0.1); }
 
 /* =========================================
    АДАПТИВНОСТЬ
@@ -292,14 +352,8 @@ footer {
 @media (max-width: 768px) {
     .hero-section { height: 250px; }
     .hero-section h2 { font-size: 28px; }
-    .hero-section p { font-size: 16px; }
-    
-    .header-container {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .ads-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
+    .header-container { flex-direction: column; gap: 15px; }
+    .ads-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .product-card img { height: 140px; }
+    .hero-section p { font-size: 14px; padding: 5px 15px; }
 }

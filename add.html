@@ -45,7 +45,12 @@
         }
         input:focus, select:focus, textarea:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
 
-        /* Специальный стиль для цены */
+        .dynamic-section {
+            background: #f0f4f8; padding: 20px; border-radius: 15px; margin-top: 10px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        }
+        .dark-mode .dynamic-section { background: #2a2a4a; }
+
         #price { font-weight: bold; color: #28a745; font-size: 18px; }
 
         .photo-upload-label {
@@ -97,10 +102,11 @@
             <div class="form-group">
                 <label>Категория</label>
                 <select id="category" required>
-                    <option value="Продукты">🍎 Продукты</option>
+                    <option value="">Выберите категорию</option>
                     <option value="Электроника">📱 Техника</option>
                     <option value="Транспорт">🚗 Авто</option>
                     <option value="Недвижимость">🏠 Жилье</option>
+                    <option value="Продукты">🍎 Продукты</option>
                     <option value="Одежда">👕 Одежда</option>
                     <option value="Для дома">🛋️ Для дома</option>
                     <option value="Услуги">🛠️ Услуги</option>
@@ -108,9 +114,16 @@
                 </select>
             </div>
 
+            <div id="dynamic-params-container"></div>
+
             <div class="form-group">
                 <label>Цена (TJS)</label>
                 <input type="number" id="price" placeholder="Укажите цену" required min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Номер телефона для связи</label>
+                <input type="text" id="phone" placeholder="+992 (__) ___-__-__" required>
             </div>
 
             <div class="form-group">
@@ -166,7 +179,7 @@
 
             <div class="form-group">
                 <label>Описание</label>
-                <textarea id="description" rows="5" placeholder="Подробно опишите ваш товар... (состояние, причина продажи и т.д.)" required></textarea>
+                <textarea id="description" rows="5" placeholder="Подробно опишите ваш товар..." required></textarea>
             </div>
 
             <button type="submit" class="btn-submit">Опубликовать</button>
@@ -176,6 +189,7 @@
 
 <script type="module">
     import { saveAd, getCurrentUser } from './js/storage.js';
+    import { verifyPhone } from './js/auth.js';
 
     // 1. Проверка авторизации
     const user = getCurrentUser();
@@ -185,36 +199,52 @@
     }
 
     const form = document.getElementById('add-ad-form');
+    const categorySelect = document.getElementById('category');
+    const dynamicContainer = document.getElementById('dynamic-params-container');
     const photoInput = document.getElementById('photo-input');
     const previewContainer = document.getElementById('preview-container');
+    const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
 
-    // 2. Обработка превью фотографий
+    // --- МАСКА ТЕЛЕФОНА +992 ---
+    phoneInput.addEventListener('input', (e) => {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
+        if (!x[1]) { e.target.value = '+992 '; return; }
+        if (!e.target.value.startsWith('+992')) e.target.value = '+992 ' + e.target.value.replace('+992', '');
+        e.target.value = !x[3] ? `+${x[1]} (${x[2]}` : `+${x[1]} (${x[2]}) ${x[3]}` + (x[4] ? `-${x[4]}` : '') + (x[5] ? `-${x[5]}` : '');
+    });
+
+    // --- ДИНАМИЧЕСКИЕ ПАРАМЕТРЫ ---
+    categorySelect.addEventListener('change', () => {
+        const cat = categorySelect.value;
+        dynamicContainer.innerHTML = '';
+        if (cat === 'Транспорт') {
+            dynamicContainer.innerHTML = `<div class="dynamic-section">
+                <input type="text" id="brand" placeholder="Марка" class="param-input" required>
+                <input type="number" id="year" placeholder="Год" class="param-input" required>
+            </div>`;
+        } else if (cat === 'Недвижимость') {
+            dynamicContainer.innerHTML = `<div class="dynamic-section">
+                <input type="number" id="rooms" placeholder="Комнат" class="param-input" required>
+                <input type="number" id="area" placeholder="м²" class="param-input" required>
+            </div>`;
+        }
+    });
+
+    // --- ОБРАБОТКА ФОТО ---
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        
-        // Лимит 5 фото, чтобы не перегружать localStorage
-        if (uploadedImages.length + files.length > 5) {
-            alert("Максимум 5 фотографий.");
-            return;
-        }
-
+        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фото.");
         files.forEach(file => {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                const base64 = event.target.result;
-                uploadedImages.push(base64);
-                
+            reader.onload = (ev) => {
+                uploadedImages.push(ev.target.result);
                 const div = document.createElement('div');
                 div.className = 'preview-item';
-                div.innerHTML = `
-                    <img src="${base64}">
-                    <button type="button" class="remove-btn">×</button>
-                `;
-                
+                div.innerHTML = `<img src="${ev.target.result}"><button type="button" class="remove-btn">×</button>`;
                 div.querySelector('.remove-btn').onclick = () => {
                     div.remove();
-                    uploadedImages = uploadedImages.filter(img => img !== base64);
+                    uploadedImages = uploadedImages.filter(img => img !== ev.target.result);
                 };
                 previewContainer.appendChild(div);
             };
@@ -222,13 +252,23 @@
         });
     });
 
-    // 3. Сохранение объявления
-    form.onsubmit = (e) => {
+    // --- СОХРАНЕНИЕ С ВЕРИФИКАЦИЕЙ ---
+    form.onsubmit = async (e) => {
         e.preventDefault();
+        
+        const phoneValue = phoneInput.value;
+        if (phoneValue.length < 18) return alert("Введите полный номер телефона.");
+
+        // ЗАПУСК SMS ВЕРИФИКАЦИИ
+        const isVerified = await verifyPhone(phoneValue);
+        if (!isVerified) return;
 
         const btn = e.submitter;
         btn.disabled = true;
-        btn.textContent = "Сохранение...";
+        btn.textContent = "Публикация...";
+
+        const extraParams = {};
+        document.querySelectorAll('.param-input').forEach(input => extraParams[input.id] = input.value);
 
         const newAd = {
             id: Date.now(),
@@ -237,9 +277,9 @@
             price: document.getElementById('price').value,
             region: document.getElementById('region').value,
             description: document.getElementById('description').value,
-            // Если фото нет, ставим заглушку
+            params: extraParams,
             images: uploadedImages.length > 0 ? uploadedImages : ['https://via.placeholder.com/600x400?text=Нет+фото'],
-            phone: user.phone || 'Номер не указан',
+            phone: phoneValue,
             createdAt: new Date().toLocaleDateString('ru-RU'),
             userId: user.id
         };
@@ -248,16 +288,13 @@
             saveAd(newAd);
             alert("Объявление успешно опубликовано!");
             window.location.href = "index.html";
-        } catch (error) {
-            console.error("Ошибка:", error);
-            alert("Ошибка: память браузера переполнена. Попробуйте загрузить фото меньшего размера.");
+        } catch (err) {
+            alert("Ошибка! Возможно, фото слишком тяжелые.");
             btn.disabled = false;
-            btn.textContent = "Опубликовать";
         }
     };
 
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
-
 </body>
 </html>

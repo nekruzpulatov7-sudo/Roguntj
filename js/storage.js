@@ -1,14 +1,14 @@
 /**
  * Rogun.tj - Модуль управления данными (LocalStorage)
+ * Финальная версия с поддержкой удаления и редактирования
  */
 
-// --- ОБЪЯВЛЕНИЯ ---
+// --- ОБЪЯВЛЕНИЯ (ADS) ---
 
-// Получение всех объявлений
+// 1. Получение всех объявлений
 export function getAds() {
     try {
         const data = localStorage.getItem('ads');
-        // Проверка на пустоту или некорректные данные
         if (!data || data === "undefined" || data === "null") return [];
         return JSON.parse(data);
     } catch (e) {
@@ -17,22 +17,35 @@ export function getAds() {
     }
 }
 
-// Сохранение массива объявлений
+// 2. Сохранение всего массива объявлений (перезапись)
 export function saveAds(ads) {
     try {
         localStorage.setItem('ads', JSON.stringify(ads));
     } catch (e) {
-        // Обработка переполнения памяти (LocalStorage ограничен ~5-10 МБ)
         if (e.name === 'QuotaExceededError') {
-            alert('Ошибка: Память браузера переполнена! Попробуйте загружать фото меньшего размера или удалите старые объявления.');
+            alert('Ошибка: Память браузера переполнена! Фото слишком тяжелые.');
         }
         console.error("Ошибка записи объявлений:", e);
     }
 }
 
-// --- ПОЛЬЗОВАТЕЛИ ---
+// 3. Добавление одного нового объявления в список
+export function saveAd(newAd) {
+    const ads = getAds();
+    ads.push(newAd);
+    saveAds(ads);
+}
 
-// Получение списка всех зарегистрированных пользователей
+// 4. Удаление объявления по ID
+export function deleteAd(adId) {
+    let ads = getAds();
+    ads = ads.filter(ad => ad.id !== adId);
+    saveAds(ads);
+}
+
+// --- ПОЛЬЗОВАТЕЛИ (USERS) ---
+
+// 5. Получение списка всех пользователей
 export function getUsers() {
     try {
         const data = localStorage.getItem('users');
@@ -44,7 +57,7 @@ export function getUsers() {
     }
 }
 
-// Сохранение списка пользователей
+// 6. Сохранение списка пользователей
 export function saveUsers(users) {
     try {
         localStorage.setItem('users', JSON.stringify(users));
@@ -53,9 +66,9 @@ export function saveUsers(users) {
     }
 }
 
-// --- ТЕКУЩАЯ СЕССИЯ (КТО ВОШЕЛ) ---
+// --- СЕССИЯ (AUTH) ---
 
-// Получение данных вошедшего пользователя
+// 7. Получение текущего вошедшего пользователя
 export function getCurrentUser() {
     try {
         const data = localStorage.getItem('currentUser');
@@ -67,7 +80,7 @@ export function getCurrentUser() {
     }
 }
 
-// Сохранение текущего пользователя (вход)
+// 8. Сохранение сессии (вход)
 export function setCurrentUser(user) {
     if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -76,12 +89,12 @@ export function setCurrentUser(user) {
     }
 }
 
-// Альтернативное имя (для совместимости)
+// Псевдоним для совместимости
 export function saveCurrentUser(user) {
     setCurrentUser(user);
 }
 
-// Выход из системы
+// 9. Выход из системы
 export function logout() {
     localStorage.removeItem('currentUser');
     window.location.href = 'index.html';
