@@ -6,12 +6,13 @@
     <title>Rogun.tj — Магазин объявлений</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* Встроенные стили для надежности */
         .dark-mode { background-color: #1a1a1a; color: white; }
         .dark-mode .product-card { background: #2d2d2d; color: white; border: 1px solid #444; }
         .dark-mode header, .dark-mode footer { background: #111; }
         .header-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
         .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
-        .product-card { border: 1px solid #ddd; border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; background: white; }
+        .product-card { border: 1px solid #ddd; border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; background: white; color: #333; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .product-card img { width: 100%; height: 180px; object-fit: cover; }
         .product-card .info { padding: 15px; }
@@ -19,41 +20,40 @@
         .product-card .title { font-size: 16px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-card .category-tag { font-size: 12px; color: #888; }
         .product-card .region-tag { font-size: 12px; color: #007bff; float: right; }
-        .fav-icon { position: absolute; top: 10px; right: 10px; font-size: 24px; color: rgba(255,255,255,0.8); cursor: pointer; }
-        .fav-icon.active { color: #ff4d4d; }
-        .search-section { background: #f8f9fa; padding: 20px 0; border-bottom: 1px solid #eee; }
-        .search-container { display: flex; gap: 10px; flex-wrap: wrap; }
-        .search-container input, .search-container select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; flex: 1; min-width: 150px; }
-        .btn-add-main { background: #007bff; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        .btn-add-main { background: #007bff; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; }
         .cat-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; background: white; white-space: nowrap; }
         .cat-btn.active { background: #007bff; color: white; border-color: #007bff; }
+        #user-menu a { text-decoration: none; color: #007bff; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="container header-content">
-        <h1>Rogun.tj</h1>
-        <div id="user-menu"></div> <button id="theme-toggle" class="btn">🌙 Тёмная тема</button>
+        <h1 style="margin:0;">Rogun.tj</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="user-menu"></div> 
+            <button id="theme-toggle" style="cursor:pointer; padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd;">🌙 Тёмная тема</button>
+        </div>
     </div>
 </header>
 
-<section class="search-section">
+<section class="search-section" style="background: #f8f9fa; padding: 20px 0; border-bottom: 1px solid #eee;">
     <div class="container">
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Что ищем?">
-            <select id="region-filter">
+        <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" id="search-input" placeholder="Что ищем?" style="padding: 10px; flex: 2; border-radius: 8px; border: 1px solid #ddd;">
+            <select id="region-filter" style="padding: 10px; flex: 1; border-radius: 8px; border: 1px solid #ddd;">
                 <option value="">Все регионы</option>
                 <option value="Рогун">Рогун</option>
                 <option value="Душанбе">Душанбе</option>
                 <option value="Худжанд">Худжанд</option>
             </select>
-            <a href="add.html" class="btn-add-main">+ Разместить объявление</a>
+            <a href="add.html" class="btn-add-main">+ Разместить</a>
         </div>
     </div>
 </section>
 
-<nav id="category-filter-container" class="categories-nav container" style="margin-top: 20px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+<nav id="category-filter-container" class="container" style="margin-top: 20px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
     <button class="cat-btn active" data-cat="">Все</button>
     <button class="cat-btn" data-cat="Продуктовый Магазин">Продукты</button>
     <button class="cat-btn" data-cat="Электроника и Бытовая Техника">Электроника</button>
@@ -65,13 +65,14 @@
     <div id="ads-container" class="ads-grid"></div>
 </main>
 
-<footer style="margin-top: 50px; padding: 20px 0; border-top: 1px solid #eee; text-align: center;">
+<footer style="margin-top: 50px; padding: 20px 0; border-top: 1px solid #eee; text-align: center; color: #888;">
     <div class="container">
-        &copy; 2026 Rogun.tj | Профессиональный маркетплейс
+        &copy; 2026 Rogun.tj | Маркетплейс Таджикистана
     </div>
 </footer>
 
 <script type="module">
+    // ИСПРАВЛЕНО: Убрали точку перед /js/ для стабильности на GitHub
     import { getAds, getCurrentUser } from './js/storage.js';
 
     const adsContainer = document.getElementById('ads-container');
@@ -86,17 +87,17 @@
         const user = getCurrentUser();
         if (user) {
             userMenu.innerHTML = `
-                <a href="profile.html" style="text-decoration:none; color:#007bff; font-weight:bold;">Мои объявления</a>
+                <a href="profile.html">Мои объявления</a>
                 <span style="margin-left:10px; color:#888;">| ${user.email.split('@')[0]}</span>
             `;
         } else {
-            userMenu.innerHTML = `<a href="login.html" style="text-decoration:none; color:#007bff; font-weight:bold;">Войти</a>`;
+            userMenu.innerHTML = `<a href="login.html">Войти</a>`;
         }
     }
 
     // 2. Отрисовка объявлений
     function updateAds() {
-        const allAds = getAds();
+        const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
         const selectedRegion = regionFilter.value;
         const activeBtn = document.querySelector('.cat-btn.active');
@@ -121,7 +122,6 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                <div class="fav-icon">&#9733;</div>
                 <img src="${imageSrc}" alt="${ad.title}">
                 <div class="info">
                     <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
@@ -135,7 +135,7 @@
         });
     }
 
-    // Слушатели
+    // Слушатели событий
     catButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             catButtons.forEach(b => b.classList.remove('active'));
@@ -152,7 +152,7 @@
         themeBtn.textContent = document.body.classList.contains('dark-mode') ? "☀️ Светлая тема" : "🌙 Тёмная тема";
     });
 
-    // Старт
+    // Запуск
     renderUserMenu();
     updateAds();
 </script>

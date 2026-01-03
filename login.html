@@ -10,10 +10,8 @@
         .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
         .tab { flex: 1; padding: 10px; cursor: pointer; color: #888; font-weight: bold; }
         .tab.active { color: #007bff; border-bottom: 2px solid #007bff; }
-        .auth-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .btn-auth { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-auth:hover { background: #0056b3; }
-        .switch-msg { margin-top: 15px; font-size: 14px; color: #666; }
+        .auth-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-auth { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .error-msg { color: #ff4d4d; font-size: 13px; margin-top: 5px; display: none; }
     </style>
 </head>
@@ -30,11 +28,10 @@
     <form id="auth-form" class="auth-form">
         <input type="email" id="email" placeholder="E-mail" required>
         <input type="password" id="password" placeholder="Пароль" required>
-        <div id="auth-error" class="error-msg">Неверный логин или пароль</div>
+        <div id="auth-error" class="error-msg"></div>
         <button type="submit" class="btn-auth" id="auth-btn">Войти</button>
     </form>
     
-    <p class="switch-msg">Забыли пароль? <a href="#" style="color:#007bff">Восстановить</a></p>
     <a href="index.html" style="display:block; margin-top:20px; text-decoration:none; color:#888;">← На главную</a>
 </div>
 
@@ -47,7 +44,6 @@
     const btn = document.getElementById('auth-btn');
     const errorDiv = document.getElementById('auth-error');
 
-    // Переключение вкладок
     document.getElementById('tab-login').onclick = () => setMode(true);
     document.getElementById('tab-reg').onclick = () => setMode(false);
 
@@ -64,10 +60,9 @@
         e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const users = getUsers();
+        const users = getUsers() || [];
 
         if (isLogin) {
-            // Логика входа
             const user = users.find(u => u.email === email && u.password === password);
             if (user) {
                 saveCurrentUser(user);
@@ -76,7 +71,6 @@
                 showError('Неверный e-mail или пароль');
             }
         } else {
-            // Логика регистрации
             if (users.find(u => u.email === email)) {
                 showError('Этот e-mail уже занят');
                 return;
@@ -95,6 +89,5 @@
         errorDiv.style.display = 'block';
     }
 </script>
-
 </body>
 </html>
