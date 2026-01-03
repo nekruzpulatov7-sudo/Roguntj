@@ -10,14 +10,11 @@
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
-        
         #image-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
         #image-preview img { width: 85px; height: 85px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
-        
-        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; transition: 0.3s; }
+        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.3s; }
         .btn-submit:hover { background: #218838; }
         .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-        
         label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; color: #555; }
         header h2 { margin: 0; }
         optgroup { font-style: normal; font-weight: bold; color: #007bff; }
@@ -58,7 +55,6 @@
             <label>Регион / Город</label>
             <select id="region" required>
                 <option value="">Выберите местоположение</option>
-                
                 <optgroup label="Основные города">
                     <option value="Душанбе">Душанбе</option>
                     <option value="Худжанд">Худжанд</option>
@@ -70,7 +66,6 @@
                     <option value="Хисор">Хисор</option>
                     <option value="Турсунзаде">Турсунзаде</option>
                 </optgroup>
-
                 <optgroup label="РРП (Районы респ. подчинения)">
                     <option value="Вахдат">Вахдат</option>
                     <option value="Варзоб">Варзоб</option>
@@ -79,56 +74,25 @@
                     <option value="Нуробод">Нуробод</option>
                     <option value="Рашт">Рашт</option>
                     <option value="Рудаки">Рудаки</option>
-                    <option value="Сангвор">Сангвор</option>
-                    <option value="Лахш">Лахш</option>
                 </optgroup>
-
                 <optgroup label="Согдийская область">
                     <option value="Айни">Айни</option>
                     <option value="Ашт">Ашт</option>
-                    <option value="Б.Гафуров">Б.Гафуров</option>
-                    <option value="Деваштич">Деваштич</option>
                     <option value="Исфара">Исфара</option>
-                    <option value="Конибодом">Конибодом</option>
-                    <option value="Мастчох">Мастчох</option>
                     <option value="Панчакент">Панчакент</option>
-                    <option value="Шахристон">Шахристон</option>
                 </optgroup>
-
                 <optgroup label="Хатлонская область">
                     <option value="А.Чоми">Абдурахмони Чоми</option>
-                    <option value="Балчувон">Балчувон</option>
-                    <option value="Вахш">Вахш</option>
-                    <option value="Восеъ">Восеъ</option>
                     <option value="Дангара">Дангара</option>
-                    <option value="Дусти">Дусти (Кумсангир)</option>
                     <option value="Ёвон">Ёвон</option>
-                    <option value="Кушониён">Кушониён</option>
-                    <option value="Панч">Панч</option>
-                    <option value="Темурмалик">Темурмалик</option>
-                    <option value="Фархор">Фархор</option>
-                    <option value="Хуросон">Хуросон</option>
-                    <option value="Шахритус">Шахритус</option>
-                    <option value="Хамадони">Хамадони</option>
-                </optgroup>
-
-                <optgroup label="ГБАО">
-                    <option value="Хоруг">Хоруг</option>
-                    <option value="Ванч">Ванч</option>
-                    <option value="Дарвоз">Дарвоз</option>
-                    <option value="Ишкошим">Ишкошим</option>
-                    <option value="Мургаб">Мургаб</option>
-                    <option value="Рошткала">Рошткала</option>
-                    <option value="Рушон">Рушон</option>
-                    <option value="Шугнан">Шугнан</option>
                 </optgroup>
             </select>
 
             <label>Описание</label>
-            <textarea id="description" rows="4" placeholder="Напишите подробнее о товаре (состояние, торг и т.д.)"></textarea>
+            <textarea id="description" rows="4" placeholder="Напишите подробнее о товаре..."></textarea>
 
             <label>Ваш номер телефона</label>
-            <input type="tel" id="phone" placeholder="+992" required>
+            <input type="tel" id="phone" value="+992" required>
 
             <label>Фотографии (до 5 штук)</label>
             <input type="file" id="images" multiple accept="image/*">
@@ -149,13 +113,10 @@
     const phoneInput = document.getElementById('phone');
     const submitBtn = document.getElementById('submit-btn');
     
-    // 1. Проверка авторизации
+    // 1. ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ (Мягкая)
     const user = getCurrentUser();
-    if (!user) {
-        alert("Пожалуйста, войдите в аккаунт, чтобы добавить объявление");
-        window.location.href = 'login.html';
-    } else {
-        phoneInput.value = user.phone || '';
+    if (user) {
+        phoneInput.value = user.phone || '+992';
     }
 
     // 2. Предпросмотр фото
@@ -173,7 +134,7 @@
         });
     };
 
-    // 3. Функция сжатия фото (уменьшаем размер для LocalStorage)
+    // 3. Функция сжатия фото
     async function compressImage(base64) {
         return new Promise(resolve => {
             const img = new Image();
@@ -195,10 +156,17 @@
     form.onsubmit = async (e) => {
         e.preventDefault();
         
+        // Если юзера нет, просим войти только при попытке нажать кнопку
+        if (!user) {
+            alert("Пожалуйста, войдите в аккаунт, чтобы опубликовать объявление");
+            window.location.href = 'login.html';
+            return;
+        }
+
         submitBtn.disabled = true;
         const msg = document.getElementById('message');
         msg.style.color = "#333";
-        msg.innerText = "Загрузка...";
+        msg.innerText = "Публикация...";
 
         try {
             const files = Array.from(imageInput.files).slice(0, 5);
@@ -216,7 +184,7 @@
 
             const newAd = {
                 id: Date.now(),
-                ownerId: user.id,
+                ownerId: user.id, // Теперь мы точно знаем, что user есть
                 title: document.getElementById('title').value,
                 price: Number(document.getElementById('price').value),
                 phone: phoneInput.value,
@@ -238,7 +206,7 @@
         } catch(error) {
             console.error(error);
             msg.style.color = "red";
-            msg.innerText = "Ошибка. Возможно, фото слишком тяжелые.";
+            msg.innerText = "Ошибка сохранения. Фото слишком тяжелые.";
             submitBtn.disabled = false;
         }
     };
