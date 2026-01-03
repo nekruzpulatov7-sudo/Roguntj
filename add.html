@@ -3,191 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавить объявление — Rogun.tj</title>
+    <title>Подать объявление — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background: #f4f7f6; font-family: sans-serif; margin: 0; }
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
-        #image-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-        #image-preview img { width: 85px; height: 85px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
-        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 15px; transition: 0.3s; }
-        .btn-submit:hover { background: #218838; }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-        label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; color: #555; }
-        header h2 { margin: 0; }
-        optgroup { font-style: normal; font-weight: bold; color: #007bff; }
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; min-height: 100vh; transition: 0.5s;
+        }
+        body.dark-mode { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; }
+
+        .container { max-width: 700px; margin: 0 auto; padding: 20px; }
+
+        header { 
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); 
+            position: sticky; top: 0; z-index: 1000; padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .dark-mode header { background: rgba(26, 26, 46, 0.8); border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        .form-card { 
+            background: white; padding: 40px; border-radius: 24px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.07); margin-top: 20px;
+        }
+        .dark-mode .form-card { background: #1f1f3a; color: white; }
+
+        h2 { margin-top: 0; font-weight: 800; font-size: 28px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #555; }
+        .dark-mode label { color: #aaa; }
+
+        input, select, textarea { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; 
+            box-sizing: border-box; font-size: 16px; transition: 0.3s;
+            background: #fdfdfd;
+        }
+        .dark-mode input, .dark-mode select, .dark-mode textarea { 
+            background: #252545; border-color: #333; color: white; 
+        }
+        input:focus, select:focus, textarea:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
+
+        /* Загрузка фото */
+        .photo-upload-label {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 2px dashed #007bff; border-radius: 15px; padding: 30px;
+            cursor: pointer; background: rgba(0,123,255,0.02); transition: 0.3s;
+        }
+        .photo-upload-label:hover { background: rgba(0,123,255,0.05); }
+        
+        #preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        .preview-item { position: relative; height: 100px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-btn { 
+            position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); 
+            color: white; border: none; border-radius: 50%; width: 20px; height: 20px; 
+            font-size: 12px; cursor: pointer; 
+        }
+
+        .btn-submit { 
+            background: #007bff; color: white; border: none; padding: 18px; 
+            width: 100%; border-radius: 14px; font-size: 18px; font-weight: 800; 
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+        }
+        .btn-submit:hover { transform: translateY(-3px); background: #0056b3; box-shadow: 0 12px 25px rgba(0,123,255,0.4); }
     </style>
 </head>
 <body>
 
-<header style="background: white; border-bottom: 1px solid #eee; padding: 15px 0; margin-bottom: 20px;">
+<header>
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 onclick="location.href='index.html'" style="cursor:pointer; color:#007bff;">Rogun.tj</h2>
-        <a href="index.html" style="text-decoration:none; color: #666;">← Отмена</a>
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; color: #007bff;">Rogun<span style="color:#28a745">.tj</span></h1>
+        <a href="index.html" style="text-decoration:none; color:#666; font-weight:600;">Отмена</a>
     </div>
 </header>
 
 <main class="container">
-    <div class="card">
-        <h3 style="margin-top:0;">Новое объявление</h3>
-        <form id="add-form">
-            <label>Название товара</label>
-            <input type="text" id="title" placeholder="Например: iPhone 13 Pro Max" required>
-            
-            <label>Категория</label>
-            <select id="category" required>
-                <option value="">Выберите категорию</option>
-                <option value="Продукты">🍎 Продукты питания</option>
-                <option value="Электроника">📱 Электроника и Техника</option>
-                <option value="Транспорт">🚗 Транспорт (Авто)</option>
-                <option value="Недвижимость">🏠 Недвижимость</option>
-                <option value="Одежда">👕 Одежда и Обувь</option>
-                <option value="Для дома">🛋️ Все для дома</option>
-                <option value="Услуги">🛠️ Услуги</option>
-                <option value="Работа">💼 Работа и Вакансии</option>
-            </select>
+    <div class="form-card">
+        <h2>Новое объявление</h2>
+        <form id="add-ad-form">
+            <div class="form-group">
+                <label>Что вы продаете?</label>
+                <input type="text" id="title" placeholder="Название товара" required maxlength="50">
+            </div>
 
-            <label>Цена (TJS)</label>
-            <input type="number" id="price" placeholder="Введите цену" required>
+            <div class="form-group">
+                <label>Категория</label>
+                <select id="category" required>
+                    <option value="Продукты">🍎 Продукты</option>
+                    <option value="Электроника">📱 Техника</option>
+                    <option value="Транспорт">🚗 Авто</option>
+                    <option value="Недвижимость">🏠 Жилье</option>
+                    <option value="Одежда">👕 Одежда</option>
+                    <option value="Услуги">🛠️ Услуги</option>
+                </select>
+            </div>
 
-            <label>Регион / Город</label>
-            <select id="region" required>
-                <option value="">Выберите местоположение</option>
-                <optgroup label="Основные города">
-                    <option value="Душанбе">Душанбе</option>
-                    <option value="Худжанд">Худжанд</option>
-                    <option value="Бохтар">Бохтар</option>
-                    <option value="Куляб">Куляб</option>
+            <div class="form-group">
+                <label>Цена (TJS)</label>
+                <input type="number" id="price" placeholder="Сумма" required>
+            </div>
+
+            <div class="form-group">
+                <label>Регион</label>
+                <select id="region">
                     <option value="Рогун">Рогун</option>
-                </optgroup>
-                <optgroup label="Районы">
+                    <option value="Душанбе">Душанбе</option>
                     <option value="Вахдат">Вахдат</option>
-                    <option value="Файзобод">Файзобод</option>
-                    <option value="Рудаки">Рудаки</option>
-                </optgroup>
-            </select>
+                    <option value="Худжанд">Худжанд</option>
+                </select>
+            </div>
 
-            <label>Описание</label>
-            <textarea id="description" rows="4" placeholder="Напишите подробнее о товаре..."></textarea>
+            <div class="form-group">
+                <label>Фотографии</label>
+                <label for="photo-input" class="photo-upload-label">
+                    <span style="font-size: 30px;">📸</span>
+                    <span>Нажмите, чтобы добавить фото</span>
+                    <input type="file" id="photo-input" accept="image/*" multiple style="display:none">
+                </label>
+                <div id="preview-container"></div>
+            </div>
 
-            <label>Ваш номер телефона</label>
-            <input type="tel" id="phone" value="+992" required>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="description" rows="5" placeholder="Расскажите о товаре..."></textarea>
+            </div>
 
-            <label>Фотографии (до 5 штук)</label>
-            <input type="file" id="images" multiple accept="image/*">
-            <div id="image-preview"></div>
-
-            <div id="message" style="text-align:center; font-weight:bold; margin-top:15px; min-height: 20px;"></div>
-            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать</button>
+            <button type="submit" class="btn-submit">Опубликовать</button>
         </form>
     </div>
 </main>
 
 <script type="module">
-    import { getAds, saveAds, getCurrentUser } from './js/storage.js';
+    import { saveAd, getCurrentUser } from './js/storage.js';
 
-    const form = document.getElementById('add-form');
-    const imageInput = document.getElementById('images');
-    const preview = document.getElementById('image-preview');
-    const phoneInput = document.getElementById('phone');
-    const submitBtn = document.getElementById('submit-btn');
-    
-    // Подгружаем данные пользователя, если он вошел
+    // Проверяем авторизацию
     const user = getCurrentUser();
-    if (user) {
-        phoneInput.value = user.phone || '+992';
+    if (!user) {
+        alert("Пожалуйста, войдите в систему, чтобы подать объявление.");
+        window.location.href = "login.html";
     }
 
-    // Предпросмотр фото
-    imageInput.onchange = () => {
-        preview.innerHTML = '';
-        const files = Array.from(imageInput.files).slice(0, 5);
+    const form = document.getElementById('add-ad-form');
+    const photoInput = document.getElementById('photo-input');
+    const previewContainer = document.getElementById('preview-container');
+    let uploadedImages = [];
+
+    // Обработка фотографий
+    photoInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
         files.forEach(file => {
             const reader = new FileReader();
-            reader.onload = e => {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                preview.appendChild(img);
+            reader.onload = (event) => {
+                const base64 = event.target.result;
+                uploadedImages.push(base64);
+                
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `<img src="${base64}"><button type="button" class="remove-btn">×</button>`;
+                
+                div.querySelector('.remove-btn').onclick = () => {
+                    div.remove();
+                    uploadedImages = uploadedImages.filter(img => img !== base64);
+                };
+                
+                previewContainer.appendChild(div);
             };
             reader.readAsDataURL(file);
         });
-    };
+    });
 
-    async function compressImage(base64) {
-        return new Promise(resolve => {
-            const img = new Image();
-            img.src = base64;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxWidth = 500; 
-                const scale = maxWidth / img.width;
-                canvas.width = maxWidth;
-                canvas.height = img.height * scale;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6)); 
-            };
-        });
-    }
-
-    form.onsubmit = async (e) => {
+    // Отправка формы
+    form.onsubmit = (e) => {
         e.preventDefault();
-        
-        // Если юзер не вошел, отправляем на логин
-        if (!user) {
-            alert("Пожалуйста, войдите в аккаунт, чтобы добавить объявление.");
-            window.location.href = 'login.html';
-            return;
-        }
 
-        submitBtn.disabled = true;
-        const msg = document.getElementById('message');
-        msg.style.color = "#333";
-        msg.innerText = "Публикация...";
+        const newAd = {
+            id: Date.now(),
+            title: document.getElementById('title').value,
+            category: document.getElementById('category').value,
+            price: document.getElementById('price').value,
+            region: document.getElementById('region').value,
+            description: document.getElementById('description').value,
+            images: uploadedImages.length > 0 ? uploadedImages : ['https://via.placeholder.com/600x400?text=Нет+фото'],
+            phone: user.phone,
+            createdAt: new Date().toLocaleDateString('ru-RU'),
+            userId: user.id
+        };
 
-        try {
-            const files = Array.from(imageInput.files).slice(0, 5);
-            const compressedImages = [];
-
-            for (const file of files) {
-                const base64 = await new Promise(r => {
-                    const reader = new FileReader();
-                    reader.onload = ev => r(ev.target.result);
-                    reader.readAsDataURL(file);
-                });
-                const compressed = await compressImage(base64);
-                compressedImages.push(compressed);
-            }
-
-            const newAd = {
-                id: Date.now(),
-                ownerId: user.id,
-                title: document.getElementById('title').value,
-                price: Number(document.getElementById('price').value),
-                phone: phoneInput.value,
-                region: document.getElementById('region').value,
-                category: document.getElementById('category').value,
-                description: document.getElementById('description').value,
-                images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190?text=Нет+фото'],
-                createdAt: new Date().toLocaleDateString('ru-RU')
-            };
-
-            const ads = getAds();
-            ads.unshift(newAd);
-            saveAds(ads);
-            
-            msg.style.color = "green";
-            msg.innerText = "Успешно опубликовано!";
-            setTimeout(() => window.location.href = 'index.html', 1000);
-
-        } catch(error) {
-            msg.style.color = "red";
-            msg.innerText = "Ошибка сохранения.";
-            submitBtn.disabled = false;
-        }
+        saveAd(newAd);
+        alert("Объявление успешно опубликовано!");
+        window.location.href = "index.html";
     };
+
+    // Темная тема
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
+
 </body>
 </html>
