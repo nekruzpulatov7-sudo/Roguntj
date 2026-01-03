@@ -1,11 +1,13 @@
 /**
  * Rogun.tj - Модуль управления данными (LocalStorage)
- * Финальная версия с поддержкой удаления и редактирования
+ * Версия: 2.0 (Стабильная)
  */
 
 // --- ОБЪЯВЛЕНИЯ (ADS) ---
 
-// 1. Получение всех объявлений
+/**
+ * Получить все объявления из базы
+ */
 export function getAds() {
     try {
         const data = localStorage.getItem('ads');
@@ -17,35 +19,44 @@ export function getAds() {
     }
 }
 
-// 2. Сохранение всего массива объявлений (перезапись)
+/**
+ * Сохранить весь массив объявлений (перезапись)
+ */
 export function saveAds(ads) {
     try {
         localStorage.setItem('ads', JSON.stringify(ads));
     } catch (e) {
         if (e.name === 'QuotaExceededError') {
-            alert('Ошибка: Память браузера переполнена! Фото слишком тяжелые.');
+            alert('Ошибка: Память браузера переполнена! Попробуйте загрузить меньше фото или уменьшить их размер.');
         }
         console.error("Ошибка записи объявлений:", e);
     }
 }
 
-// 3. Добавление одного нового объявления в список
+/**
+ * Добавить одно новое объявление
+ */
 export function saveAd(newAd) {
     const ads = getAds();
     ads.push(newAd);
     saveAds(ads);
 }
 
-// 4. Удаление объявления по ID
+/**
+ * Удалить объявление по его ID
+ */
 export function deleteAd(adId) {
     let ads = getAds();
+    // Фильтруем массив, оставляя всё, кроме указанного ID
     ads = ads.filter(ad => ad.id !== adId);
     saveAds(ads);
 }
 
 // --- ПОЛЬЗОВАТЕЛИ (USERS) ---
 
-// 5. Получение списка всех пользователей
+/**
+ * Получить список зарегистрированных пользователей
+ */
 export function getUsers() {
     try {
         const data = localStorage.getItem('users');
@@ -57,7 +68,9 @@ export function getUsers() {
     }
 }
 
-// 6. Сохранение списка пользователей
+/**
+ * Сохранить список пользователей
+ */
 export function saveUsers(users) {
     try {
         localStorage.setItem('users', JSON.stringify(users));
@@ -66,9 +79,11 @@ export function saveUsers(users) {
     }
 }
 
-// --- СЕССИЯ (AUTH) ---
+// --- СЕССИЯ (АВТОРИЗАЦИЯ) ---
 
-// 7. Получение текущего вошедшего пользователя
+/**
+ * Получить данные текущего вошедшего пользователя
+ */
 export function getCurrentUser() {
     try {
         const data = localStorage.getItem('currentUser');
@@ -80,7 +95,9 @@ export function getCurrentUser() {
     }
 }
 
-// 8. Сохранение сессии (вход)
+/**
+ * Сохранить данные текущей сессии (вход в систему)
+ */
 export function setCurrentUser(user) {
     if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -89,12 +106,16 @@ export function setCurrentUser(user) {
     }
 }
 
-// Псевдоним для совместимости
+/**
+ * Псевдоним для совместимости с другими модулями
+ */
 export function saveCurrentUser(user) {
     setCurrentUser(user);
 }
 
-// 9. Выход из системы
+/**
+ * Выход из системы с редиректом
+ */
 export function logout() {
     localStorage.removeItem('currentUser');
     window.location.href = 'index.html';
