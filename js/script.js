@@ -1,5 +1,6 @@
 /**
  * Rogun.tj - Главный скрипт отрисовки и интерфейса
+ * Версия: 2.1 (Стабильная: Избранное, Поиск, Фильтры, Тема)
  */
 import { getAds, getCurrentUser } from './storage.js';
 
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (themeBtn) themeBtn.textContent = "🌙";
     }
     
-    // 2. Слушатель для переключателя темы (если кнопка есть)
+    // 2. Слушатель переключателя темы
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
             const isDark = document.body.classList.toggle('dark-mode');
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         regionFilter.addEventListener('change', () => renderAds());
     }
 
-    // Клик по категориям (новые иконки)
+    // Клик по категориям
     categoryItems.forEach(item => {
         item.addEventListener('click', () => {
             categoryItems.forEach(i => i.classList.remove('active'));
@@ -60,7 +61,6 @@ export function renderAds() {
 
     if (!list) return;
 
-    // Сбор данных для фильтрации
     const searchInput = document.getElementById('search-input');
     const regionFilter = document.getElementById('region-filter');
     const activeCatItem = document.querySelector('.category-item.active');
@@ -83,10 +83,8 @@ export function renderAds() {
         return matchesSearch && matchesRegion && matchesCategory;
     });
 
-    // Очистка списка
     list.innerHTML = '';
 
-    // Если товаров нет
     if (filteredAds.length === 0) {
         list.innerHTML = `
             <div class="no-ads" style="grid-column: 1/-1; text-align: center; padding: 80px 20px; color: #888;">
@@ -100,14 +98,14 @@ export function renderAds() {
 
     if (countLabel) countLabel.innerText = filteredAds.length;
 
-    // Рендерим (новые сверху)
-    [...filteredAds].sort((a, b) => b.id - a.id).forEach(ad => {
+    // Сортировка (новые сверху) и отрисовка
+    [...filteredAds].sort((a, b) => (b.id || 0) - (a.id || 0)).forEach(ad => {
         list.appendChild(createAdCard(ad));
     });
 }
 
 /**
- * Создание DOM-элемента карточки
+ * Создание карточки товара (DOM-элемент)
  */
 function createAdCard(ad) {
     const card = document.createElement('div');
@@ -130,7 +128,7 @@ function createAdCard(ad) {
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
         </div>
-        <div onclick="location.href='detail.html?id=${ad.id}'">
+        <div class="card-clickable-area" onclick="location.href='detail.html?id=${ad.id}'" style="cursor:pointer">
             <img src="${imageSrc}" alt="${ad.title}" loading="lazy">
             <div class="info">
                 <div class="price">${Number(ad.price || 0).toLocaleString()} TJS</div>
@@ -144,7 +142,7 @@ function createAdCard(ad) {
         </div>
     `;
 
-    // Логика клика по сердечку
+    // Логика кнопки "Избранное"
     const favBtn = card.querySelector('.fav-btn');
     favBtn.onclick = (e) => {
         e.stopPropagation(); 
@@ -159,7 +157,7 @@ function createAdCard(ad) {
             svg.setAttribute('fill', 'none');
             svg.setAttribute('stroke', 'currentColor');
             
-            // Если мы на странице избранного, скрываем карточку плавно
+            // Плавное удаление если мы на странице избранного
             if (window.location.pathname.includes('favorites.html')) {
                 card.style.transition = '0.3s ease';
                 card.style.transform = 'scale(0.8)';
@@ -197,7 +195,7 @@ function toggleFavorite(id) {
     return added;
 }
 
-// Глобальная функция смены темы (для совместимости)
+// Глобальная смена темы (для доступа из HTML через onclick)
 window.toggleTheme = function() {
     const isDark = document.body.classList.toggle('dark-mode');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');

@@ -300,10 +300,11 @@
 
     // ЛОГИКА ТЕЛЕГРАМ-БОТА
     function startTgAuth() {
-        generatedCode = Math.floor(10000 + Math.random() * 90000);
-        window.open(`https://t.me/RogunBot?start=${generatedCode}`, '_blank');
-        document.getElementById('tg-modal').style.display = 'block';
-    }
+    generatedCode = Math.floor(10000 + Math.random() * 90000);
+    // ТЕПЕРЬ ПРАВИЛЬНО:
+    window.open(`https://t.me/RoguntjBot?start=${generatedCode}`, '_blank'); 
+    document.getElementById('tg-modal').style.display = 'block';
+}
 
     document.getElementById('verify-btn').onclick = function() {
         const userEntered = document.getElementById('input-tg-code').value;
