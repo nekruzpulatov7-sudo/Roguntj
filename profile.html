@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои объявления — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-header { background: #f8f9fa; padding: 30px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; }
+        .user-info h2 { margin: 0; color: #333; }
+        .user-info p { color: #666; margin: 5px 0 0; }
+        
+        .my-ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .my-ad-card { border: 1px solid #eee; border-radius: 12px; display: flex; overflow: hidden; background: white; transition: 0.3s; }
+        .my-ad-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .my-ad-card img { width: 120px; height: 120px; object-fit: cover; }
+        .my-ad-info { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .my-ad-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .my-ad-price { color: #28a745; font-weight: bold; }
+        
+        .my-ad-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .btn-delete:hover { background: #cc0000; }
+        
+        .empty-state { text-align: center; padding: 50px; color: #888; }
+        .btn-logout { background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0;">
+        <h1 onclick="window.location.href='index.html'" style="cursor:pointer">Rogun.tj</h1>
+        <button id="logout-btn" class="btn-logout">Выйти из аккаунта</button>
+    </div>
+</header>
+
+<div class="profile-header">
+    <div class="container user-info">
+        <h2 id="user-email">Загрузка...</h2>
+        <p>Ваш личный кабинет продавца</p>
+    </div>
+</div>
+
+<main class="container">
+    <h3>Ваши активные объявления</h3>
+    <div id="my-ads-container" class="my-ads-grid">
+        </div>
+</main>
+
+<script type="module">
+    import { getAds, saveAds, getCurrentUser, saveCurrentUser } from './js/storage.js';
+
+    const container = document.getElementById('my-ads-container');
+    const userEmailDisplay = document.getElementById('user-email');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // 1. Проверка авторизации
+    const user = getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+    } else {
+        userEmailDisplay.innerText = user.email;
+    }
+
+    // 2. Функция удаления объявления
+    window.deleteAd = (id) => {
+        if (confirm('Вы уверены, что хотите удалить это объявление?')) {
+            const allAds = getAds();
+            const updatedAds = allAds.filter(ad => ad.id !== id);
+            saveAds(updatedAds);
+            renderMyAds(); // Перерисовываем список
+        }
+    };
+
+    // 3. Отрисовка объявлений пользователя
+    function renderMyAds() {
+        const allAds = getAds();
+        // Фильтруем: берем только те, где ownerId совпадает с ID текущего юзера
+        const myAds = allAds.filter(ad => ad.ownerId === user.id);
+
+        container.innerHTML = '';
+
+        if (myAds.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p>У вас пока нет объявлений.</p>
+                    <a href="add-ad.html" style="color:#007bff">Разместить первое объявление</a>
+                </div>`;
+            return;
+        }
+
+        myAds.sort((a,b) => b.id - a.id).forEach(ad => {
+            const img = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/120';
+            const card = document.createElement('div');
+            card.className = 'my-ad-card';
+            card.innerHTML = `
+                <img src="${img}" alt="">
+                <div class="my-ad-info">
+                    <div>
+                        <div class="my-ad-title">${ad.title}</div>
+                        <div class="my-ad-price">${Number(ad.price).toLocaleString()} TJS</div>
+                    </div>
+                    <div class="my-ad-actions">
+                        <button class="btn-delete" onclick="deleteAd(${ad.id})">Удалить</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 4. Выход из системы
+    logoutBtn.addEventListener('click', () => {
+        saveCurrentUser(null);
+        window.location.href = 'index.html';
+    });
+
+    // Запуск
+    renderMyAds();
+</script>
+
+</body>
+</html>

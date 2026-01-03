@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин объявлений</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="header-container container">
+        <h1>Мой Магазин Объявлений</h1>
+        <a href="#" class="btn">Вход / Регистрация</a>
+    </div>
+</header>
+
+<nav class="categories-nav container">
+    <button class="cat-btn active">Все</button>
+    <button class="cat-btn">Электроника</button>
+    <button class="cat-btn">Одежда</button>
+    <button class="cat-btn">Книги</button>
+    <button class="cat-btn">Дом и сад</button>
+    <button class="cat-btn">Спорт</button>
+    <button class="cat-btn">Игрушки</button>
+    <button class="cat-btn">Авто</button>
+</nav>
+
+<section class="ads-grid container">
+    <div class="product-card">
+        <img src="images/phone.jpg" alt="Смартфон Samsung">
+        <div class="price">₽1500</div>
+        <div class="title">Смартфон Samsung Galaxy</div>
+        <div class="category">Электроника</div>
+        <div class="rating">★★★★☆</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/jacket.jpg" alt="Куртка зимняя">
+        <div class="price">₽800</div>
+        <div class="title">Куртка зимняя мужская</div>
+        <div class="category">Одежда</div>
+        <div class="rating">★★★☆☆</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/book.jpg" alt="Книга">
+        <div class="price">₽300</div>
+        <div class="title">Книга "Программирование для начинающих"</div>
+        <div class="category">Книги</div>
+        <div class="rating">★★★★★</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/tools.jpg" alt="Набор инструментов">
+        <div class="price">₽1200</div>
+        <div class="title">Набор инструментов</div>
+        <div class="category">Дом и сад</div>
+        <div class="rating">★★★★☆</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/bracelet.jpg" alt="Фитнес-браслет">
+        <div class="price">₽950</div>
+        <div class="title">Фитнес-браслет Xiaomi</div>
+        <div class="category">Спорт</div>
+        <div class="rating">★★★☆☆</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/lego.jpg" alt="LEGO">
+        <div class="price">₽500</div>
+        <div class="title">Игрушечный набор LEGO</div>
+        <div class="category">Игрушки</div>
+        <div class="rating">★★★★★</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+    <div class="product-card">
+        <img src="images/car-seat.jpg" alt="Автомобильное кресло">
+        <div class="price">₽7500</div>
+        <div class="title">Автомобильное кресло</div>
+        <div class="category">Авто</div>
+        <div class="rating">★★★★☆</div>
+        <div class="fav-icon">&#9733;</div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        &copy; 2026 Мой Магазин Объявлений | <a href="#">Политика конфиденциальности</a>
+    </div>
+</footer>
+
+<script>
+    const catButtons = document.querySelectorAll('.cat-btn');
+    const cards = document.querySelectorAll('.product-card');
+
+    catButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            catButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const category = btn.textContent.toLowerCase();
+            cards.forEach(card => {
+                card.style.display = (category === 'все' || card.querySelector('.category').textContent.toLowerCase() === category) ? 'block' : 'none';
+            });
+        });
+    });
+
+    const favIcons = document.querySelectorAll('.fav-icon');
+    favIcons.forEach(icon => icon.addEventListener('click', () => icon.classList.toggle('active')));
+</script>
+
+</body>
+</html>

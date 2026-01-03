@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход / Регистрация — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .auth-container { max-width: 400px; margin: 80px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; color: #888; font-weight: bold; }
+        .tab.active { color: #007bff; border-bottom: 2px solid #007bff; }
+        .auth-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-auth { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-auth:hover { background: #0056b3; }
+        .switch-msg { margin-top: 15px; font-size: 14px; color: #666; }
+        .error-msg { color: #ff4d4d; font-size: 13px; margin-top: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <h2 id="auth-title">Вход в систему</h2>
+    
+    <div class="auth-tabs">
+        <div class="tab active" id="tab-login">Вход</div>
+        <div class="tab" id="tab-reg">Регистрация</div>
+    </div>
+
+    <form id="auth-form" class="auth-form">
+        <input type="email" id="email" placeholder="E-mail" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <div id="auth-error" class="error-msg">Неверный логин или пароль</div>
+        <button type="submit" class="btn-auth" id="auth-btn">Войти</button>
+    </form>
+    
+    <p class="switch-msg">Забыли пароль? <a href="#" style="color:#007bff">Восстановить</a></p>
+    <a href="index.html" style="display:block; margin-top:20px; text-decoration:none; color:#888;">← На главную</a>
+</div>
+
+<script type="module">
+    import { getUsers, saveUsers, saveCurrentUser } from './js/storage.js';
+
+    let isLogin = true;
+    const form = document.getElementById('auth-form');
+    const title = document.getElementById('auth-title');
+    const btn = document.getElementById('auth-btn');
+    const errorDiv = document.getElementById('auth-error');
+
+    // Переключение вкладок
+    document.getElementById('tab-login').onclick = () => setMode(true);
+    document.getElementById('tab-reg').onclick = () => setMode(false);
+
+    function setMode(mode) {
+        isLogin = mode;
+        title.innerText = isLogin ? 'Вход в систему' : 'Создать аккаунт';
+        btn.innerText = isLogin ? 'Войти' : 'Зарегистрироваться';
+        document.getElementById('tab-login').classList.toggle('active', isLogin);
+        document.getElementById('tab-reg').classList.toggle('active', !isLogin);
+        errorDiv.style.display = 'none';
+    }
+
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const users = getUsers();
+
+        if (isLogin) {
+            // Логика входа
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                saveCurrentUser(user);
+                window.location.href = 'index.html';
+            } else {
+                showError('Неверный e-mail или пароль');
+            }
+        } else {
+            // Логика регистрации
+            if (users.find(u => u.email === email)) {
+                showError('Этот e-mail уже занят');
+                return;
+            }
+            const newUser = { id: Date.now(), email, password };
+            users.push(newUser);
+            saveUsers(users);
+            saveCurrentUser(newUser);
+            alert('Регистрация успешна!');
+            window.location.href = 'index.html';
+        }
+    };
+
+    function showError(text) {
+        errorDiv.innerText = text;
+        errorDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

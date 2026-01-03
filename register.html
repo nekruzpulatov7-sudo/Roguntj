@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+    <h2>Регистрация</h2>
+    <form id="register-form">
+        <input type="text" id="username" placeholder="Имя пользователя" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <button type="submit" class="btn">Зарегистрироваться</button>
+    </form>
+    <div id="message"></div>
+</main>
+
+<script type="module">
+import { registerUser } from './js/auth.js';
+
+const form = document.getElementById('register-form');
+const message = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        message.innerText = 'Введите имя пользователя и пароль';
+        return;
+    }
+
+    const result = await registerUser(username, password);
+    message.innerText = result.message;
+
+    if (result.success) form.reset();
+});
+</script>
+</body>
+</html>

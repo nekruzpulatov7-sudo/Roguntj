@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить объявление — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Стили для красоты формы и превью */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        #add-form input, #add-form select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+        #image-preview { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+        #image-preview img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
+        .btn-submit { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-submit:hover { background: #0056b3; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-container">
+            <h1>Rogun.tj</h1>
+            <a href="index.html" class="btn" style="text-decoration: none; color: #007bff;">← На главную</a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <form id="add-form">
+        <h2>Новое объявление</h2>
+        
+        <input type="text" id="title" placeholder="Название товара или услуги" required>
+        
+        <input type="number" id="price" placeholder="Цена (TJS)" required>
+        
+        <input type="tel" id="phone" placeholder="Номер телефона (например: 900112233)" required>
+
+        <select id="region" required>
+            <option value="">Выберите город / район</option>
+            <option value="Рогун">Рогун</option>
+            <option value="Душанбе">Душанбе</option>
+            <option value="Худжанд">Худжанд</option>
+            <option value="Бохтар">Бохтар</option>
+            <option value="Нурек">Нурек</option>
+            <option value="Вахдат">Вахдат</option>
+        </select>
+
+        <select id="category" required>
+            <option value="">Выберите категорию</option>
+            <option value="Продуктовый Магазин">Продукты</option>
+            <option value="Услуги и Вакансии">Услуги</option>
+            <option value="Отели и Рестораны">Отели</option>
+            <option value="Фаст Фуд">Фаст Фуд</option>
+            <option value="Строительство и Ремонт">Стройка</option>
+            <option value="Магазин Одежда">Одежда</option>
+            <option value="Все для Дома">Для Дома</option>
+            <option value="Электроника и Бытовая Техника">Электроника</option>
+        </select>
+
+        <label for="images">Добавить фото (макс. 5)</label>
+        <input type="file" id="images" multiple accept="image/*">
+        <div id="image-preview"></div>
+
+        <div id="message" class="form-message"></div>
+        <button type="submit" class="btn-submit">Опубликовать объявление</button>
+    </form>
+</main>
+
+<script type="module">
+    // Встроенная логика для того, чтобы файл сразу заработал
+    import { getAds, saveAds, getCurrentUser } from './js/storage.js';
+
+    const form = document.getElementById('add-form');
+    const imageInput = document.getElementById('images');
+    const preview = document.getElementById('image-preview');
+    const user = getCurrentUser();
+
+    // Проверка авторизации
+    if (!user) {
+        alert("Пожалуйста, сначала войдите в аккаунт");
+        window.location.href = 'login.html';
+    }
+
+    // Показ превью картинок
+    imageInput.addEventListener('change', () => {
+        preview.innerHTML = '';
+        const files = Array.from(imageInput.files).slice(0, 5);
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Функция сжатия фото (чтобы localStorage не переполнился)
+    async function compressImage(base64) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = 600; // Макс. ширина
+                const scale = size / img.width;
+                canvas.width = size;
+                canvas.height = img.height * scale;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); // Качество 60%
+            };
+        });
+    }
+
+    // Отправка формы
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgDiv = document.getElementById('message');
+        msgDiv.innerText = 'Загрузка...';
+
+        const files = Array.from(imageInput.files).slice(0, 5);
+        const compressedImages = [];
+
+        for (const file of files) {
+            const base64 = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = ev => r(ev.target.result);
+                reader.readAsDataURL(file);
+            });
+            const compressed = await compressImage(base64);
+            compressedImages.push(compressed);
+        }
+
+        const newAd = {
+            id: Date.now(),
+            ownerId: user.id,
+            title: document.getElementById('title').value,
+            price: Number(document.getElementById('price').value),
+            phone: document.getElementById('phone').value,
+            region: document.getElementById('region').value,
+            category: document.getElementById('category').value,
+            images: compressedImages,
+            createdAt: new Date().toLocaleDateString('ru-RU')
+        };
+
+        const ads = getAds();
+        ads.push(newAd);
+        
+        try {
+            saveAds(ads);
+            msgDiv.style.color = 'green';
+            msgDiv.innerText = 'Объявление успешно добавлено!';
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        } catch (err) {
+            msgDiv.style.color = 'red';
+            msgDiv.innerText = 'Ошибка: слишком много фото или данных.';
+        }
+    });
+</script>
+</body>
+</html>

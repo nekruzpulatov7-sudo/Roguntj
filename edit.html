@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать объявление — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <h1>Редактировать объявление</h1>
+        <a href="profile.html" class="btn">← Назад в профиль</a>
+    </div>
+</header>
+
+<main class="container">
+    <form id="edit-form">
+        <input type="text" id="title" placeholder="Название" required>
+        <input type="number" id="price" placeholder="Цена" required>
+        <input type="tel" id="phone" placeholder="Телефон (опционально)">
+        <select id="category" required>
+            <option value="">Выберите категорию</option>
+            <option value="Продуктовый Магазин">Продукты</option>
+            <option value="Услуги и Вакансии">Услуги</option>
+            <option value="Отели и Рестораны">Отели</option>
+            <option value="Фаст Фуд">Фаст Фуд</option>
+            <option value="Строительство и Ремонт">Стройка</option>
+            <option value="Магазин Одежда">Одежда</option>
+            <option value="Все для Дома">Для Дома</option>
+            <option value="Электроника и Бытовая Техника">Электроника</option>
+        </select>
+
+        <label for="images">Изображения (можно несколько):</label>
+        <input type="file" id="images" multiple accept="image/*">
+        <div id="image-preview"></div>
+
+        <div id="message" class="form-message"></div>
+        <button type="submit" class="btn">Сохранить изменения</button>
+    </form>
+</main>
+
+<script type="module" src="js/edit.js"></script>
+</body>
+</html>

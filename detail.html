@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр объявления — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .detail-container { max-width: 900px; margin: 30px auto; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .detail-main { display: flex; gap: 30px; flex-wrap: wrap; }
+        
+        /* Галерея */
+        .detail-gallery { flex: 1; min-width: 300px; }
+        .main-img { width: 100%; height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; border: 1px solid #eee; }
+        .thumbs { display: flex; gap: 10px; overflow-x: auto; }
+        .thumbs img { width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 8px; border: 2px solid transparent; }
+        .thumbs img:hover { border-color: #007bff; }
+
+        /* Информация */
+        .detail-info { flex: 1; min-width: 300px; }
+        .detail-price { font-size: 32px; font-weight: bold; color: #28a745; margin: 10px 0; }
+        .detail-title { font-size: 24px; color: #333; margin-bottom: 15px; }
+        .meta-item { margin: 10px 0; color: #666; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        /* Кнопка телефона */
+        .contact-box { background: #f8f9fa; padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center; }
+        .btn-show-phone { background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-show-phone:hover { background: #0056b3; }
+        .phone-number { font-size: 22px; font-weight: bold; color: #333; display: none; }
+
+        @media (max-width: 768px) { .detail-main { flex-direction: column; } .main-img { height: 300px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0;">
+        <h1 onclick="window.location.href='index.html'" style="cursor:pointer">Rogun.tj</h1>
+        <a href="index.html" class="btn">← Назад к поиску</a>
+    </div>
+</header>
+
+<main class="container">
+    <div id="product-detail" class="detail-container">
+        <p style="text-align: center;">Загрузка объявления...</p>
+    </div>
+</main>
+
+<script type="module">
+    import { getAds } from './js/storage.js';
+
+    const container = document.getElementById('product-detail');
+
+    // 1. Получаем ID из ссылки (?id=123)
+    const urlParams = new URLSearchParams(window.location.search);
+    const adId = parseInt(urlParams.get('id'));
+
+    // 2. Ищем товар в базе
+    const allAds = getAds();
+    const ad = allAds.find(item => item.id === adId);
+
+    if (!ad) {
+        container.innerHTML = `<h2>Объявление не найдено</h2><a href="index.html">Вернуться на главную</a>`;
+    } else {
+        renderDetail(ad);
+    }
+
+    function renderDetail(ad) {
+        // Проверка наличия фото
+        const hasImages = ad.images && ad.images.length > 0;
+        const mainPhoto = hasImages ? ad.images[0] : 'https://via.placeholder.com/600x400?text=Нет+фото';
+        
+        // Генерируем миниатюры, если фото несколько
+        let thumbsHtml = '';
+        if (hasImages && ad.images.length > 1) {
+            ad.images.forEach(img => {
+                thumbsHtml += `<img src="${img}" onclick="document.getElementById('main-img').src='${img}'">`;
+            });
+        }
+
+        container.innerHTML = `
+            <div class="detail-main">
+                <div class="detail-gallery">
+                    <img src="${mainPhoto}" id="main-img" class="main-img" alt="">
+                    <div class="thumbs">${thumbsHtml}</div>
+                </div>
+                
+                <div class="detail-info">
+                    <div class="category-tag" style="color:#888;">${ad.category}</div>
+                    <h1 class="detail-title">${ad.title}</h1>
+                    <div class="detail-price">${Number(ad.price).toLocaleString()} TJS</div>
+                    
+                    <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Рогун'}</div>
+                    <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.createdAt || 'Не указано'}</div>
+                    
+                    <div class="contact-box">
+                        <button class="btn-show-phone" id="btn-phone">Показать номер телефона</button>
+                        <div class="phone-number" id="phone-val">${ad.phone}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                <h3>Описание</h3>
+                <p style="line-height: 1.6; color: #444;">${ad.description || 'Продавец не добавил описание к этому товару.'}</p>
+            </div>
+        `;
+
+        // Логика кнопки телефона
+        const btnPhone = document.getElementById('btn-phone');
+        const valPhone = document.getElementById('phone-val');
+        
+        btnPhone.addEventListener('click', () => {
+            btnPhone.style.display = 'none';
+            valPhone.style.display = 'block';
+        });
+    }
+</script>
+
+</body>
+</html>
