@@ -45,11 +45,15 @@
         }
         input:focus, select:focus, textarea:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
 
+        /* Специальный стиль для цены */
+        #price { font-weight: bold; color: #28a745; font-size: 18px; }
+
         .photo-upload-label {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 2px dashed #007bff; border-radius: 15px; padding: 30px;
             cursor: pointer; background: rgba(0,123,255,0.02); transition: 0.3s;
         }
+        .photo-upload-label:hover { background: rgba(0,123,255,0.08); border-color: #0056b3; }
         
         #preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
         .preview-item { position: relative; height: 100px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
@@ -61,12 +65,15 @@
         }
 
         .btn-submit { 
-            background: #007bff; color: white; border: none; padding: 18px; 
+            background: #28a745; color: white; border: none; padding: 18px; 
             width: 100%; border-radius: 14px; font-size: 18px; font-weight: 800; 
             cursor: pointer; transition: 0.3s; margin-top: 10px;
-            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+            box-shadow: 0 8px 20px rgba(40,167,69,0.3);
         }
-        .btn-submit:hover { transform: translateY(-3px); background: #0056b3; }
+        .btn-submit:hover { transform: translateY(-3px); background: #218838; }
+
+        .back-link { text-decoration: none; color: #666; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .back-link:hover { color: #007bff; }
     </style>
 </head>
 <body>
@@ -74,7 +81,7 @@
 <header>
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
         <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; color: #007bff;">Rogun<span style="color:#28a745">.tj</span></h1>
-        <a href="index.html" style="text-decoration:none; color:#666; font-weight:600;">Отмена</a>
+        <a href="index.html" class="back-link">← Назад</a>
     </div>
 </header>
 
@@ -103,7 +110,7 @@
 
             <div class="form-group">
                 <label>Цена (TJS)</label>
-                <input type="number" id="price" placeholder="Укажите цену" required>
+                <input type="number" id="price" placeholder="Укажите цену" required min="0">
             </div>
 
             <div class="form-group">
@@ -150,7 +157,8 @@
                 <label>Фотографии</label>
                 <label for="photo-input" class="photo-upload-label">
                     <span style="font-size: 30px;">📸</span>
-                    <span>Нажмите для выбора фото</span>
+                    <span style="margin-top: 10px; font-weight: 600;">Нажмите для выбора фото</span>
+                    <span style="font-size: 12px; color: #888;">(До 5 штук)</span>
                     <input type="file" id="photo-input" accept="image/*" multiple style="display:none">
                 </label>
                 <div id="preview-container"></div>
@@ -158,10 +166,10 @@
 
             <div class="form-group">
                 <label>Описание</label>
-                <textarea id="description" rows="5" placeholder="Подробно опишите ваш товар..."></textarea>
+                <textarea id="description" rows="5" placeholder="Подробно опишите ваш товар... (состояние, причина продажи и т.д.)" required></textarea>
             </div>
 
-            <button type="submit" class="btn-submit">Разместить объявление</button>
+            <button type="submit" class="btn-submit">Опубликовать</button>
         </form>
     </div>
 </main>
@@ -172,7 +180,7 @@
     // 1. Проверка авторизации
     const user = getCurrentUser();
     if (!user) {
-        alert("Только авторизованные пользователи могут подавать объявления.");
+        alert("Пожалуйста, войдите в систему, чтобы подать объявление.");
         window.location.href = "login.html";
     }
 
@@ -184,6 +192,13 @@
     // 2. Обработка превью фотографий
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
+        
+        // Лимит 5 фото, чтобы не перегружать localStorage
+        if (uploadedImages.length + files.length > 5) {
+            alert("Максимум 5 фотографий.");
+            return;
+        }
+
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -211,7 +226,10 @@
     form.onsubmit = (e) => {
         e.preventDefault();
 
-        // Формируем объект объявления
+        const btn = e.submitter;
+        btn.disabled = true;
+        btn.textContent = "Сохранение...";
+
         const newAd = {
             id: Date.now(),
             title: document.getElementById('title').value,
@@ -221,22 +239,23 @@
             description: document.getElementById('description').value,
             // Если фото нет, ставим заглушку
             images: uploadedImages.length > 0 ? uploadedImages : ['https://via.placeholder.com/600x400?text=Нет+фото'],
-            phone: user.phone,
+            phone: user.phone || 'Номер не указан',
             createdAt: new Date().toLocaleDateString('ru-RU'),
-            userId: user.id // Обязательно сохраняем ID владельца для профиля
+            userId: user.id
         };
 
         try {
             saveAd(newAd);
-            alert("Готово! Объявление успешно размещено.");
+            alert("Объявление успешно опубликовано!");
             window.location.href = "index.html";
         } catch (error) {
-            console.error("Ошибка при сохранении:", error);
-            alert("Не удалось сохранить объявление. Возможно, фото слишком тяжелые.");
+            console.error("Ошибка:", error);
+            alert("Ошибка: память браузера переполнена. Попробуйте загрузить фото меньшего размера.");
+            btn.disabled = false;
+            btn.textContent = "Опубликовать";
         }
     };
 
-    // Применяем темную тему, если она была выбрана
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
 

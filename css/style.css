@@ -1,131 +1,305 @@
-/* ==============================
-   Общие стили
-============================== */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+/* =========================================
+   БАЗА И ТЁМНАЯ ТЕМА
+========================================= */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    color: #333;
 }
 
-.container {
-    max-width: 700px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f1f3f5;
+    color: #222;
+    transition: background 0.3s, color 0.3s;
+    line-height: 1.6;
 }
 
-h1 {
-    color: #007BFF;
-    margin-bottom: 20px;
-    text-align: center;
+body.dark-mode {
+    background: #121212;
+    color: #ddd;
 }
 
-/* Header */
+body.dark-mode header {
+    background: linear-gradient(135deg, #1a237e, #0d1b5c);
+}
+
+body.dark-mode .product-card, 
+body.dark-mode .ad-page, 
+body.dark-mode .modal-content {
+    background: #1e1e1e;
+    color: #eee;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+
+/* =========================================
+   ХЕДЕР (ШАПКА)
+========================================= */
 header {
-    background-color: #007BFF;
-    color: white;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
     padding: 15px 0;
-    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-header .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 900px;
+.header-container {
+    max-width: 1200px;
     margin: auto;
     padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-header .btn {
-    background-color: white;
-    color: #007BFF;
+header h1 {
+    font-size: 1.8em;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: -1px;
 }
 
-header .btn:hover {
-    background-color: #e2e6ea;
+nav {
+    display: flex;
+    gap: 15px;
+    align-items: center;
 }
 
-/* Forms */
-form label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 500;
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: 0.25s;
 }
 
-form input, form select {
+nav a:hover, nav a.active {
+    background: rgba(255,255,255,0.2);
+}
+
+/* =========================================
+   БАННЕР С РОГУНСКОЙ ГЭС (ГОРЫ, ОЗЕРО, ГЭС)
+========================================= */
+.hero-section {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 1em;
-    transition: 0.3s;
-}
-
-form input:focus, form select:focus {
-    outline: none;
-    border-color: #007BFF;
-    box-shadow: 0 0 5px rgba(0,123,255,0.3);
-}
-
-/* Preview Images */
-#image-preview img {
-    max-height: 150px;
-    margin-top: 5px;
-    border-radius: 5px;
-    transition: transform 0.3s;
-}
-
-#image-preview img:hover {
-    transform: scale(1.05);
-}
-
-/* Buttons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007BFF;
+    height: 350px;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
+                url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Rogun_Dam_construction_2018.jpg/1200px-Rogun_Dam_construction_2018.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     color: white;
-    border-radius: 5px;
+    text-align: center;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    border-bottom: 5px solid #28a745; /* Зеленая линия как символ энергии */
+}
+
+.hero-section h2 {
+    font-size: 48px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 900;
+}
+
+.hero-section p {
+    font-size: 20px;
+    margin-top: 15px;
+    background: rgba(0, 123, 255, 0.8); /* Фирменный синий фон для текста */
+    padding: 8px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+/* =========================================
+   КНОПКИ
+========================================= */
+.btn {
+    background: #fff;
+    color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
     text-decoration: none;
     display: inline-block;
-    margin: 5px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    background: #f8f9fa;
 }
 
-/* Messages */
-.form-message {
-    margin: 10px 0;
-    font-weight: bold;
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+/* =========================================
+   КАТЕГОРИИ
+========================================= */
+.categories-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 30px auto;
+}
+
+.cat-btn {
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: 1px solid #007bff;
+    background: #fff;
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.cat-btn.active, .cat-btn:hover {
+    background: #007bff;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+}
+
+/* =========================================
+   СЕТКА И КАРТОЧКИ ОБЪЯВЛЕНИЙ
+========================================= */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.ads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-card .price {
+    font-size: 20px;
+    font-weight: 800;
+    color: #28a745;
+    margin: 12px 15px 5px;
+}
+
+.product-card .title {
+    font-size: 16px;
+    margin: 5px 15px;
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 42px;
+}
+
+.product-card .category {
+    font-size: 13px;
+    color: #777;
+    margin: 5px 15px 15px;
+}
+
+/* Иконка избранного */
+.fav-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255,255,255,0.9);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.fav-icon.active { color: #ff9800; }
+
+/* =========================================
+   СТРАНИЦА ОБЪЯВЛЕНИЯ (DETAIL)
+========================================= */
+.ad-page {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+/* =========================================
+   ФУТЕР
+========================================= */
+footer {
+    background: #007bff;
+    color: #fff;
+    padding: 30px 0;
     text-align: center;
-    color: green;
+    margin-top: 50px;
 }
 
-.validation-message {
-    font-size: 0.9em;
-    margin-top: 2px;
-    color: red;
-}
-
-/* Responsive */
+/* =========================================
+   АДАПТИВНОСТЬ
+========================================= */
 @media (max-width: 768px) {
-    header .header-container {
+    .hero-section { height: 250px; }
+    .hero-section h2 { font-size: 28px; }
+    .hero-section p { font-size: 16px; }
+    
+    .header-container {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
-
-    .container {
-        margin: 20px;
-        padding: 15px;
+    
+    .ads-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 }
