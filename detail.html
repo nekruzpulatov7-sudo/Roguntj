@@ -27,6 +27,7 @@
             position: sticky; top: 0; z-index: 1000; 
             border-bottom: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            padding: 12px 0;
         }
         .dark-mode header { background: rgba(26, 26, 46, 0.8); border-bottom: 1px solid rgba(255,255,255,0.1); }
 
@@ -69,12 +70,12 @@
         .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .param-box { background: #f8fafc; padding: 10px 15px; border-radius: 12px; font-size: 14px; }
         .dark-mode .param-box { background: rgba(255,255,255,0.05); }
-        .param-box span { color: #888; display: block; font-size: 12px; }
-        .param-box b { color: inherit; }
+        .param-box span { color: #888; display: block; font-size: 11px; text-transform: uppercase; }
+        .param-box b { color: inherit; font-size: 15px; }
 
         .meta-list { margin-bottom: 25px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
         .dark-mode .meta-list { border-color: rgba(255,255,255,0.05); }
-        .meta-item { margin: 12px 0; color: #555; font-size: 16px; display: flex; align-items: center; gap: 12px; }
+        .meta-item { margin: 12px 0; color: #555; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .dark-mode .meta-item { color: #bbb; }
         
         /* КОНТАКТЫ */
@@ -87,18 +88,29 @@
             cursor: pointer; width: 100%; transition: 0.3s; 
             box-shadow: 0 10px 20px rgba(0,123,255,0.2); 
         }
-        .btn-show-phone:hover { background: #0056b3; transform: translateY(-3px); box-shadow: 0 15px 25px rgba(0,123,255,0.3); }
+        .btn-show-phone:hover { background: #0056b3; transform: translateY(-3px); }
         
-        .phone-number { font-size: 28px; font-weight: 800; color: #007bff; display: none; animation: slideIn 0.4s ease; }
-        .phone-number a { color: inherit; text-decoration: none; display: block; padding: 10px; }
+        .phone-number { font-size: 26px; font-weight: 800; color: #007bff; display: none; animation: slideIn 0.4s ease; }
+        .phone-number a { color: inherit; text-decoration: none; }
+
+        .btn-whatsapp {
+            margin-top: 15px; background: #25D366; color: white; border: none; padding: 15px 20px; 
+            border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;
+        }
+        .btn-whatsapp:hover { background: #1eb954; transform: translateY(-2px); }
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ОПИСАНИЕ */
         .description-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); }
         .dark-mode .description-section { border-color: rgba(255,255,255,0.05); }
-        .desc-text { line-height: 1.7; color: #444; white-space: pre-wrap; font-size: 17px; word-wrap: break-word; }
+        .desc-text { line-height: 1.7; color: #444; white-space: pre-wrap; font-size: 17px; }
         .dark-mode .desc-text { color: #ccc; }
+
+        /* ПОХОЖИЕ */
+        .similar-section { margin: 40px auto; padding: 30px; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .dark-mode .similar-section { background: #1f1f3a; }
 
         @media (max-width: 768px) { 
             .detail-container { margin: 0; border-radius: 0; padding: 20px; }
@@ -111,8 +123,8 @@
 <body>
 
 <header>
-    <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
-        <h1 onclick="window.location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; color: #007bff; font-weight: 800; letter-spacing: -1px;">Rogun<span style="color:#28a745">.tj</span></h1>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 onclick="window.location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; color: #007bff; font-weight: 800;">Rogun<span style="color:#28a745">.tj</span></h1>
         <button onclick="history.back()" style="background:none; border:none; color: #007bff; font-weight: 700; cursor:pointer; font-size: 15px;">← Назад</button>
     </div>
 </header>
@@ -121,46 +133,44 @@
     <div id="product-detail" class="detail-container">
         <p style="text-align: center; padding: 100px; color: #888;">Загрузка данных...</p>
     </div>
+
+    <div class="similar-section" id="similar-section" style="display: none;">
+        <h3 style="margin-bottom: 20px; font-size: 22px;">Похожие объявления</h3>
+        <div id="similar-ads-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        </div>
+    </div>
 </main>
 
 <script type="module">
     import { getAds } from './js/storage.js';
 
     const container = document.getElementById('product-detail');
+    const allAds = getAds() || [];
 
-    // Проверка темы
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+    // Применяем тему
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
     const urlParams = new URLSearchParams(window.location.search);
     const adId = parseInt(urlParams.get('id'));
-
-    const allAds = getAds() || [];
     const ad = allAds.find(item => item.id === adId);
 
-    // Глобальная функция смены фото
+    // Смена фото в галерее
     window.changePhoto = (src, el) => {
         const mainImg = document.getElementById('main-img');
-        if (!mainImg) return;
         document.querySelectorAll('.thumbs img').forEach(img => img.classList.remove('active'));
         el.classList.add('active');
-        mainImg.style.opacity = '0';
+        mainImg.style.opacity = '0.5';
         setTimeout(() => {
             mainImg.src = src;
             mainImg.style.opacity = '1';
-        }, 200);
+        }, 150);
     };
 
     if (!ad) {
-        container.innerHTML = `
-            <div style="text-align:center; padding: 80px 20px;">
-                <h2 style="font-size: 60px; margin:0;">🔍</h2>
-                <h2 style="color: #333; margin-top:20px;">Объявление не найдено</h2>
-                <a href="index.html" style="background:#007bff; color:white; padding:15px 30px; border-radius:14px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:20px;">На главную</a>
-            </div>`;
+        container.innerHTML = `<div style="text-align:center; padding: 80px 20px;"><h2>Объявление не найдено</h2><a href="index.html">Вернуться на главную</a></div>`;
     } else {
         renderDetail(ad);
+        renderSimilarAds(ad);
     }
 
     function renderDetail(ad) {
@@ -175,12 +185,13 @@
 
         let paramsHtml = '';
         if (ad.params) {
+            const labels = { brand: 'Марка', year: 'Год', rooms: 'Комнат', area: 'Площадь' };
             paramsHtml = '<div class="params-grid">';
             for (const [key, value] of Object.entries(ad.params)) {
-                if (value && value.toString().trim() !== "") {
+                if (value) {
                     paramsHtml += `
                         <div class="param-box">
-                            <span>${key}</span>
+                            <span>${labels[key] || key}</span>
                             <b>${value}</b>
                         </div>`;
                 }
@@ -198,40 +209,74 @@
                 </div>
                 
                 <div class="detail-info">
-                    <span class="category-tag">${ad.category || 'Общее'}</span>
+                    <span class="category-tag">${ad.category}</span>
                     <h1 class="detail-title">${ad.title}</h1>
                     <div class="detail-price">${Number(ad.price).toLocaleString()} TJS</div>
                     
                     ${paramsHtml}
 
                     <div class="meta-list">
-                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Рогун'}</div>
-                        <div class="meta-item">📅 <b>Дата:</b> ${ad.createdAt || 'Не указана'}</div>
-                        <div class="meta-item">🆔 <b>ID:</b> ${ad.id}</div>
+                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region}</div>
+                        <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.createdAt}</div>
+                        <div class="meta-item">🆔 <b>Номер объявления:</b> ${ad.id}</div>
                     </div>
                     
                     <div class="contact-box">
                         <button class="btn-show-phone" id="btn-phone">📞 Показать номер</button>
                         <div class="phone-number" id="phone-val">
-                            <a href="tel:${ad.phone || ''}">${ad.phone || 'Номер не указан'}</a>
-                            <p style="font-size:12px; color:#888; margin-top:5px;">Скажите, что вы с Rogun.tj</p>
+                            <a href="tel:${ad.phone}">${ad.phone}</a>
                         </div>
+                        
+                        <button class="btn-whatsapp" id="btn-whatsapp">
+                            <span>Поделиться в WhatsApp</span>
+                        </button>
                     </div>
                 </div>
             </div>
             
             <div class="description-section">
-                <h3 style="margin-bottom: 15px;">Описание</h3>
-                <div class="desc-text">${ad.description || 'Описание отсутствует.'}</div>
+                <h3>Описание</h3>
+                <div class="desc-text">${ad.description}</div>
             </div>
         `;
 
-        const phoneBtn = document.getElementById('btn-phone');
-        if(phoneBtn) {
-            phoneBtn.onclick = function() {
-                this.style.display = 'none';
-                document.getElementById('phone-val').style.display = 'block';
-            };
+        // События кнопок
+        document.getElementById('btn-phone').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('phone-val').style.display = 'block';
+        };
+
+        document.getElementById('btn-whatsapp').onclick = () => {
+            const text = `Посмотри на Rogun.tj: ${ad.title}\nЦена: ${ad.price} TJS\n${window.location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        };
+    }
+
+    function renderSimilarAds(currentAd) {
+        const list = document.getElementById('similar-ads-list');
+        const section = document.getElementById('similar-section');
+        
+        const similar = allAds
+            .filter(item => item.category === currentAd.category && item.id !== currentAd.id)
+            .slice(0, 4);
+
+        if (similar.length > 0) {
+            section.style.display = 'block';
+            similar.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'similar-card';
+                card.style.cssText = "background:#f8fafc; border-radius:15px; cursor:pointer; overflow:hidden; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);";
+                card.onclick = () => window.location.href = `detail.html?id=${item.id}`;
+                card.innerHTML = `
+                    <img src="${item.images[0]}" style="width:100%; height:150px; object-fit:cover;">
+                    <div style="padding:15px;">
+                        <div style="color:#28a745; font-weight:800;">${Number(item.price).toLocaleString()} TJS</div>
+                        <div style="font-size:14px; margin:5px 0; height:40px; overflow:hidden;">${item.title}</div>
+                        <div style="font-size:11px; color:#888;">📍 ${item.region}</div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
         }
     }
 </script>

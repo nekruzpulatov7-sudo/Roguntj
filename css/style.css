@@ -9,267 +9,261 @@
 
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f1f3f5;
-    color: #222;
-    transition: background 0.3s, color 0.3s;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-attachment: fixed;
+    color: #333;
+    transition: background 0.5s ease, color 0.3s;
     line-height: 1.6;
     min-height: 100vh;
 }
 
 body.dark-mode {
-    background: #121212;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: #ddd;
 }
 
-body.dark-mode header {
-    background: linear-gradient(135deg, #1a237e, #0d1b5c);
-}
-
+/* Эффект для темных карточек и модулей */
 body.dark-mode .product-card, 
-body.dark-mode .ad-page, 
+body.dark-mode .category-item,
 body.dark-mode .modal-content,
-body.dark-mode .dynamic-section,
 body.dark-mode .sms-content {
-    background: #1e1e1e;
+    background: #1f1f3a;
     color: #eee;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-    border-color: #333;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.05);
 }
 
 body.dark-mode input, 
 body.dark-mode textarea, 
 body.dark-mode select {
-    background: #2d2d2d;
-    border-color: #444;
+    background: #2d2d4d;
+    border-color: #3d3d5d;
     color: #fff;
 }
 
 /* =========================================
-   ХЕДЕР (ШАПКА)
+   ХЕДЕР (СТЕКЛЯННЫЙ СТИЛЬ)
 ========================================= */
-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: #fff;
-    padding: 15px 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+header { 
+    background: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    padding: 12px 0;
+}
+
+.dark-mode header { 
+    background: rgba(26, 26, 46, 0.8); 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .header-container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: auto;
-    padding: 0 20px;
+    padding: 0 15px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
 header h1 {
-    font-size: 1.8em;
+    font-size: 24px;
+    letter-spacing: -1px;
     font-weight: 800;
     cursor: pointer;
-    letter-spacing: -1px;
-}
-
-nav {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 8px 15px;
-    border-radius: 10px;
-    transition: 0.25s;
-}
-
-nav a:hover, nav a.active {
-    background: rgba(255,255,255,0.2);
-}
-
-.btn-theme {
-    background: none;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 18px;
 }
 
 /* =========================================
    БАННЕР С РОГУНСКОЙ ГЭС
 ========================================= */
-.hero-section {
+.hero-banner {
     width: 100%;
-    height: 350px;
-    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
+    height: 400px;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
                 url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Rogun_Dam_construction_2018.jpg/1200px-Rogun_Dam_construction_2018.jpg');
     background-size: cover;
     background-position: center;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     color: white;
     text-align: center;
-    text-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    border-bottom: 5px solid #28a745;
+    margin-bottom: 30px;
 }
 
-.hero-section h2 {
-    font-size: 48px;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-weight: 900;
+.hero-banner h2 { 
+    font-size: 38px; 
+    font-weight: 800; 
+    margin-bottom: 15px; 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5); 
 }
 
-.hero-section p {
-    font-size: 20px;
-    margin-top: 15px;
-    background: rgba(0, 123, 255, 0.8);
-    padding: 8px 25px;
-    border-radius: 50px;
-    font-weight: 600;
+/* Поиск внутри баннера */
+.search-glass-box {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 90%;
+    max-width: 850px;
 }
 
-/* =========================================
-   КАТЕГОРИИ И ПОИСК
-========================================= */
-.search-container {
-    max-width: 800px;
-    margin: -30px auto 20px;
-    position: relative;
-    z-index: 10;
-    display: flex;
-    gap: 10px;
-    padding: 0 20px;
-}
+.search-box { display: flex; gap: 10px; flex-wrap: wrap; }
 
-.search-container input {
-    flex: 1;
-    padding: 15px 25px;
-    border-radius: 30px;
-    border: none;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    font-size: 16px;
+input, select { 
+    padding: 12px 15px; 
+    border-radius: 12px; 
+    border: 1px solid rgba(0,0,0,0.1); 
     outline: none;
-}
-
-.categories-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-    margin: 30px auto;
-}
-
-.cat-btn {
-    padding: 10px 20px;
-    border-radius: 25px;
-    border: 1px solid #007bff;
-    background: #fff;
-    color: #007bff;
-    cursor: pointer;
-    font-weight: 600;
+    font-size: 15px;
     transition: 0.3s;
 }
 
-.cat-btn.active, .cat-btn:hover {
-    background: #007bff;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0,123,255,0.3);
-}
+input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
 /* =========================================
-   СЕТКА И КАРТОЧКИ ОБЪЯВЛЕНИЙ
+   НОВЫЙ БЛОК КАТЕГОРИЙ (СЕТКА)
+========================================= */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.category-item {
+    background: white;
+    padding: 20px 10px;
+    border-radius: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-item:hover, .category-item.active {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,123,255,0.1);
+    border-color: #007bff;
+}
+
+.category-item.active {
+    background: #e7f3ff;
+    border-width: 2px;
+}
+
+.dark-mode .category-item.active { background: #25254d; }
+
+.cat-icon { font-size: 32px; }
+.category-item span { font-size: 13px; font-weight: 600; color: #444; }
+.dark-mode .category-item span { color: #ccc; }
+
+/* =========================================
+   СЕТКА И КАРТОЧКИ
 ========================================= */
 .container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 20px auto;
-    padding: 0 20px;
+    padding: 0 15px;
 }
 
 .ads-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
 }
 
 .product-card {
     background: #fff;
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s ease;
     position: relative;
-    border: 1px solid rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    cursor: pointer;
 }
 
 .product-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
 }
 
 .product-card img {
     width: 100%;
-    height: 190px;
+    height: 180px;
     object-fit: cover;
 }
 
-.product-card .card-content {
+.product-card .info {
     padding: 15px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
 }
 
 .product-card .price {
     font-size: 20px;
     font-weight: 800;
     color: #28a745;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .product-card .title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    height: 42px;
+    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow: hidden;
-    height: 42px;
-    color: inherit;
-    line-height: 1.3;
-}
-
-.params-preview {
-    font-size: 13px;
-    color: #6c757d;
-    margin-bottom: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .card-footer {
+    margin-top: auto;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 10px;
+}
+
+.category-tag {
     font-size: 11px;
     color: #888;
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    background: #f0f2f5;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.region-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: #007bff;
+}
+
+/* Кнопка "Подать объявление" */
+.btn-add-main { 
+    background: #28a745; 
+    color: white; 
+    padding: 12px 20px; 
+    border-radius: 12px; 
+    text-decoration: none; 
+    font-weight: bold; 
+    transition: 0.3s; 
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
 }
 
 /* =========================================
@@ -288,72 +282,27 @@ nav a:hover, nav a.active {
     justify-content: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.15);
     z-index: 10;
-    transition: 0.3s;
+    cursor: pointer;
 }
 
-.fav-btn svg { width: 20px; height: 20px; color: #666; transition: 0.3s; fill: none; }
-.fav-btn.active svg { fill: #ff4757; stroke: #ff4757; animation: heartBeat 0.4s ease; }
+.dark-mode .fav-btn { background: rgba(31, 31, 58, 0.9); }
 
-@keyframes heartBeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
-/* =========================================
-   ВЕРИФИКАЦИЯ И СМС (НОВОЕ)
-========================================= */
-.sms-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(5px);
-}
-
-.sms-content {
-    background: white;
-    padding: 40px;
-    border-radius: 24px;
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-}
-
-.sms-code-input {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 25px 0;
-}
-
-.code-digit {
-    width: 50px;
-    height: 65px;
-    font-size: 28px;
-    font-weight: 700;
-    text-align: center;
-    border: 2px solid #e1e1e1;
-    border-radius: 12px;
-    background: #f8f9fa;
-    outline: none;
-    transition: 0.2s;
-}
-
-.code-digit:focus { border-color: #007bff; background: #fff; box-shadow: 0 0 10px rgba(0,123,255,0.1); }
+.fav-btn.active svg { fill: #ff4757; stroke: #ff4757; }
 
 /* =========================================
    АДАПТИВНОСТЬ
 ========================================= */
 @media (max-width: 768px) {
-    .hero-section { height: 250px; }
-    .hero-section h2 { font-size: 28px; }
-    .header-container { flex-direction: column; gap: 15px; }
-    .ads-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .hero-banner { height: 350px; }
+    .hero-banner h2 { font-size: 24px; }
+    .search-box { flex-direction: column; }
+    .search-box > * { width: 100%; }
+    .categories-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .ads-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .product-card img { height: 140px; }
-    .hero-section p { font-size: 14px; padding: 5px 15px; }
+    .product-card .price { font-size: 17px; }
+}
+
+@media (max-width: 480px) {
+    .ads-grid { grid-template-columns: 1fr; }
 }

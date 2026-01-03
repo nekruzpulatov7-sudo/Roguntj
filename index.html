@@ -86,23 +86,43 @@
         .dark-mode input, .dark-mode select { background: #1f1f3a; color: white; border-color: #333; }
         input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
-        /* КАТЕГОРИИ */
-        .cat-nav { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 20px 0; scrollbar-width: none; }
-        .cat-nav::-webkit-scrollbar { display: none; }
-        .cat-btn { 
-            padding: 10px 18px; 
-            border-radius: 25px; 
-            border: none; 
-            cursor: pointer; 
-            background: white; 
-            white-space: nowrap; 
-            font-size: 14px; 
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: 0.3s;
+        /* НОВЫЙ БЛОК КАТЕГОРИЙ (СЕТКА С ИКОНКАМИ) */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
         }
-        .dark-mode .cat-btn { background: #16213e; color: #ddd; }
-        .cat-btn.active { background: #007bff; color: white; transform: scale(1.05); }
+
+        .category-item {
+            background: white;
+            padding: 20px 10px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dark-mode .category-item { background: #1f1f3a; border-color: rgba(255,255,255,0.05); }
+
+        .category-item:hover, .category-item.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,123,255,0.1);
+            border-color: #007bff;
+        }
+        
+        .category-item.active { background: #e7f3ff; border-width: 2px; }
+        .dark-mode .category-item.active { background: #25254d; }
+
+        .cat-icon { font-size: 32px; }
+        .category-item span { font-size: 13px; font-weight: 600; color: #444; }
+        .dark-mode .category-item span { color: #ccc; }
 
         /* СЕТКА ОБЪЯВЛЕНИЙ */
         .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding-bottom: 40px; }
@@ -130,7 +150,8 @@
         }
         
         .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; }
-        .category-tag { font-size: 12px; color: #888; }
+        .category-tag { font-size: 11px; color: #888; background: #f0f2f5; padding: 2px 8px; border-radius: 10px; }
+        .dark-mode .category-tag { background: #2a2a4a; }
         .region-tag { font-size: 12px; font-weight: 600; color: #007bff; }
 
         .btn-add-main { 
@@ -145,6 +166,7 @@
             .hero-banner h2 { font-size: 24px; }
             .search-box { flex-direction: column; }
             .search-box > * { width: 100%; }
+            .categories-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -209,17 +231,44 @@
 </section>
 
 <div class="container">
-    <nav class="cat-nav" id="category-filter-container">
-        <button class="cat-btn active" data-cat="">Все категории</button>
-        <button class="cat-btn" data-cat="Продукты">🍎 Продукты</button>
-        <button class="cat-btn" data-cat="Электроника">📱 Техника</button>
-        <button class="cat-btn" data-cat="Транспорт">🚗 Авто</button>
-        <button class="cat-btn" data-cat="Недвижимость">🏠 Жилье</button>
-        <button class="cat-btn" data-cat="Одежда">👕 Одежда</button>
-        <button class="cat-btn" data-cat="Для дома">🛋️ Для дома</button>
-        <button class="cat-btn" data-cat="Услуги">🛠️ Услуги</button>
-        <button class="cat-btn" data-cat="Работа">💼 Работа</button>
-    </nav>
+    <div class="categories-grid" id="category-filter-container">
+        <div class="category-item active" data-cat="">
+            <div class="cat-icon">✨</div>
+            <span>Все</span>
+        </div>
+        <div class="category-item" data-cat="Продукты">
+            <div class="cat-icon">🍎</div>
+            <span>Продукты</span>
+        </div>
+        <div class="category-item" data-cat="Электроника">
+            <div class="cat-icon">📱</div>
+            <span>Техника</span>
+        </div>
+        <div class="category-item" data-cat="Транспорт">
+            <div class="cat-icon">🚗</div>
+            <span>Транспорт</span>
+        </div>
+        <div class="category-item" data-cat="Недвижимость">
+            <div class="cat-icon">🏠</div>
+            <span>Жилье</span>
+        </div>
+        <div class="category-item" data-cat="Одежда">
+            <div class="cat-icon">👕</div>
+            <span>Одежда</span>
+        </div>
+        <div class="category-item" data-cat="Для дома">
+            <div class="cat-icon">🛋️</div>
+            <span>Для дома</span>
+        </div>
+        <div class="category-item" data-cat="Услуги">
+            <div class="cat-icon">🛠️</div>
+            <span>Услуги</span>
+        </div>
+        <div class="category-item" data-cat="Работа">
+            <div class="cat-icon">💼</div>
+            <span>Работа</span>
+        </div>
+    </div>
 
     <main id="ads-container" class="ads-grid"></main>
 </div>
@@ -232,7 +281,7 @@
     const regionFilter = document.getElementById('region-filter');
     const userMenu = document.getElementById('user-menu');
     const themeBtn = document.getElementById('theme-toggle');
-    const catButtons = document.querySelectorAll('.cat-btn');
+    const catItems = document.querySelectorAll('.category-item');
 
     // Отображение кнопки входа или профиля
     function renderUserMenu() {
@@ -249,8 +298,8 @@
         const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
         const selectedRegion = regionFilter.value;
-        const activeBtn = document.querySelector('.cat-btn.active');
-        const selectedCategory = activeBtn ? activeBtn.dataset.cat : "";
+        const activeItem = document.querySelector('.category-item.active');
+        const selectedCategory = activeItem ? activeItem.dataset.cat : "";
 
         const filtered = allAds.filter(ad => {
             const matchesSearch = ad.title.toLowerCase().includes(searchText);
@@ -270,7 +319,6 @@
             return;
         }
 
-        // Сортировка: новые сверху
         filtered.sort((a, b) => b.id - a.id).forEach(ad => {
             const imageSrc = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/300x200?text=Нет+фото';
             const card = document.createElement('div');
@@ -286,17 +334,16 @@
                     </div>
                 </div>
             `;
-            // Переход на страницу деталей (убедись, что detail.html создан)
             card.onclick = () => window.location.href = `detail.html?id=${ad.id}`;
             adsContainer.appendChild(card);
         });
     }
 
     // Обработка клика по категориям
-    catButtons.forEach(btn => {
-        btn.onclick = () => {
-            catButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    catItems.forEach(item => {
+        item.onclick = () => {
+            catItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
             updateAds();
         };
     });
@@ -313,13 +360,11 @@
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     };
 
-    // Проверка сохраненной темы
     if(localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         themeBtn.textContent = "☀️";
     }
 
-    // Запуск
     renderUserMenu();
     updateAds();
 </script>
