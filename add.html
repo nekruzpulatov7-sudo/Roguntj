@@ -61,30 +61,11 @@
                     <option value="Бохтар">Бохтар</option>
                     <option value="Куляб">Куляб</option>
                     <option value="Рогун">Рогун</option>
-                    <option value="Истаравшан">Истаравшан</option>
-                    <option value="Норак">Норак</option>
-                    <option value="Хисор">Хисор</option>
-                    <option value="Турсунзаде">Турсунзаде</option>
                 </optgroup>
-                <optgroup label="РРП (Районы респ. подчинения)">
+                <optgroup label="Районы">
                     <option value="Вахдат">Вахдат</option>
-                    <option value="Варзоб">Варзоб</option>
                     <option value="Файзобод">Файзобод</option>
-                    <option value="Шахринав">Шахринав</option>
-                    <option value="Нуробод">Нуробод</option>
-                    <option value="Рашт">Рашт</option>
                     <option value="Рудаки">Рудаки</option>
-                </optgroup>
-                <optgroup label="Согдийская область">
-                    <option value="Айни">Айни</option>
-                    <option value="Ашт">Ашт</option>
-                    <option value="Исфара">Исфара</option>
-                    <option value="Панчакент">Панчакент</option>
-                </optgroup>
-                <optgroup label="Хатлонская область">
-                    <option value="А.Чоми">Абдурахмони Чоми</option>
-                    <option value="Дангара">Дангара</option>
-                    <option value="Ёвон">Ёвон</option>
                 </optgroup>
             </select>
 
@@ -113,13 +94,13 @@
     const phoneInput = document.getElementById('phone');
     const submitBtn = document.getElementById('submit-btn');
     
-    // 1. ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ (Мягкая)
+    // Подгружаем данные пользователя, если он вошел
     const user = getCurrentUser();
     if (user) {
         phoneInput.value = user.phone || '+992';
     }
 
-    // 2. Предпросмотр фото
+    // Предпросмотр фото
     imageInput.onchange = () => {
         preview.innerHTML = '';
         const files = Array.from(imageInput.files).slice(0, 5);
@@ -134,7 +115,6 @@
         });
     };
 
-    // 3. Функция сжатия фото
     async function compressImage(base64) {
         return new Promise(resolve => {
             const img = new Image();
@@ -152,13 +132,12 @@
         });
     }
 
-    // 4. Отправка формы
     form.onsubmit = async (e) => {
         e.preventDefault();
         
-        // Если юзера нет, просим войти только при попытке нажать кнопку
+        // Если юзер не вошел, отправляем на логин
         if (!user) {
-            alert("Пожалуйста, войдите в аккаунт, чтобы опубликовать объявление");
+            alert("Пожалуйста, войдите в аккаунт, чтобы добавить объявление.");
             window.location.href = 'login.html';
             return;
         }
@@ -184,7 +163,7 @@
 
             const newAd = {
                 id: Date.now(),
-                ownerId: user.id, // Теперь мы точно знаем, что user есть
+                ownerId: user.id,
                 title: document.getElementById('title').value,
                 price: Number(document.getElementById('price').value),
                 phone: phoneInput.value,
@@ -195,7 +174,7 @@
                 createdAt: new Date().toLocaleDateString('ru-RU')
             };
 
-            const ads = getAds() || [];
+            const ads = getAds();
             ads.unshift(newAd);
             saveAds(ads);
             
@@ -204,9 +183,8 @@
             setTimeout(() => window.location.href = 'index.html', 1000);
 
         } catch(error) {
-            console.error(error);
             msg.style.color = "red";
-            msg.innerText = "Ошибка сохранения. Фото слишком тяжелые.";
+            msg.innerText = "Ошибка сохранения.";
             submitBtn.disabled = false;
         }
     };
