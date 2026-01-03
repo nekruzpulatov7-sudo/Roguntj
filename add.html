@@ -6,60 +6,73 @@
     <title>Добавить объявление — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        body { background: #f4f7f6; font-family: sans-serif; }
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        #image-preview { display: flex; gap: 5px; flex-wrap: wrap; margin: 10px 0; }
-        #image-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
-        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
-        label { font-weight: bold; display: block; margin-top: 10px; font-size: 14px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        
+        #image-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+        #image-preview img { width: 85px; height: 85px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+        
+        .btn-submit { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; transition: 0.3s; }
+        .btn-submit:hover { background: #218838; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        
+        label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; color: #555; }
+        header h2 { margin: 0; }
     </style>
 </head>
 <body>
 
-<header class="container" style="display: flex; justify-content: space-between; align-items: center;">
-    <h2 onclick="location.href='index.html'" style="cursor:pointer; color:#007bff;">Rogun.tj</h2>
-    <a href="index.html" style="text-decoration:none;">← Назад</a>
+<header style="background: white; border-bottom: 1px solid #eee; padding: 15px 0; margin-bottom: 20px;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 onclick="location.href='index.html'" style="cursor:pointer; color:#007bff;">Rogun.tj</h2>
+        <a href="index.html" style="text-decoration:none; color: #666;">← Отмена</a>
+    </div>
 </header>
 
 <main class="container">
-    <form id="add-form">
-        <label>Что вы продаете?</label>
-        <input type="text" id="title" placeholder="Например: Продаю iPhone 13" required>
-        
-        <label>Категория</label>
-        <select id="category" required>
-            <option value="">Выберите категорию</option>
-            <option value="Продукты">🍎 Продукты питания</option>
-            <option value="Электроника">📱 Электроника и Техника</option>
-            <option value="Транспорт">🚗 Транспорт (Авто)</option>
-            <option value="Недвижимость">🏠 Недвижимость</option>
-            <option value="Одежда">👕 Одежда и Обувь</option>
-            <option value="Для дома">🛋️ Все для дома</option>
-            <option value="Услуги">🛠️ Услуги</option>
-            <option value="Работа">💼 Работа и Вакансии</option>
-        </select>
+    <div class="card">
+        <h3 style="margin-top:0;">Новое объявление</h3>
+        <form id="add-form">
+            <label>Название товара</label>
+            <input type="text" id="title" placeholder="Например: iPhone 13 Pro Max" required>
+            
+            <label>Категория</label>
+            <select id="category" required>
+                <option value="">Выберите категорию</option>
+                <option value="Продукты">🍎 Продукты питания</option>
+                <option value="Электроника">📱 Электроника и Техника</option>
+                <option value="Транспорт">🚗 Транспорт (Авто)</option>
+                <option value="Недвижимость">🏠 Недвижимость</option>
+                <option value="Одежда">👕 Одежда и Обувь</option>
+                <option value="Для дома">🛋️ Все для дома</option>
+                <option value="Услуги">🛠️ Услуги</option>
+                <option value="Работа">💼 Работа и Вакансии</option>
+            </select>
 
-        <label>Цена (TJS)</label>
-        <input type="number" id="price" required>
+            <label>Цена (TJS)</label>
+            <input type="number" id="price" placeholder="Введите цену" required>
 
-        <label>Регион</label>
-        <select id="region" required>
-            <option value="Рогун">Рогун</option>
-            <option value="Душанбе">Душанбе</option>
-            <option value="Худжанд">Худжанд</option>
-            <option value="Вахдат">Вахдат</option>
-        </select>
+            <label>Регион</label>
+            <select id="region" required>
+                <option value="Рогун">Рогун</option>
+                <option value="Душанбе">Душанбе</option>
+                <option value="Худжанд">Худжанд</option>
+                <option value="Вахдат">Вахдат</option>
+            </select>
 
-        <label>Ваш номер телефона</label>
-        <input type="tel" id="phone" required>
+            <label>Ваш номер телефона</label>
+            <input type="tel" id="phone" placeholder="+992" required>
 
-        <label>Фото (макс. 5)</label>
-        <input type="file" id="images" multiple accept="image/*">
-        <div id="image-preview"></div>
+            <label>Фотографии (до 5 штук)</label>
+            <input type="file" id="images" multiple accept="image/*">
+            <div id="image-preview"></div>
 
-        <div id="message" style="text-align:center; font-weight:bold; margin-top:10px;"></div>
-        <button type="submit" class="btn-submit">Опубликовать</button>
-    </form>
+            <div id="message" style="text-align:center; font-weight:bold; margin-top:15px; min-height: 20px;"></div>
+            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать</button>
+        </form>
+    </div>
 </main>
 
 <script type="module">
@@ -68,13 +81,23 @@
     const form = document.getElementById('add-form');
     const imageInput = document.getElementById('images');
     const preview = document.getElementById('image-preview');
+    const phoneInput = document.getElementById('phone');
+    const submitBtn = document.getElementById('submit-btn');
     const user = getCurrentUser();
 
-    if (user) document.getElementById('phone').value = user.phone;
+    // 1. Проверка авторизации
+    if (!user) {
+        alert("Пожалуйста, войдите в аккаунт, чтобы добавить объявление");
+        window.location.href = 'login.html';
+    } else {
+        phoneInput.value = user.phone;
+    }
 
+    // 2. Предпросмотр фото
     imageInput.onchange = () => {
         preview.innerHTML = '';
-        Array.from(imageInput.files).slice(0,5).forEach(file => {
+        const files = Array.from(imageInput.files).slice(0, 5);
+        files.forEach(file => {
             const reader = new FileReader();
             reader.onload = e => {
                 const img = document.createElement('img');
@@ -85,6 +108,7 @@
         });
     };
 
+    // 3. Функция сжатия фото (уменьшаем размер, чтобы влезло в localStorage)
     async function compressImage(base64) {
         return new Promise(resolve => {
             const img = new Image();
@@ -92,56 +116,70 @@
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const maxWidth = 800;
+                
+                // Максимальный размер 600px по ширине
+                const maxWidth = 600; 
                 const scale = maxWidth / img.width;
                 canvas.width = maxWidth;
                 canvas.height = img.height * scale;
+                
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
+                // Качество 0.5 (золотая середина)
+                resolve(canvas.toDataURL('image/jpeg', 0.5)); 
             };
         });
     }
 
+    // 4. Отправка формы
     form.onsubmit = async (e) => {
         e.preventDefault();
+        
+        submitBtn.disabled = true;
         const msg = document.getElementById('message');
-        msg.innerText = "Загрузка...";
+        msg.style.color = "#333";
+        msg.innerText = "Сжимаем фото и сохраняем...";
 
-        const files = Array.from(imageInput.files).slice(0,5);
+        const files = Array.from(imageInput.files).slice(0, 5);
         const compressedImages = [];
 
-        for (const file of files) {
-            const base64 = await new Promise(r => {
-                const reader = new FileReader();
-                reader.onload = ev => r(ev.target.result);
-                reader.readAsDataURL(file);
-            });
-            compressedImages.push(await compressImage(base64));
-        }
-
-        const newAd = {
-            id: Date.now(),
-            ownerId: user ? user.id : 'guest',
-            title: document.getElementById('title').value,
-            price: Number(document.getElementById('price').value),
-            phone: document.getElementById('phone').value,
-            region: document.getElementById('region').value,
-            category: document.getElementById('category').value,
-            images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190'],
-            createdAt: new Date().toLocaleDateString('ru-RU')
-        };
-
-        const ads = getAds() || [];
-        ads.push(newAd);
-        
         try {
+            for (const file of files) {
+                const base64 = await new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onload = ev => r(ev.target.result);
+                    reader.readAsDataURL(file);
+                });
+                const compressed = await compressImage(base64);
+                compressedImages.push(compressed);
+            }
+
+            const newAd = {
+                id: Date.now(),
+                ownerId: user.id, // Привязываем к ID текущего пользователя
+                title: document.getElementById('title').value,
+                price: Number(document.getElementById('price').value),
+                phone: phoneInput.value,
+                region: document.getElementById('region').value,
+                category: document.getElementById('category').value,
+                images: compressedImages.length > 0 ? compressedImages : ['https://via.placeholder.com/300x190?text=Нет+фото'],
+                createdAt: new Date().toLocaleDateString('ru-RU')
+            };
+
+            const ads = getAds() || [];
+            ads.unshift(newAd); // Добавляем в начало списка
+            
             saveAds(ads);
+            
             msg.style.color = "green";
-            msg.innerText = "Готово!";
-            setTimeout(() => window.location.href = 'index.html', 800);
-        } catch(e) {
+            msg.innerText = "Объявление успешно опубликовано!";
+            
+            setTimeout(() => window.location.href = 'index.html', 1200);
+
+        } catch(error) {
+            console.error(error);
             msg.style.color = "red";
-            msg.innerText = "Ошибка: фото слишком тяжелые!";
+            msg.innerText = "Ошибка сохранения. Возможно, фото слишком много.";
+            submitBtn.disabled = false;
         }
     };
 </script>
