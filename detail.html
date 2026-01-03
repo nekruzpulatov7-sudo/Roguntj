@@ -17,7 +17,7 @@
         }
         body.dark-mode { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
 
         /* ШАПКА */
         header { 
@@ -65,19 +65,18 @@
         .dark-mode .detail-title { color: #fff; }
         .detail-price { font-size: 36px; font-weight: 900; color: #28a745; margin-bottom: 25px; }
         
-        .meta-list { margin-bottom: 25px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .dark-mode .meta-list { border-color: rgba(255,255,255,0.05); }
-        .meta-item { margin: 12px 0; color: #555; font-size: 16px; display: flex; align-items: center; gap: 12px; }
-        .dark-mode .meta-item { color: #bbb; }
-        .meta-icon { width: 20px; text-align: center; }
-        
-        /* ДИНАМИЧЕСКИЕ ПАРАМЕТРЫ (Марка, Год и т.д.) */
+        /* ДИНАМИЧЕСКИЕ ПАРАМЕТРЫ */
         .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .param-box { background: #f8fafc; padding: 10px 15px; border-radius: 12px; font-size: 14px; }
         .dark-mode .param-box { background: rgba(255,255,255,0.05); }
         .param-box span { color: #888; display: block; font-size: 12px; }
         .param-box b { color: inherit; }
 
+        .meta-list { margin-bottom: 25px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .dark-mode .meta-list { border-color: rgba(255,255,255,0.05); }
+        .meta-item { margin: 12px 0; color: #555; font-size: 16px; display: flex; align-items: center; gap: 12px; }
+        .dark-mode .meta-item { color: #bbb; }
+        
         /* КОНТАКТЫ */
         .contact-box { background: #f0f7ff; padding: 25px; border-radius: 20px; margin-top: auto; text-align: center; border: 1px solid rgba(0,123,255,0.1); }
         .dark-mode .contact-box { background: rgba(0,123,255,0.05); border-color: rgba(0,123,255,0.2); }
@@ -105,7 +104,6 @@
             .detail-container { margin: 0; border-radius: 0; padding: 20px; }
             .main-img-wrapper { height: 320px; }
             .detail-title { font-size: 24px; }
-            .detail-price { font-size: 30px; }
             .params-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -130,20 +128,18 @@
 
     const container = document.getElementById('product-detail');
 
-    // Проверка темы при загрузке
+    // Проверка темы
     if(localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
 
-    // 1. Извлекаем ID объявления
     const urlParams = new URLSearchParams(window.location.search);
     const adId = parseInt(urlParams.get('id'));
 
-    // 2. Ищем объявление
     const allAds = getAds() || [];
     const ad = allAds.find(item => item.id === adId);
 
-    // Функция переключения фото (глобальная для onclick)
+    // Глобальная функция смены фото
     window.changePhoto = (src, el) => {
         const mainImg = document.getElementById('main-img');
         if (!mainImg) return;
@@ -177,12 +173,11 @@
             });
         }
 
-        // Рендер динамических параметров (Марка, Год и т.д.)
         let paramsHtml = '';
         if (ad.params) {
             paramsHtml = '<div class="params-grid">';
             for (const [key, value] of Object.entries(ad.params)) {
-                if (value) {
+                if (value && value.toString().trim() !== "") {
                     paramsHtml += `
                         <div class="param-box">
                             <span>${key}</span>
@@ -210,15 +205,15 @@
                     ${paramsHtml}
 
                     <div class="meta-list">
-                        <div class="meta-item"><span class="meta-icon">📍</span> <b>Регион:</b> ${ad.region || 'Рогун'}</div>
-                        <div class="meta-item"><span class="meta-icon">📅</span> <b>Дата:</b> ${ad.createdAt || 'Не указана'}</div>
-                        <div class="meta-item"><span class="meta-icon">🆔</span> <b>ID:</b> ${ad.id}</div>
+                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Рогун'}</div>
+                        <div class="meta-item">📅 <b>Дата:</b> ${ad.createdAt || 'Не указана'}</div>
+                        <div class="meta-item">🆔 <b>ID:</b> ${ad.id}</div>
                     </div>
                     
                     <div class="contact-box">
                         <button class="btn-show-phone" id="btn-phone">📞 Показать номер</button>
                         <div class="phone-number" id="phone-val">
-                            <a href="tel:${ad.phone}">${ad.phone}</a>
+                            <a href="tel:${ad.phone || ''}">${ad.phone || 'Номер не указан'}</a>
                             <p style="font-size:12px; color:#888; margin-top:5px;">Скажите, что вы с Rogun.tj</p>
                         </div>
                     </div>
@@ -231,11 +226,13 @@
             </div>
         `;
 
-        // Логика кнопки номера
-        document.getElementById('btn-phone').onclick = function() {
-            this.style.display = 'none';
-            document.getElementById('phone-val').style.display = 'block';
-        };
+        const phoneBtn = document.getElementById('btn-phone');
+        if(phoneBtn) {
+            phoneBtn.onclick = function() {
+                this.style.display = 'none';
+                document.getElementById('phone-val').style.display = 'block';
+            };
+        }
     }
 </script>
 
