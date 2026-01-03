@@ -1,4 +1,5 @@
 // js/storage.js
+
 export function getAds() {
     try {
         return JSON.parse(localStorage.getItem('ads') || '[]');
@@ -14,6 +15,7 @@ export function saveAds(ads) {
     } catch (e) {
         if (e.name === 'QuotaExceededError') {
             alert('Ошибка: Память браузера переполнена! Удалите старые объявления или используйте фото поменьше.');
+            throw e; // Пробрасываем ошибку для обработки в форме
         }
     }
 }
