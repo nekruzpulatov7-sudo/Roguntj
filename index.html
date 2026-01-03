@@ -45,12 +45,38 @@
     <div class="container">
         <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
             <input type="text" id="search-input" placeholder="Что ищем?" style="padding: 12px; flex: 2; border-radius: 8px; border: 1px solid #ddd;">
+            
             <select id="region-filter" style="padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
-                <option value="">Все регионы</option>
-                <option value="Рогун">Рогун</option>
-                <option value="Душанбе">Душанбе</option>
-                <option value="Худжанд">Худжанд</option>
+                <option value="">Весь Таджикистан</option>
+                <optgroup label="Основные города">
+                    <option value="Душанбе">Душанбе</option>
+                    <option value="Худжанд">Худжанд</option>
+                    <option value="Бохтар">Бохтар</option>
+                    <option value="Куляб">Куляб</option>
+                    <option value="Рогун">Рогун</option>
+                    <option value="Истаравшан">Истаравшан</option>
+                    <option value="Норак">Норак</option>
+                    <option value="Хисор">Хисор</option>
+                </optgroup>
+                <optgroup label="Районы РРП и др.">
+                    <option value="А.Чоми">А. Чоми</option>
+                    <option value="Айни">Айни</option>
+                    <option value="Ашт">Ашт</option>
+                    <option value="Балчувон">Балчувон</option>
+                    <option value="Ванч">Ванч</option>
+                    <option value="Варзоб">Варзоб</option>
+                    <option value="Вахдат">Вахдат</option>
+                    <option value="Вахш">Вахш</option>
+                    <option value="Восеъ">Восеъ</option>
+                    <option value="Дангара">Дангара</option>
+                    <option value="Дусти">Дусти</option>
+                    <option value="Нуробод">Нуробод</option>
+                    <option value="Файзобод">Файзобод</option>
+                    <option value="Хоруг">Хоруг</option>
+                    <option value="Шахринав">Шахринав</option>
+                </optgroup>
             </select>
+            
             <a href="add.html" class="btn-add-main">+ Разместить</a>
         </div>
         
@@ -111,6 +137,7 @@
             return;
         }
 
+        // Сортировка: новые сверху
         filtered.sort((a, b) => b.id - a.id).forEach(ad => {
             const imageSrc = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/300x190';
             const card = document.createElement('div');
@@ -121,7 +148,7 @@
                     <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
                     <div class="title">${ad.title}</div>
                     <span class="category-tag">${ad.category}</span>
-                    <span class="region-tag">📍 ${ad.region || 'Рогун'}</span>
+                    <span class="region-tag">📍 ${ad.region || 'Не указан'}</span>
                 </div>
             `;
             card.onclick = () => window.location.href = `detail.html?id=${ad.id}`;
@@ -139,10 +166,19 @@
 
     searchInput.addEventListener('input', updateAds);
     regionFilter.addEventListener('change', updateAds);
+    
     themeBtn.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         themeBtn.textContent = document.body.classList.contains('dark-mode') ? "☀️" : "🌙";
+        // Сохраним выбор темы
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     });
+
+    // Проверка сохраненной темы при загрузке
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeBtn.textContent = "☀️";
+    }
 
     renderUserMenu();
     updateAds();
