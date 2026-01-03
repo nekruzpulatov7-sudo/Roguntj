@@ -85,7 +85,19 @@
         }
         .change-phone:hover { text-decoration: underline; }
 
-        /* Стиль для проверочного кода (зеленый) */
+        /* Стиль для имитации СМС уведомления на странице */
+        .debug-notice {
+            display: none;
+            background: #fff9db;
+            border: 1px solid #fab005;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: left;
+        }
+
         .btn-verify { background: #28a745; }
         .btn-verify:hover { background: #218838; }
     </style>
@@ -94,6 +106,11 @@
 
 <div class="login-card">
     <h2 onclick="window.location.href='index.html'">Rogun.tj</h2>
+    
+    <div id="debug-notice" class="debug-notice">
+        <b>Тестовое уведомление:</b><br>
+        Код подтверждения для входа: <span id="visual-code" style="font-weight: bold; font-size: 18px; color: #d9480f;"></span>
+    </div>
     
     <div id="phone-section">
         <p>Введите ваш номер для входа или регистрации</p>
@@ -124,6 +141,8 @@
     const phoneInput = document.getElementById('phone-input');
     const smsInput = document.getElementById('sms-input');
     const displayPhone = document.getElementById('display-phone');
+    const debugNotice = document.getElementById('debug-notice');
+    const visualCode = document.getElementById('visual-code');
     
     let generatedCode = null;
 
@@ -144,11 +163,12 @@
             return;
         }
 
-        // Имитация генерации и отправки кода
+        // Имитация генерации кода
         generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         
-        // В реальном проекте здесь будет запрос к API СМС-шлюза
-        alert('ВАШ СМС КОД: ' + generatedCode); 
+        // Показываем код в уведомлении на странице
+        visualCode.innerText = generatedCode;
+        debugNotice.style.display = 'block';
         
         // Переход к следующему экрану
         displayPhone.innerText = phone;
@@ -160,7 +180,6 @@
     // 2. Шаг: Проверка кода и вход
     document.getElementById('btn-verify').onclick = () => {
         if (smsInput.value === generatedCode) {
-            // Создаем объект пользователя
             const userData = {
                 id: Date.now(),
                 phone: phoneInput.value.trim(),
@@ -169,13 +188,12 @@
                 joinedAt: new Date().toLocaleDateString()
             };
             
-            // Сохраняем через твой модуль storage.js
             setCurrentUser(userData);
             
             alert('Добро пожаловать на Rogun.tj!');
             window.location.href = 'index.html'; 
         } else {
-            alert('Неверный код! Попробуйте еще раз.');
+            alert('Неверный код! Проверьте желтое окошко сверху.');
             smsInput.value = '';
             smsInput.focus();
         }
@@ -186,6 +204,7 @@
         e.preventDefault();
         phoneSection.style.display = 'block';
         smsSection.style.display = 'none';
+        debugNotice.style.display = 'none'; // Скрываем уведомление при возврате
         smsInput.value = '';
     };
 </script>
