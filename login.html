@@ -8,13 +8,18 @@
     <style>
         /* Центрирование карточки на странице */
         body { 
-            background: #f4f7f6; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             min-height: 100vh; 
             margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+        }
+
+        /* Стиль для темной темы, если она включена в системе */
+        @media (prefers-color-scheme: dark) {
+            body.dark-mode { background: #1a1a2e; }
         }
 
         .login-card { 
@@ -22,119 +27,129 @@
             width: 90%; 
             padding: 35px; 
             background: white; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
             text-align: center; 
-            transition: 0.3s;
+            transition: 0.3s ease;
         }
 
         .login-card h2 { 
-            margin-bottom: 10px; 
+            margin-bottom: 5px; 
             color: #007bff; 
-            font-size: 28px; 
+            font-size: 32px; 
             cursor: pointer;
+            letter-spacing: -1px;
         }
 
         .login-card p {
-            color: #777;
-            font-size: 14px;
+            color: #666;
+            font-size: 15px;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
         
         .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 600; }
+        .input-group label { display: block; margin-bottom: 8px; color: #444; font-size: 14px; font-weight: 600; }
         
         input { 
             width: 100%; 
-            padding: 14px; 
-            border: 2px solid #eee; 
-            border-radius: 10px; 
+            padding: 15px; 
+            border: 2px solid #edf2f7; 
+            border-radius: 12px; 
             font-size: 16px; 
             box-sizing: border-box; 
             outline: none; 
-            transition: 0.3s; 
+            transition: 0.2s; 
+            background: #f8fafc;
         }
 
-        input:focus { border-color: #007bff; background: #fcfdfe; }
+        input:focus { border-color: #007bff; background: white; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); }
         
-        .btn-send { 
+        .btn-primary { 
             width: 100%; 
-            padding: 15px; 
+            padding: 16px; 
             background: #007bff; 
             color: white; 
             border: none; 
-            border-radius: 10px; 
-            font-weight: bold; 
+            border-radius: 12px; 
+            font-weight: 700; 
             cursor: pointer; 
             font-size: 16px; 
             transition: 0.3s; 
         }
 
-        .btn-send:hover { background: #0056b3; transform: translateY(-2px); }
-        .btn-send:active { transform: translateY(0); }
+        .btn-primary:hover { background: #0056b3; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,123,255,0.2); }
+        .btn-primary:active { transform: translateY(0); }
         
         #sms-section { display: none; }
         
         .change-phone { 
-            font-size: 13px; 
+            font-size: 14px; 
             color: #007bff; 
             cursor: pointer; 
             text-decoration: none; 
             display: inline-block; 
             margin-top: 20px; 
+            font-weight: 500;
         }
         .change-phone:hover { text-decoration: underline; }
 
-        /* Стиль для имитации СМС уведомления на странице */
+        /* Имитация всплывающего уведомления СМС */
         .debug-notice {
             display: none;
-            background: #fff9db;
-            border: 1px solid #fab005;
+            background: #fff4e6;
+            border-left: 5px solid #fd7e14;
             color: #856404;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
             font-size: 14px;
             text-align: left;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .btn-verify { background: #28a745; }
-        .btn-verify:hover { background: #218838; }
+        .btn-verify:hover { background: #218838; box-shadow: 0 8px 15px rgba(40,167,69,0.2); }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2 onclick="window.location.href='index.html'">Rogun.tj</h2>
+    <h2 onclick="window.location.href='index.html'">Rogun<span style="color:#28a745">.tj</span></h2>
     
     <div id="debug-notice" class="debug-notice">
-        <b>Тестовое уведомление:</b><br>
-        Код подтверждения для входа: <span id="visual-code" style="font-weight: bold; font-size: 18px; color: #d9480f;"></span>
+        <strong>📩 Новое сообщение:</strong><br>
+        Код подтверждения Rogun.tj: <span id="visual-code" style="font-weight: 800; font-size: 18px; color: #e67e22;"></span>
     </div>
     
     <div id="phone-section">
-        <p>Введите ваш номер для входа или регистрации</p>
+        <p>Для входа или регистрации введите ваш номер телефона</p>
         <div class="input-group">
             <label>Номер телефона</label>
             <input type="tel" id="phone-input" placeholder="+992 900 00 00 00" value="+992 ">
         </div>
-        <button class="btn-send" id="btn-get-code">Получить код</button>
+        <button class="btn-primary" id="btn-get-code">Получить код</button>
     </div>
 
     <div id="sms-section">
-        <p>Код отправлен на номер: <br><strong id="display-phone" style="color: #333;"></strong></p>
+        <p>Мы отправили код на номер: <br><strong id="display-phone" style="color: #333;"></strong></p>
         <div class="input-group">
             <label>Код из СМС</label>
-            <input type="number" id="sms-input" placeholder="0 0 0 0" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+            <input type="text" id="sms-input" placeholder="· · · ·" maxlength="4" style="text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: bold;">
         </div>
-        <button class="btn-send btn-verify" id="btn-verify">Войти</button>
+        <button class="btn-primary btn-verify" id="btn-verify">Подтвердить и войти</button>
         <br>
         <a class="change-phone" id="btn-back">← Изменить номер</a>
     </div>
 </div>
 
 <script type="module">
-    import { setCurrentUser } from './js/storage.js';
+    import { setCurrentUser, getUsers, saveUsers } from './js/storage.js';
 
     const phoneSection = document.getElementById('phone-section');
     const smsSection = document.getElementById('sms-section');
@@ -146,66 +161,83 @@
     
     let generatedCode = null;
 
-    // Контроль префикса +992
-    phoneInput.addEventListener('input', () => {
-        if (!phoneInput.value.startsWith('+992 ')) {
-            phoneInput.value = '+992 ';
-        }
+    // Авто-префикс для удобства
+    phoneInput.addEventListener('focus', () => {
+        if (phoneInput.value === '') phoneInput.value = '+992 ';
     });
 
-    // 1. Шаг: Получение кода
+    // 1. Шаг: Генерация кода (Имитация отправки СМС)
     document.getElementById('btn-get-code').onclick = () => {
         const phone = phoneInput.value.trim();
         
-        // Проверка: +992 (4 символа) + 9 цифр = 13
+        // Валидация (минимум 13 символов для формата +992 000000000)
         if (phone.length < 13) {
-            alert('Пожалуйста, введите корректный номер (+992 и 9 цифр)');
+            alert('Введите полный номер телефона в формате +992XXXXXXXXX');
             return;
         }
 
-        // Имитация генерации кода
+        // Генерируем случайный 4-значный код
         generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         
-        // Показываем код в уведомлении на странице
+        // Показываем "СМС" в тестовом окне
         visualCode.innerText = generatedCode;
         debugNotice.style.display = 'block';
         
-        // Переход к следующему экрану
+        // Анимация перехода
         displayPhone.innerText = phone;
         phoneSection.style.display = 'none';
         smsSection.style.display = 'block';
         smsInput.focus();
     };
 
-    // 2. Шаг: Проверка кода и вход
+    // 2. Шаг: Проверка кода и создание/вход в профиль
     document.getElementById('btn-verify').onclick = () => {
         if (smsInput.value === generatedCode) {
-            const userData = {
-                id: Date.now(),
-                phone: phoneInput.value.trim(),
-                name: "Пользователь",
-                email: phoneInput.value.trim().replace(/\s/g, '') + "@rogun.tj",
-                joinedAt: new Date().toLocaleDateString()
-            };
+            const phone = phoneInput.value.trim();
+            const allUsers = getUsers() || [];
             
-            setCurrentUser(userData);
+            // Проверяем, существует ли пользователь с таким номером
+            let user = allUsers.find(u => u.phone === phone);
             
-            alert('Добро пожаловать на Rogun.tj!');
+            if (!user) {
+                // Если нет — создаем нового
+                user = {
+                    id: Date.now(),
+                    phone: phone,
+                    name: "Пользователь Рогуна",
+                    registered: new Date().toLocaleDateString(),
+                    avatarColor: '#007bff'
+                };
+                allUsers.push(user);
+                saveUsers(allUsers);
+            }
+            
+            // Сохраняем как текущего пользователя
+            setCurrentUser(user);
+            
+            alert('Вы успешно вошли!');
             window.location.href = 'index.html'; 
         } else {
-            alert('Неверный код! Проверьте желтое окошко сверху.');
+            alert('Неверный код! Посмотрите на оранжевое уведомление вверху карточки.');
             smsInput.value = '';
             smsInput.focus();
         }
     };
 
-    // Возврат назад
+    // Кнопка назад (если ошибся в номере)
     document.getElementById('btn-back').onclick = (e) => {
         e.preventDefault();
         phoneSection.style.display = 'block';
         smsSection.style.display = 'none';
-        debugNotice.style.display = 'none'; // Скрываем уведомление при возврате
+        debugNotice.style.display = 'none';
         smsInput.value = '';
+    };
+
+    // Автоматический вход при вводе 4 цифр
+    smsInput.oninput = () => {
+        if (smsInput.value.length === 4) {
+            document.getElementById('btn-verify').click();
+        }
     };
 </script>
 

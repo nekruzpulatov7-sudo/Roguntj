@@ -66,7 +66,7 @@
         input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
         /* КАТЕГОРИИ */
-        .cat-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .cat-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .cat-nav::-webkit-scrollbar { display: none; }
         .cat-btn { 
             padding: 10px 18px; 
@@ -128,7 +128,7 @@
 
 <section class="search-section">
     <div class="container">
-        <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 800;">Найди лучшее в Рогуне 🏔️</h2>
+        <h2 style="margin: 0 0 20px 0; font-size: 28px; font-weight: 800;">Найди лучшее в Таджикистане 🏔️</h2>
         <div class="search-box">
             <input type="text" id="search-input" placeholder="Что ищем?" style="flex: 2; min-width: 200px;">
             
@@ -138,7 +138,34 @@
                     <option value="Рогун">Рогун</option>
                     <option value="Душанбе">Душанбе</option>
                     <option value="Худжанд">Худжанд</option>
+                    <option value="Бохтар">Бохтар</option>
+                    <option value="Куляб">Куляб</option>
                     <option value="Вахдат">Вахдат</option>
+                    <option value="Истаравшан">Истаравшан</option>
+                    <option value="Гиссар">Гиссар</option>
+                    <option value="Турсунзаде">Турсунзаде</option>
+                    <option value="Канибадам">Канибадам</option>
+                    <option value="Исфара">Исфара</option>
+                    <option value="Пенджикент">Пенджикент</option>
+                    <option value="Норак">Норак</option>
+                    <option value="Хоруг">Хоруг</option>
+                </optgroup>
+                <optgroup label="Районы и поселки">
+                    <option value="Нуробод">Нуробод</option>
+                    <option value="Файзобод">Файзобод</option>
+                    <option value="Рашт">Рашт (Гарм)</option>
+                    <option value="Варзоб">Варзоб</option>
+                    <option value="Айни">Айни</option>
+                    <option value="Дангара">Дангара</option>
+                    <option value="Яван">Яван</option>
+                    <option value="Рудаки">Рудаки</option>
+                    <option value="Шахринав">Шахринав</option>
+                    <option value="Лахш">Лахш</option>
+                    <option value="Сангвор">Сангвор</option>
+                    <option value="Таджикабад">Таджикабад</option>
+                    <option value="Восеъ">Восеъ</option>
+                    <option value="Фархор">Фархор</option>
+                    <option value="Мургаб">Мургаб</option>
                 </optgroup>
             </select>
             
@@ -151,7 +178,10 @@
             <button class="cat-btn" data-cat="Электроника">📱 Техника</button>
             <button class="cat-btn" data-cat="Транспорт">🚗 Авто</button>
             <button class="cat-btn" data-cat="Недвижимость">🏠 Жилье</button>
+            <button class="cat-btn" data-cat="Одежда">👕 Одежда</button>
+            <button class="cat-btn" data-cat="Для дома">🛋️ Для дома</button>
             <button class="cat-btn" data-cat="Услуги">🛠️ Услуги</button>
+            <button class="cat-btn" data-cat="Работа">💼 Работа</button>
         </nav>
     </div>
 </section>
@@ -170,6 +200,7 @@
     const themeBtn = document.getElementById('theme-toggle');
     const catButtons = document.querySelectorAll('.cat-btn');
 
+    // Отображение меню пользователя (Войти или Профиль)
     function renderUserMenu() {
         const user = getCurrentUser();
         if (user) {
@@ -179,6 +210,7 @@
         }
     }
 
+    // Основная функция фильтрации и показа объявлений
     function updateAds() {
         const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
@@ -199,18 +231,19 @@
             return;
         }
 
+        // Сортировка: новые сверху
         filtered.sort((a, b) => b.id - a.id).forEach(ad => {
             const imageSrc = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/300x200?text=Нет+фото';
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                <img src="${imageSrc}" loading="lazy">
+                <img src="${imageSrc}" alt="${ad.title}" loading="lazy">
                 <div class="info">
                     <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
                     <div class="title">${ad.title}</div>
                     <div class="card-footer">
                         <span class="category-tag">${ad.category}</span>
-                        <span class="region-tag">📍 ${ad.region || 'Рогун'}</span>
+                        <span class="region-tag">📍 ${ad.region || 'Не указан'}</span>
                     </div>
                 </div>
             `;
@@ -219,6 +252,7 @@
         });
     }
 
+    // Обработка клика по категориям
     catButtons.forEach(btn => {
         btn.onclick = () => {
             catButtons.forEach(b => b.classList.remove('active'));
@@ -227,9 +261,11 @@
         };
     });
 
+    // Слушатели ввода
     searchInput.oninput = updateAds;
     regionFilter.onchange = updateAds;
     
+    // Переключатель темы
     themeBtn.onclick = () => {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
@@ -237,6 +273,7 @@
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     };
 
+    // Проверка сохраненной темы
     if(localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         themeBtn.textContent = "☀️";

@@ -6,42 +6,49 @@
     <title>Мой профиль — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
+        body { background: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; transition: 0.3s; }
+        body.dark-mode { background: #121225; color: white; }
+        
         .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
         
         /* Шапка профиля */
         .profile-header { background: white; padding: 40px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .dark-mode .profile-header { background: #1f1f3a; border-bottom: 1px solid #333; }
+        
         .user-info { display: flex; align-items: center; gap: 20px; }
         .user-avatar { width: 80px; height: 80px; background: #007bff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,123,255,0.3); }
         
         /* Сетка объявлений */
         .my-ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 50px; }
         .my-ad-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: 0.3s; }
+        .dark-mode .my-ad-card { background: #1f1f3a; }
         .my-ad-card:hover { transform: translateY(-5px); }
         .my-ad-card img { width: 100%; height: 180px; object-fit: cover; }
         
         .my-ad-info { padding: 15px; flex-grow: 1; }
         .my-ad-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px; }
+        .dark-mode .my-ad-title { color: #eee; }
         .my-ad-price { font-size: 18px; font-weight: bold; color: #28a745; margin-bottom: 5px; }
         
         /* Кнопки */
         .btn-delete { width: 100%; padding: 12px; background: #fff1f1; color: #ff4d4d; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; border-top: 1px solid #ffebeb; }
         .btn-delete:hover { background: #ff4d4d; color: white; }
+        .dark-mode .btn-delete { background: #2d1a1a; border-top: 1px solid #442222; }
         
         .btn-logout { background: #f8f9fa; color: #6c757d; padding: 8px 15px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; font-size: 14px; transition: 0.3s; }
         .btn-logout:hover { background: #e2e6ea; color: #333; }
         
         .empty-state { text-align: center; padding: 60px 20px; color: #888; background: white; border-radius: 20px; grid-column: 1/-1; }
+        .dark-mode .empty-state { background: #1f1f3a; }
         
         header h1 { color: #007bff; transition: 0.3s; }
-        header h1:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <header style="background: white; padding: 15px 0; border-bottom: 1px solid #eee;">
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px;">Rogun.tj</h1>
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px;">Rogun<span style="color:#28a745">.tj</span></h1>
         <div style="display: flex; gap: 15px; align-items: center;">
             <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: 500;">На главную</a>
             <button id="logout-btn" class="btn-logout">Выйти</button>
@@ -52,17 +59,17 @@
 <div class="profile-header">
     <div class="container">
         <div class="user-info">
-            <div class="user-avatar" id="user-initial">R</div>
+            <div class="user-avatar" id="user-initial">?</div>
             <div>
                 <h2 id="user-phone" style="margin:0; color: #333;">+992 ...</h2>
-                <p style="color: #888; margin: 5px 0 0;">Личный кабинет продавца</p>
+                <p id="user-status" style="color: #888; margin: 5px 0 0;">Личный кабинет продавца</p>
             </div>
         </div>
     </div>
 </div>
 
 <main class="container">
-    <h3 style="margin-bottom: 25px; color: #333;">Мои объявления</h3>
+    <h3 style="margin-bottom: 25px; color: #333;" id="section-title">Мои объявления</h3>
     <div id="my-ads-container" class="my-ads-grid">
         </div>
 </main>
@@ -81,8 +88,8 @@
         window.location.href = 'login.html';
     } else {
         userPhoneDisplay.innerText = user.phone;
-        // Берем первую цифру номера после кода страны или просто первую букву
-        userInitialDisplay.innerText = user.phone.replace(/[^0-9]/g, '')[3] || 'R';
+        // Красивая аватарка: берем первую цифру номера или букву
+        userInitialDisplay.innerText = user.phone.charAt(0).toUpperCase();
     }
 
     // 2. Функция выхода
@@ -97,10 +104,8 @@
     function renderMyAds() {
         const allAds = getAds() || [];
         
-        // Фильтрация по ID владельца или по номеру телефона (для старых записей)
-        const myAds = allAds.filter(ad => 
-            ad.ownerId === user.id || ad.phone === user.phone
-        );
+        // ВАЖНО: Фильтруем по userId (как в add.html)
+        const myAds = allAds.filter(ad => ad.userId === user.id);
 
         if (myAds.length === 0) {
             adsContainer.innerHTML = `
@@ -118,7 +123,7 @@
         myAds.sort((a, b) => b.id - a.id).forEach(ad => {
             const card = document.createElement('div');
             card.className = 'my-ad-card';
-            const img = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/300x190?text=Нет+фото';
+            const img = (ad.images && ad.images.length > 0) ? ad.images[0] : 'https://via.placeholder.com/300x190?text=Нет+фото';
             
             card.innerHTML = `
                 <img src="${img}" alt="${ad.title}">
@@ -131,13 +136,13 @@
             adsContainer.appendChild(card);
         });
 
-        // Слушатель событий на кнопки удаления
-        adsContainer.onclick = (e) => {
-            if (e.target.classList.contains('btn-delete')) {
+        // Слушатель на кнопки удаления
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.onclick = (e) => {
                 const idToDelete = parseInt(e.target.dataset.id);
                 deleteAd(idToDelete);
-            }
-        };
+            };
+        });
     }
 
     // 4. Функция удаления
@@ -145,9 +150,14 @@
         if (confirm('Это действие нельзя будет отменить. Удалить объявление?')) {
             const allAds = getAds();
             const updatedAds = allAds.filter(ad => ad.id !== id);
-            saveAds(updatedAds);
-            renderMyAds();
+            saveAds(updatedAds); // Используем saveAds для перезаписи базы
+            renderMyAds(); // Сразу обновляем экран
         }
+    }
+
+    // Применение темной темы
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
     }
 
     renderMyAds();
