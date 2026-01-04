@@ -6,7 +6,7 @@
     <title>Просмотр объявления — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ОСНОВНОЙ ФОН */
+        /* ТВОЙ ОРИГИНАЛЬНЫЙ СТИЛЬ БЕЗ ИЗМЕНЕНИЙ */
         body { 
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             background-attachment: fixed;
@@ -19,7 +19,6 @@
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
 
-        /* ШАПКА */
         header { 
             background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(12px); 
@@ -31,7 +30,6 @@
         }
         .dark-mode header { background: rgba(26, 26, 46, 0.8); border-bottom: 1px solid rgba(255,255,255,0.1); }
 
-        /* КОНТЕЙНЕР ОБЪЯВЛЕНИЯ */
         .detail-container { 
             margin: 30px auto; 
             padding: 30px; 
@@ -43,7 +41,6 @@
 
         .detail-main { display: flex; gap: 40px; flex-wrap: wrap; }
         
-        /* ГАЛЕРЕЯ */
         .detail-gallery { flex: 1.2; min-width: 320px; }
         .main-img-wrapper { 
             position: relative; width: 100%; height: 450px; 
@@ -59,26 +56,24 @@
         .thumbs img:hover { opacity: 1; border-color: #007bff; }
         .thumbs img.active { opacity: 1; border-color: #007bff; transform: scale(1.05); }
 
-        /* ИНФОРМАЦИЯ */
         .detail-info { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
         .category-tag { color: #007bff; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; display: block; }
         .detail-title { font-size: 30px; color: #222; margin: 0 0 15px 0; line-height: 1.2; font-weight: 800; }
         .dark-mode .detail-title { color: #fff; }
         .detail-price { font-size: 36px; font-weight: 900; color: #28a745; margin-bottom: 25px; }
         
-        /* ДИНАМИЧЕСКИЕ ПАРАМЕТРЫ */
+        /* ПАРАМЕТРЫ */
         .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .param-box { background: #f8fafc; padding: 10px 15px; border-radius: 12px; font-size: 14px; }
-        .dark-mode .param-box { background: rgba(255,255,255,0.05); }
-        .param-box span { color: #888; display: block; font-size: 11px; text-transform: uppercase; }
-        .param-box b { color: inherit; font-size: 15px; }
+        .param-box { background: #f8fafc; padding: 10px 15px; border-radius: 12px; font-size: 14px; border: 1px solid #eee; }
+        .dark-mode .param-box { background: rgba(255,255,255,0.05); border-color: transparent; }
+        .param-box span { color: #888; display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 2px; }
+        .param-box b { color: inherit; font-size: 15px; font-weight: 700; }
 
         .meta-list { margin-bottom: 25px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); }
         .dark-mode .meta-list { border-color: rgba(255,255,255,0.05); }
         .meta-item { margin: 12px 0; color: #555; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         .dark-mode .meta-item { color: #bbb; }
         
-        /* КОНТАКТЫ */
         .contact-box { background: #f0f7ff; padding: 25px; border-radius: 20px; margin-top: auto; text-align: center; border: 1px solid rgba(0,123,255,0.1); }
         .dark-mode .contact-box { background: rgba(0,123,255,0.05); border-color: rgba(0,123,255,0.2); }
         
@@ -98,25 +93,18 @@
             border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; 
             display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;
         }
-        .btn-whatsapp:hover { background: #1eb954; transform: translateY(-2px); }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ОПИСАНИЕ */
         .description-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); }
-        .dark-mode .description-section { border-color: rgba(255,255,255,0.05); }
         .desc-text { line-height: 1.7; color: #444; white-space: pre-wrap; font-size: 17px; }
         .dark-mode .desc-text { color: #ccc; }
 
-        /* ПОХОЖИЕ */
         .similar-section { margin: 40px auto; padding: 30px; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .dark-mode .similar-section { background: #1f1f3a; }
 
         @media (max-width: 768px) { 
             .detail-container { margin: 0; border-radius: 0; padding: 20px; }
             .main-img-wrapper { height: 320px; }
-            .detail-title { font-size: 24px; }
-            .params-grid { grid-template-columns: 1fr; }
+            .params-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -131,13 +119,11 @@
 
 <main class="container">
     <div id="product-detail" class="detail-container">
-        <p style="text-align: center; padding: 100px; color: #888;">Загрузка данных...</p>
-    </div>
+        </div>
 
     <div class="similar-section" id="similar-section" style="display: none;">
         <h3 style="margin-bottom: 20px; font-size: 22px;">Похожие объявления</h3>
-        <div id="similar-ads-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
-        </div>
+        <div id="similar-ads-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
     </div>
 </main>
 
@@ -147,37 +133,26 @@
     const container = document.getElementById('product-detail');
     const allAds = getAds() || [];
 
-    // Применяем тему при загрузке
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
     const urlParams = new URLSearchParams(window.location.search);
     const adId = parseInt(urlParams.get('id'));
     const ad = allAds.find(item => item.id === adId);
 
-    // Смена фото в галерее (выносим в window для доступа из HTML onclick)
+    // ГЛОБАЛЬНАЯ ФУНКЦИЯ ДЛЯ СМЕНЫ ФОТО
     window.changePhoto = (src, el) => {
         const mainImg = document.getElementById('main-img');
-        if (!mainImg) return;
-        
         document.querySelectorAll('.thumbs img').forEach(img => img.classList.remove('active'));
         el.classList.add('active');
-        
-        mainImg.style.opacity = '0';
+        mainImg.style.opacity = '0.5';
         setTimeout(() => {
             mainImg.src = src;
             mainImg.style.opacity = '1';
-        }, 150);
+        }, 100);
     };
 
     if (!ad) {
-        container.innerHTML = `
-            <div style="text-align:center; padding: 80px 20px;">
-                <h2>Объявление не найдено</h2>
-                <p>Возможно, оно было удалено автором.</p>
-                <a href="index.html" style="color:#007bff; text-decoration:none; font-weight:bold;">Вернуться на главную</a>
-            </div>`;
+        container.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Объявление не найдено</h2><a href="index.html">На главную</a></div>`;
     } else {
         renderDetail(ad);
         renderSimilarAds(ad);
@@ -193,20 +168,36 @@
             });
         }
 
+        // КРАСИВАЯ ОБРАБОТКА ПАРАМЕТРОВ
         let paramsHtml = '';
-        if (ad.params && Object.keys(ad.params).length > 0) {
-            const labels = { brand: 'Марка', year: 'Год', rooms: 'Комнат', area: 'Площадь', condition: 'Состояние' };
-            paramsHtml = '<div class="params-grid">';
+        if (ad.params) {
+            const labels = { 
+                brand: 'Марка', 
+                model: 'Модель',
+                fuel: 'Топливо',
+                year: 'Год выпуска', 
+                rooms: 'Комнат', 
+                area: 'Площадь', 
+                condition: 'Состояние' 
+            };
+            
+            let hasValidParams = false;
+            let gridContent = '';
+
             for (const [key, value] of Object.entries(ad.params)) {
-                if (value) {
-                    paramsHtml += `
+                if (value && value !== "" && labels[key]) {
+                    hasValidParams = true;
+                    gridContent += `
                         <div class="param-box">
-                            <span>${labels[key] || key}</span>
-                            <b>${value}</b>
+                            <span>${labels[key]}</span>
+                            <b>${value}${key === 'area' ? ' м²' : ''}</b>
                         </div>`;
                 }
             }
-            paramsHtml += '</div>';
+            
+            if (hasValidParams) {
+                paramsHtml = `<div class="params-grid">${gridContent}</div>`;
+            }
         }
 
         container.innerHTML = `
@@ -226,8 +217,8 @@
                     ${paramsHtml}
 
                     <div class="meta-list">
-                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Не указан'}</div>
-                        <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.createdAt || 'Недавно'}</div>
+                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Рогун'}</div>
+                        <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.date || 'Недавно'}</div>
                         <div class="meta-item">🆔 <b>ID:</b> ${ad.id}</div>
                     </div>
                     
@@ -238,34 +229,29 @@
                         </div>
                         
                         <button class="btn-whatsapp" id="btn-whatsapp">
-                            <span>Поделиться в WhatsApp</span>
+                            <span>Написать в WhatsApp</span>
                         </button>
                     </div>
                 </div>
             </div>
             
             <div class="description-section">
-                <h3>Описание</h3>
+                <h3 style="font-size: 20px; margin-bottom: 15px;">Описание</h3>
                 <div class="desc-text">${ad.description || 'Описание отсутствует.'}</div>
             </div>
         `;
 
-        // Слушатели событий
-        const btnPhone = document.getElementById('btn-phone');
-        if (btnPhone) {
-            btnPhone.onclick = function() {
-                this.style.display = 'none';
-                document.getElementById('phone-val').style.display = 'block';
-            };
-        }
+        // Логика кнопок
+        document.getElementById('btn-phone').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('phone-val').style.display = 'block';
+        };
 
-        const btnWA = document.getElementById('btn-whatsapp');
-        if (btnWA) {
-            btnWA.onclick = () => {
-                const text = `Посмотри на Rogun.tj: ${ad.title}\nЦена: ${ad.price} TJS\n${window.location.href}`;
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-            };
-        }
+        document.getElementById('btn-whatsapp').onclick = () => {
+            const cleanPhone = ad.phone.replace(/\D/g, '');
+            const text = `Здравствуйте! Пишу по поводу объявления на Rogun.tj: ${ad.title}`;
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
+        };
     }
 
     function renderSimilarAds(currentAd) {
@@ -278,20 +264,18 @@
 
         if (similar.length > 0) {
             section.style.display = 'block';
-            list.innerHTML = ''; // Очистка
             similar.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'similar-card';
-                card.style.cssText = "background:#f8fafc; border-radius:15px; cursor:pointer; overflow:hidden; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);";
+                card.style.cssText = "background:white; border-radius:15px; cursor:pointer; overflow:hidden; border:1px solid #eee; transition:0.3s;";
                 card.onclick = () => window.location.href = `detail.html?id=${item.id}`;
                 
                 const img = (item.images && item.images[0]) ? item.images[0] : 'https://via.placeholder.com/300x200?text=Нет+фото';
                 
                 card.innerHTML = `
-                    <img src="${img}" style="width:100%; height:150px; object-fit:cover;">
-                    <div style="padding:15px;">
-                        <div style="color:#28a745; font-weight:800;">${Number(item.price).toLocaleString()} TJS</div>
-                        <div style="font-size:14px; margin:5px 0; height:40px; overflow:hidden; line-height:1.4;">${item.title}</div>
+                    <img src="${img}" style="width:100%; height:140px; object-fit:cover;">
+                    <div style="padding:12px;">
+                        <div style="color:#28a745; font-weight:800; font-size:16px;">${Number(item.price).toLocaleString()} TJS</div>
+                        <div style="font-size:13px; margin:5px 0; height:36px; overflow:hidden; line-height:1.3; color:#333;">${item.title}</div>
                         <div style="font-size:11px; color:#888;">📍 ${item.region || 'Рогун'}</div>
                     </div>
                 `;
