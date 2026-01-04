@@ -147,19 +147,24 @@
     const container = document.getElementById('product-detail');
     const allAds = getAds() || [];
 
-    // Применяем тему
-    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    // Применяем тему при загрузке
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const adId = parseInt(urlParams.get('id'));
     const ad = allAds.find(item => item.id === adId);
 
-    // Смена фото в галерее
+    // Смена фото в галерее (выносим в window для доступа из HTML onclick)
     window.changePhoto = (src, el) => {
         const mainImg = document.getElementById('main-img');
+        if (!mainImg) return;
+        
         document.querySelectorAll('.thumbs img').forEach(img => img.classList.remove('active'));
         el.classList.add('active');
-        mainImg.style.opacity = '0.5';
+        
+        mainImg.style.opacity = '0';
         setTimeout(() => {
             mainImg.src = src;
             mainImg.style.opacity = '1';
@@ -167,7 +172,12 @@
     };
 
     if (!ad) {
-        container.innerHTML = `<div style="text-align:center; padding: 80px 20px;"><h2>Объявление не найдено</h2><a href="index.html">Вернуться на главную</a></div>`;
+        container.innerHTML = `
+            <div style="text-align:center; padding: 80px 20px;">
+                <h2>Объявление не найдено</h2>
+                <p>Возможно, оно было удалено автором.</p>
+                <a href="index.html" style="color:#007bff; text-decoration:none; font-weight:bold;">Вернуться на главную</a>
+            </div>`;
     } else {
         renderDetail(ad);
         renderSimilarAds(ad);
@@ -184,8 +194,8 @@
         }
 
         let paramsHtml = '';
-        if (ad.params) {
-            const labels = { brand: 'Марка', year: 'Год', rooms: 'Комнат', area: 'Площадь' };
+        if (ad.params && Object.keys(ad.params).length > 0) {
+            const labels = { brand: 'Марка', year: 'Год', rooms: 'Комнат', area: 'Площадь', condition: 'Состояние' };
             paramsHtml = '<div class="params-grid">';
             for (const [key, value] of Object.entries(ad.params)) {
                 if (value) {
@@ -216,9 +226,9 @@
                     ${paramsHtml}
 
                     <div class="meta-list">
-                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region}</div>
-                        <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.createdAt}</div>
-                        <div class="meta-item">🆔 <b>Номер объявления:</b> ${ad.id}</div>
+                        <div class="meta-item">📍 <b>Регион:</b> ${ad.region || 'Не указан'}</div>
+                        <div class="meta-item">📅 <b>Опубликовано:</b> ${ad.createdAt || 'Недавно'}</div>
+                        <div class="meta-item">🆔 <b>ID:</b> ${ad.id}</div>
                     </div>
                     
                     <div class="contact-box">
@@ -236,20 +246,26 @@
             
             <div class="description-section">
                 <h3>Описание</h3>
-                <div class="desc-text">${ad.description}</div>
+                <div class="desc-text">${ad.description || 'Описание отсутствует.'}</div>
             </div>
         `;
 
-        // События кнопок
-        document.getElementById('btn-phone').onclick = function() {
-            this.style.display = 'none';
-            document.getElementById('phone-val').style.display = 'block';
-        };
+        // Слушатели событий
+        const btnPhone = document.getElementById('btn-phone');
+        if (btnPhone) {
+            btnPhone.onclick = function() {
+                this.style.display = 'none';
+                document.getElementById('phone-val').style.display = 'block';
+            };
+        }
 
-        document.getElementById('btn-whatsapp').onclick = () => {
-            const text = `Посмотри на Rogun.tj: ${ad.title}\nЦена: ${ad.price} TJS\n${window.location.href}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        };
+        const btnWA = document.getElementById('btn-whatsapp');
+        if (btnWA) {
+            btnWA.onclick = () => {
+                const text = `Посмотри на Rogun.tj: ${ad.title}\nЦена: ${ad.price} TJS\n${window.location.href}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            };
+        }
     }
 
     function renderSimilarAds(currentAd) {
@@ -262,17 +278,21 @@
 
         if (similar.length > 0) {
             section.style.display = 'block';
+            list.innerHTML = ''; // Очистка
             similar.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'similar-card';
                 card.style.cssText = "background:#f8fafc; border-radius:15px; cursor:pointer; overflow:hidden; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);";
                 card.onclick = () => window.location.href = `detail.html?id=${item.id}`;
+                
+                const img = (item.images && item.images[0]) ? item.images[0] : 'https://via.placeholder.com/300x200?text=Нет+фото';
+                
                 card.innerHTML = `
-                    <img src="${item.images[0]}" style="width:100%; height:150px; object-fit:cover;">
+                    <img src="${img}" style="width:100%; height:150px; object-fit:cover;">
                     <div style="padding:15px;">
                         <div style="color:#28a745; font-weight:800;">${Number(item.price).toLocaleString()} TJS</div>
-                        <div style="font-size:14px; margin:5px 0; height:40px; overflow:hidden;">${item.title}</div>
-                        <div style="font-size:11px; color:#888;">📍 ${item.region}</div>
+                        <div style="font-size:14px; margin:5px 0; height:40px; overflow:hidden; line-height:1.4;">${item.title}</div>
+                        <div style="font-size:11px; color:#888;">📍 ${item.region || 'Рогун'}</div>
                     </div>
                 `;
                 list.appendChild(card);

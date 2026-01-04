@@ -6,13 +6,39 @@
     <title>Мой профиль — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; transition: 0.3s; }
+        body { 
+            background: #f4f7f6; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            transition: 0.3s; 
+            color: #333; 
+            padding-bottom: 80px; 
+        }
         body.dark-mode { background: #121225; color: white; }
         
         .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
         
-        /* Шапка профиля */
-        .profile-header { background: white; padding: 40px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        /* Шапка страницы */
+        header { 
+            background: white; 
+            padding: 15px 0; 
+            border-bottom: 1px solid #eee; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            transition: 0.3s; 
+        }
+        .dark-mode header { background: #1a1a2e; border-color: #333; }
+        
+        /* Секция пользователя */
+        .profile-header { 
+            background: white; 
+            padding: 40px 0; 
+            border-bottom: 1px solid #eee; 
+            margin-bottom: 30px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+            transition: 0.3s; 
+        }
         .dark-mode .profile-header { background: #1f1f3a; border-bottom: 1px solid #333; }
         
         .user-info { display: flex; align-items: center; gap: 20px; }
@@ -29,42 +55,62 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: 0.3s; 
             border: 1px solid rgba(0,0,0,0.05);
         }
-        .dark-mode .my-ad-card { background: #1f1f3a; border-color: #333; }
+        .dark-mode .my-ad-card { background: #1a1a2e; border-color: #333; }
         
-        .my-ad-card img { width: 100%; height: 180px; object-fit: cover; }
+        .my-ad-card img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
         
         .my-ad-info { padding: 15px; flex-grow: 1; }
-        .my-ad-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #333; height: 40px; overflow: hidden; }
-        .dark-mode .my-ad-title { color: #eee; }
+        .my-ad-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; height: 40px; overflow: hidden; }
         .my-ad-price { font-size: 18px; font-weight: bold; color: #28a745; margin-bottom: 5px; }
         
-        /* Кнопки управления */
+        /* Кнопки действий */
         .ad-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #eee; }
         .dark-mode .ad-actions { border-top: 1px solid #333; }
         
-        .btn-action { padding: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; background: none; text-align: center; }
+        .btn-action { padding: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; background: none; text-align: center; color: inherit; }
         .btn-edit { color: #007bff; border-right: 1px solid #eee; }
+        .dark-mode .btn-edit { border-right: 1px solid #333; }
         .btn-edit:hover { background: #f0f7ff; }
-        .dark-mode .btn-edit:hover { background: rgba(0,123,255,0.1); }
         
         .btn-delete { color: #ff4d4d; }
         .btn-delete:hover { background: #fff1f1; }
-        .dark-mode .btn-delete:hover { background: rgba(255,77,77,0.1); }
 
         .btn-logout { background: #f8f9fa; color: #6c757d; padding: 8px 15px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; }
         .btn-logout:hover { background: #ff4757; color: white; border-color: #ff4757; }
         
-        .empty-state { text-align: center; padding: 60px 20px; color: #888; background: white; border-radius: 20px; grid-column: 1/-1; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 20px; grid-column: 1/-1; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         .dark-mode .empty-state { background: #1f1f3a; color: #aaa; }
+
+        /* МОБИЛЬНОЕ МЕНЮ */
+        .mobile-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            background: white; display: flex; justify-content: space-around;
+            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .dark-mode .mobile-nav { background: #1a1a2e; border-top: 1px solid #333; }
+        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; }
+        .nav-item span:first-child { font-size: 22px; margin-bottom: 2px; }
+        .nav-item.active { color: #007bff; }
+        .add-icon-circle { 
+            width: 55px; height: 55px; background: #28a745; color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; margin-top: -35px; border: 5px solid #f4f7f6;
+            box-shadow: 0 4px 10px rgba(40,167,69,0.3);
+        }
+        .dark-mode .add-icon-circle { border-color: #121225; }
+
+        @media (max-width: 600px) {
+            .my-ads-grid { grid-template-columns: 1fr; }
+            .profile-header { padding: 25px 0; }
+        }
     </style>
 </head>
 <body>
 
-<header style="background: white; padding: 15px 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100;">
+<header>
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
         <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; color: #007bff;">Rogun<span style="color:#28a745">.tj</span></h1>
         <div style="display: flex; gap: 15px; align-items: center;">
-            <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: 500;">На главную</a>
             <button id="logout-btn" class="btn-logout">Выйти</button>
         </div>
     </div>
@@ -75,7 +121,7 @@
         <div class="user-info">
             <div class="user-avatar" id="user-initial">?</div>
             <div>
-                <h2 id="user-phone" style="margin:0; color: #333;">Загрузка...</h2>
+                <h2 id="user-phone" style="margin:0;">Загрузка...</h2>
                 <p id="user-status" style="color: #888; margin: 5px 0 0;">Личный кабинет продавца</p>
             </div>
         </div>
@@ -83,13 +129,33 @@
 </div>
 
 <main class="container">
-    <h3 style="margin-bottom: 25px; color: #333;" id="section-title">Мои объявления</h3>
+    <h3 style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+        📦 Мои объявления
+    </h3>
     <div id="my-ads-container" class="my-ads-grid">
         </div>
 </main>
 
+<div class="mobile-nav">
+    <a href="index.html" class="nav-item">
+        <span>🏠</span>
+        <span>Главная</span>
+    </a>
+    <a href="profile.html?tab=favs" class="nav-item">
+        <span>❤️</span>
+        <span>Избранное</span>
+    </a>
+    <a href="add.html" class="nav-item">
+        <div class="add-icon-circle">➕</div>
+    </a>
+    <a href="profile.html" class="nav-item active">
+        <span>👤</span>
+        <span>Профиль</span>
+    </a>
+</div>
+
 <script type="module">
-    import { getAds, saveAds, getCurrentUser } from './js/storage.js';
+    import { getAds, saveAds, getCurrentUser, logout } from './js/storage.js';
 
     const adsContainer = document.getElementById('my-ads-container');
     const userPhoneDisplay = document.getElementById('user-phone');
@@ -99,35 +165,38 @@
     // 1. Проверка авторизации
     const user = getCurrentUser();
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html'; 
     } else {
-        userPhoneDisplay.innerText = user.phone || user.username;
-        // Берем первую цифру кода оператора для аватарки
-        const cleanPhone = (user.phone || "").replace(/\D/g,'');
-        userInitialDisplay.innerText = cleanPhone.length > 3 ? cleanPhone.charAt(3) : (user.username ? user.username.charAt(0).toUpperCase() : 'U');
+        userPhoneDisplay.innerText = user.phone || "Пользователь";
+        const name = (user.phone || "U");
+        userInitialDisplay.innerText = name.charAt(0).toUpperCase();
     }
 
-    // 2. Функция выхода
+    // 2. Тема оформления
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // 3. Выход
     logoutBtn.onclick = () => {
-        if(confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-            localStorage.removeItem('currentUser'); 
-            window.location.href = 'index.html';
+        if(confirm('Вы уверены, что хотите выйти?')) {
+            logout();
         }
     };
 
-    // 3. Отображение объявлений
+    // 4. Отрисовка объявлений
     function renderMyAds() {
-        const allAds = getAds() || [];
-        // Фильтруем: только те объявления, которые принадлежат текущему пользователю
-        const myAds = allAds.filter(ad => ad.userId === user.id);
+        const allAds = getAds();
+        // Фильтруем объявления текущего пользователя
+        const myAds = allAds.filter(ad => String(ad.userId) === String(user.id));
 
         if (myAds.length === 0) {
             adsContainer.innerHTML = `
                 <div class="empty-state">
                     <div style="font-size: 50px; margin-bottom: 10px;">📦</div>
-                    <h3>У вас пока нет активных объявлений</h3>
-                    <p>Начните продавать прямо сейчас в Рогуне и по всему Таджикистану!</p>
-                    <a href="add.html" style="display:inline-block; margin-top:15px; text-decoration:none; background:#007bff; color:white; padding:12px 25px; border-radius:10px; font-weight:bold;">+ Подать объявление</a>
+                    <h3>У вас пока нет объявлений</h3>
+                    <p>Продайте что-нибудь уже сегодня!</p>
+                    <a href="add.html" style="display:inline-block; margin-top:15px; text-decoration:none; background:#28a745; color:white; padding:12px 25px; border-radius:10px; font-weight:bold;">Подать объявление</a>
                 </div>
             `;
             return;
@@ -137,49 +206,48 @@
         myAds.sort((a, b) => b.id - a.id).forEach(ad => {
             const card = document.createElement('div');
             card.className = 'my-ad-card';
-            const img = (ad.images && ad.images.length > 0) ? ad.images[0] : 'https://via.placeholder.com/300x190?text=Нет+фото';
+            const mainImg = (ad.images && ad.images.length > 0) ? ad.images[0] : 'https://via.placeholder.com/300x190?text=Нет+фото';
             
             card.innerHTML = `
-                <img src="${img}" alt="${ad.title}">
+                <img src="${mainImg}" alt="${ad.title}" onclick="location.href='detail.html?id=${ad.id}'">
                 <div class="my-ad-info">
                     <div class="my-ad-price">${Number(ad.price).toLocaleString()} TJS</div>
                     <div class="my-ad-title">${ad.title}</div>
                 </div>
                 <div class="ad-actions">
-                    <button class="btn-action btn-edit" data-id="${ad.id}">✏️ Цена</button>
+                    <button class="btn-action btn-edit" data-id="${ad.id}">✏️ Сменить цену</button>
                     <button class="btn-action btn-delete" data-id="${ad.id}">🗑️ Удалить</button>
                 </div>
             `;
             adsContainer.appendChild(card);
         });
 
-        setupListeners();
+        attachActionListeners();
     }
 
-    // 4. Настройка кнопок
-    function setupListeners() {
+    // 5. Функции управления
+    function attachActionListeners() {
         // Удаление
         document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.onclick = (e) => {
-                const id = parseInt(btn.getAttribute('data-id'));
+            btn.onclick = () => {
+                const id = parseInt(btn.dataset.id);
                 if (confirm('Удалить это объявление навсегда?')) {
-                    const allAds = getAds();
-                    const filtered = allAds.filter(ad => ad.id !== id);
-                    saveAds(filtered);
+                    const allAds = getAds().filter(ad => ad.id !== id);
+                    saveAds(allAds);
                     renderMyAds();
                 }
             };
         });
 
-        // Быстрое редактирование цены
+        // Редактирование цены
         document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.onclick = (e) => {
-                const id = parseInt(btn.getAttribute('data-id'));
+            btn.onclick = () => {
+                const id = parseInt(btn.dataset.id);
                 const allAds = getAds();
                 const adIndex = allAds.findIndex(a => a.id === id);
-                const ad = allAds[adIndex];
                 
-                const newPrice = prompt(`Введите новую цену для "${ad.title}":`, ad.price);
+                const currentPrice = allAds[adIndex].price;
+                const newPrice = prompt(`Укажите новую цену для "${allAds[adIndex].title}":`, currentPrice);
                 
                 if (newPrice !== null && !isNaN(newPrice) && newPrice.trim() !== "") {
                     allAds[adIndex].price = newPrice.trim();
@@ -188,13 +256,6 @@
                 }
             };
         });
-    }
-
-    // Применяем темную тему если она активна
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('header').style.background = '#1a1a2e';
-        document.querySelector('header').style.borderColor = '#333';
     }
 
     renderMyAds();

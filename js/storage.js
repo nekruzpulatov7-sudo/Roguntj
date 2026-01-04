@@ -1,6 +1,6 @@
 /**
  * Rogun.tj - Модуль управления данными (LocalStorage)
- * Версия: 2.0 (Стабильная)
+ * Версия: 2.1 (Стабильная: Оптимизировано для Rogun.tj)
  */
 
 // --- ОБЪЯВЛЕНИЯ (ADS) ---
@@ -12,7 +12,6 @@ export function getAds() {
     try {
         const data = localStorage.getItem('ads');
         if (!data || data === "undefined" || data === "null") {
-            // Если база пуста, можно вернуть пустой массив или демо-данные
             return []; 
         }
         return JSON.parse(data);
@@ -41,10 +40,14 @@ export function saveAds(ads) {
  */
 export function saveAd(newAd) {
     const ads = getAds();
-    // Генерируем ID если его нет
+    // Генерируем ID (отметка времени), если его нет
     if (!newAd.id) newAd.id = Date.now();
+    // Добавляем дату создания, если отсутствует
+    if (!newAd.createdAt) newAd.createdAt = new Date().toLocaleDateString('ru-RU');
+    
     ads.push(newAd);
     saveAds(ads);
+    return newAd.id;
 }
 
 /**
@@ -53,7 +56,7 @@ export function saveAd(newAd) {
 export function deleteAd(adId) {
     let ads = getAds();
     // Фильтруем массив, оставляя всё, кроме указанного ID
-    ads = ads.filter(ad => ad.id !== adId);
+    ads = ads.filter(ad => ad.id !== Number(adId));
     saveAds(ads);
 }
 

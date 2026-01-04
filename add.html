@@ -10,6 +10,8 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             background-attachment: fixed;
             min-height: 100vh;
+            margin: 0;
+            padding-bottom: 80px; 
         }
         
         .form-card { 
@@ -67,31 +69,33 @@
             width: 100%; border-radius: 14px; font-size: 18px; font-weight: 800; 
             cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(40,167,69,0.3);
         }
-        .btn-submit:hover { transform: translateY(-3px); }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
 
-        .back-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .back-link { text-decoration: none; color: inherit; font-weight: 600; font-size: 14px; opacity: 0.7; }
+        .mobile-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            background: white; display: flex; justify-content: space-around;
+            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .dark-mode .mobile-nav { background: #1a1a2e; border-top: 1px solid #333; }
+        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 12px; }
+        .add-icon-circle { width: 50px; height: 50px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: -30px; border: 5px solid #f4f7f6; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-container">
-        <h1 onclick="location.href='index.html'" style="cursor:pointer">Rogun<span>.tj</span></h1>
-        <div class="back-nav">
-            <a href="index.html" class="back-link">← Вернуться на главную</a>
-        </div>
+    <div class="header-container" style="display:flex; justify-content: space-between; align-items: center; padding: 15px 20px; background:white; position: sticky; top:0; z-index:1001;">
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; color:#007bff; font-size: 24px;">Rogun<span style="color:#28a745">.tj</span></h1>
+        <a href="index.html" style="text-decoration:none; color:#666; font-weight:600;">← Отмена</a>
     </div>
 </header>
 
 <main class="container">
     <div class="form-card">
-        <h2>Новое объявление</h2>
+        <h2>Подать объявление</h2>
         <form id="add-ad-form">
             <div class="form-group">
-                <label>Что вы продаете?</label>
-                <input type="text" id="title" placeholder="Название (например: Samsung S23 Ultra)" required maxlength="60">
+                <label>Название товара</label>
+                <input type="text" id="title" placeholder="Например: Продаю iPhone 15" required maxlength="60">
             </div>
 
             <div class="form-group">
@@ -99,13 +103,13 @@
                 <select id="category" required>
                     <option value="">Выберите категорию</option>
                     <option value="Техника">📱 Техника</option>
-                    <option value="Транспорт">🚗 Авто</option>
-                    <option value="Недвижимость">🏠 Жилье</option>
-                    <option value="Продукты">🍎 Продукты</option>
-                    <option value="Одежда">👕 Одежда</option>
-                    <option value="Для дома">🛋️ Для дома</option>
-                    <option value="Услуги">🛠️ Услуги</option>
-                    <option value="Работа">💼 Работа</option>
+                    <option value="Транспорт">🚗 Транспорт (Авто)</option>
+                    <option value="Недвижимость">🏠 Недвижимость</option>
+                    <option value="Продукты">🍎 Продукты питания</option>
+                    <option value="Одежда">👕 Одежда и обувь</option>
+                    <option value="Для дома">🛋️ Мебель и декор</option>
+                    <option value="Услуги">🛠️ Услуги и специалисты</option>
+                    <option value="Работа">💼 Работа / Вакансии</option>
                 </select>
             </div>
 
@@ -113,16 +117,16 @@
 
             <div class="form-group">
                 <label>Цена (Сомони)</label>
-                <input type="number" id="price" placeholder="Введите сумму" required min="0">
+                <input type="number" id="price" placeholder="Сумма" required min="0">
             </div>
 
             <div class="form-group">
-                <label>Номер телефона</label>
+                <label>Ваш номер телефона</label>
                 <input type="text" id="phone" placeholder="+992 (__) ___-__-__" required>
             </div>
 
             <div class="form-group">
-                <label>Регион продажи</label>
+                <label>Регион</label>
                 <select id="region" required>
                     <option value="">Выберите город/район</option>
                     <optgroup label="Основные города">
@@ -162,10 +166,10 @@
             </div>
 
             <div class="form-group">
-                <label>Фотографии (до 5 штук)</label>
+                <label>Фотографии (макс. 5)</label>
                 <label for="photo-input" class="photo-upload-label">
                     <span style="font-size: 32px;">📸</span>
-                    <span style="margin-top: 10px; font-weight: 600;">Загрузить фото</span>
+                    <span style="margin-top: 10px; font-weight: 600;">Нажмите для загрузки</span>
                     <input type="file" id="photo-input" accept="image/*" multiple style="display:none">
                 </label>
                 <div id="preview-container"></div>
@@ -173,21 +177,27 @@
 
             <div class="form-group">
                 <label>Описание</label>
-                <textarea id="description" rows="5" placeholder="Опишите состояние, комплектацию..." required></textarea>
+                <textarea id="description" rows="5" placeholder="Опишите ваш товар..." required></textarea>
             </div>
 
-            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать объявление</button>
+            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать</button>
         </form>
     </div>
 </main>
 
+<div class="mobile-nav">
+    <a href="index.html" class="nav-item"><span>🏠</span><span>Главная</span></a>
+    <a href="profile.html?tab=favs" class="nav-item"><span>❤️</span><span>Избранное</span></a>
+    <a href="add.html" class="nav-item"><div class="add-icon-circle">➕</div></a>
+    <a href="profile.html" class="nav-item"><span>👤</span><span>Профиль</span></a>
+</div>
+
 <script type="module">
     import { saveAd, getCurrentUser } from './js/storage.js';
-    import { verifyViaTelegram } from './js/auth.js'; // Используем новую функцию из auth.js
 
     const user = getCurrentUser();
     if (!user) {
-        alert("Для подачи объявления необходимо войти в аккаунт.");
+        alert("Пожалуйста, войдите в аккаунт.");
         window.location.href = "login.html";
     }
 
@@ -199,40 +209,37 @@
     const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
 
-    // Присваиваем номер пользователя из профиля в поле ввода
-    if (user && user.phone) {
-        phoneInput.value = user.phone;
-    }
+    if (user && user.phone) phoneInput.value = user.phone;
 
     // Маска телефона +992
     phoneInput.addEventListener('input', (e) => {
         let val = e.target.value.replace(/\D/g, '');
-        if (!val.startsWith('992')) val = '992' + val;
+        if (val.length > 0 && !val.startsWith('992')) val = '992' + val;
         let x = val.match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
         e.target.value = !x[2] ? `+${x[1]}` : `+${x[1]} (${x[2]}) ` + x[3] + (x[4] ? `-${x[4]}` : '') + (x[5] ? `-${x[5]}` : '');
     });
 
-    // Динамические поля
+    // Динамические параметры
     categorySelect.addEventListener('change', () => {
         const cat = categorySelect.value;
         dynamicContainer.innerHTML = '';
         if (cat === 'Транспорт') {
             dynamicContainer.innerHTML = `<div class="dynamic-section">
-                <input type="text" id="brand" placeholder="Марка авто" class="param-input" required>
+                <input type="text" id="brand" placeholder="Марка (напр. Toyota)" class="param-input" required>
                 <input type="number" id="year" placeholder="Год выпуска" class="param-input" required>
             </div>`;
         } else if (cat === 'Недвижимость') {
             dynamicContainer.innerHTML = `<div class="dynamic-section">
-                <input type="number" id="rooms" placeholder="Кол-во комнат" class="param-input" required>
+                <input type="number" id="rooms" placeholder="Комнат" class="param-input" required>
                 <input type="number" id="area" placeholder="Площадь м²" class="param-input" required>
             </div>`;
         }
     });
 
-    // Обработка фото
+    // Работа с фото
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фотографий.");
+        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фото.");
         
         files.forEach(file => {
             const reader = new FileReader();
@@ -251,21 +258,12 @@
         });
     });
 
-    // Финальная отправка
-    form.onsubmit = async (e) => {
+    // Отправка
+    form.onsubmit = (e) => {
         e.preventDefault();
-        
-        if (phoneInput.value.length < 13) return alert("Введите корректный номер телефона.");
-
-        // ПРОВЕРКА ЧЕРЕЗ TELEGRAM (Если пользователь еще не верифицирован)
-        // Если вы хотите, чтобы проверка была каждый раз - оставляем так.
-        // Если только один раз при входе - можно это условие пропустить.
-        const isVerified = await verifyViaTelegram(phoneInput.value);
-        if (!isVerified) return;
-
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.textContent = "Публикация...";
+        btn.textContent = "Загрузка...";
 
         const extraParams = {};
         document.querySelectorAll('.param-input').forEach(input => extraParams[input.id] = input.value);
@@ -273,7 +271,7 @@
         const newAd = {
             id: Date.now(),
             title: document.getElementById('title').value,
-            category: document.getElementById('category').value,
+            category: categorySelect.value,
             price: document.getElementById('price').value,
             region: document.getElementById('region').value,
             description: document.getElementById('description').value,
@@ -286,12 +284,12 @@
 
         try {
             saveAd(newAd);
-            alert("Объявление успешно опубликовано!");
+            alert("Опубликовано!");
             window.location.href = "index.html";
         } catch (err) {
-            alert("Ошибка: изображения слишком тяжелые. Попробуйте фото меньшего размера.");
+            alert("Ошибка сохранения. Возможно, фото слишком большие.");
             btn.disabled = false;
-            btn.textContent = "Опубликовать объявление";
+            btn.textContent = "Опубликовать";
         }
     };
 
