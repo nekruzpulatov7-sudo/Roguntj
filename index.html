@@ -6,7 +6,9 @@
     <title>Rogun.tj — Магазин объявлений</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ОСНОВНЫЕ СТИЛИ */
+        /* =========================================
+           ОСНОВНЫЕ СТИЛИ (ГЛОБАЛЬНЫЕ)
+        ========================================= */
         body { 
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
             background-attachment: fixed;
@@ -18,13 +20,19 @@
             padding-bottom: 80px; /* Отступ для мобильного меню */
         }
 
+        /* ТЕМНАЯ ТЕМА */
         body.dark-mode { 
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
             color: white; 
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            padding: 0 15px; 
+        }
 
+        /* ШАПКА САЙТА */
         header { 
             background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(12px); 
@@ -41,8 +49,14 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .header-content { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+        .header-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px 0; 
+        }
 
+        /* ГЛАВНЫЙ БАННЕР С ПОИСКОМ */
         .hero-banner {
             width: 100%;
             height: 400px;
@@ -58,7 +72,12 @@
             margin-bottom: 30px;
         }
 
-        .hero-banner h2 { font-size: 38px; font-weight: 800; margin-bottom: 15px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .hero-banner h2 { 
+            font-size: 38px; 
+            font-weight: 800; 
+            margin-bottom: 15px; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+        }
 
         .search-glass-box {
             background: rgba(255, 255, 255, 0.2);
@@ -70,7 +89,11 @@
             max-width: 850px;
         }
 
-        .search-box { display: flex; gap: 10px; flex-wrap: wrap; }
+        .search-box { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
         
         input, select { 
             padding: 12px 15px; 
@@ -80,9 +103,14 @@
             font-size: 15px;
             transition: 0.3s;
         }
-        .dark-mode input, .dark-mode select { background: #1f1f3a; color: white; border-color: #333; }
 
-        /* СТИЛИ ДЛЯ ПОД-ФИЛЬТРОВ (Somon Style) */
+        .dark-mode input, .dark-mode select { 
+            background: #1f1f3a; 
+            color: white; 
+            border-color: #333; 
+        }
+
+        /* ДОПОЛНИТЕЛЬНЫЕ ФИЛЬТРЫ (SOMON STYLE) */
         .advanced-filters {
             margin-top: 15px;
             display: none;
@@ -90,8 +118,13 @@
             gap: 10px;
             animation: slideDown 0.3s ease;
         }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
+        @keyframes slideDown { 
+            from { opacity: 0; transform: translateY(-10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* СЕТКА КАТЕГОРИЙ */
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -114,7 +147,10 @@
             gap: 10px;
         }
 
-        .dark-mode .category-item { background: #1f1f3a; border-color: rgba(255,255,255,0.05); }
+        .dark-mode .category-item { 
+            background: #1f1f3a; 
+            border-color: rgba(255,255,255,0.05); 
+        }
 
         .category-item:hover, .category-item.active {
             transform: translateY(-5px);
@@ -122,10 +158,22 @@
             border-color: #007bff;
         }
         
-        .category-item.active { background: #e7f3ff; border-width: 2px; }
-        .dark-mode .category-item.active { background: #25254d; }
+        .category-item.active { 
+            background: #e7f3ff; 
+            border-width: 2px; 
+        }
 
-        .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding-bottom: 40px; }
+        .dark-mode .category-item.active { 
+            background: #25254d; 
+        }
+
+        /* СЕТКА ОБЪЯВЛЕНИЙ */
+        .ads-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            padding-bottom: 40px; 
+        }
 
         .product-card { 
             background: white; 
@@ -137,39 +185,113 @@
             display: flex;
             flex-direction: column;
         }
-        .dark-mode .product-card { background: #1f1f3a; }
-        .product-card img { width: 100%; height: 180px; object-fit: cover; }
-        .product-card .info { padding: 15px; }
-        .product-card .price { font-size: 18px; font-weight: 800; color: #28a745; }
 
-        /* МОБИЛЬНОЕ МЕНЮ */
-        .mobile-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
-            background: white; display: flex; justify-content: space-around;
-            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+        .dark-mode .product-card { 
+            background: #1f1f3a; 
         }
-        .dark-mode .mobile-nav { background: #1a1a2e; border-top: 1px solid #333; }
-        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; }
-        .nav-item span:first-child { font-size: 22px; margin-bottom: 2px; }
-        .nav-item.active { color: #007bff; }
+
+        .product-card img { 
+            width: 100%; 
+            height: 180px; 
+            object-fit: cover; 
+        }
+
+        .product-card .info { 
+            padding: 15px; 
+        }
+
+        .product-card .price { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: #28a745; 
+        }
+
+        /* МОБИЛЬНАЯ НАВИГАЦИЯ */
+        .mobile-nav {
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 70px;
+            background: white; 
+            display: flex; 
+            justify-content: space-around;
+            align-items: center; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            z-index: 1000;
+        }
+
+        .dark-mode .mobile-nav { 
+            background: #1a1a2e; 
+            border-top: 1px solid #333; 
+        }
+
+        .nav-item { 
+            text-decoration: none; 
+            color: #888; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 11px; 
+            font-weight: 600; 
+        }
+
+        .nav-item span:first-child { 
+            font-size: 22px; 
+            margin-bottom: 2px; 
+        }
+
+        .nav-item.active { 
+            color: #007bff; 
+        }
+
         .add-icon-circle { 
-            width: 55px; height: 55px; background: #28a745; color: white; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 24px; margin-top: -35px; border: 5px solid #f4f7f6;
+            width: 55px; 
+            height: 55px; 
+            background: #28a745; 
+            color: white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 24px; 
+            margin-top: -35px; 
+            border: 5px solid #f4f7f6;
             box-shadow: 0 4px 10px rgba(40,167,69,0.3);
         }
-        .dark-mode .add-icon-circle { border-color: #121225; }
 
-        /* МОДАЛЬНОЕ ОКНО */
+        .dark-mode .add-icon-circle { 
+            border-color: #121225; 
+        }
+
+        /* МОДАЛЬНОЕ ОКНО TELEGRAM */
         .modal-tg {
-            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(5px);
         }
-        .modal-content {
-            background: white; margin: 15% auto; padding: 30px; border-radius: 20px; width: 300px; text-align: center;
-        }
-        .dark-mode .modal-content { background: #1f1f3a; color: white; }
 
+        .modal-content {
+            background: white; 
+            margin: 15% auto; 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 300px; 
+            text-align: center;
+        }
+
+        .dark-mode .modal-content { 
+            background: #1f1f3a; 
+            color: white; 
+        }
+
+        /* АДАПТИВНОСТЬ */
         @media (max-width: 768px) {
             .hero-banner { height: 300px; }
             .hero-banner h2 { font-size: 22px; }
@@ -233,7 +355,7 @@
                 </optgroup>
             </select>
             
-            <a href="add.html" class="btn-add-main" style="background: #28a745; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: bold;">+ Подать</a>
+            <a href="add.html" style="background: #28a745; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: bold;">+ Подать</a>
         </div>
 
         <div id="transport-filters" class="advanced-filters">
@@ -245,12 +367,7 @@
                 <option value="Opel">Opel</option>
                 <option value="Lexus">Lexus</option>
                 <option value="Hyundai">Hyundai</option>
-            </select>
-            <select id="filter-type">
-                <option value="">Тип авто</option>
-                <option value="Седан">Седан</option>
-                <option value="Внедорожник">Внедорожник</option>
-                <option value="Хэтчбек">Хэтчбек</option>
+                <option value="Kia">Kia</option>
             </select>
             <select id="filter-fuel">
                 <option value="">Топливо</option>
@@ -279,14 +396,6 @@
             <div class="cat-icon">✨</div>
             <span>Все</span>
         </div>
-        <div class="category-item" data-cat="Продукты">
-            <div class="cat-icon">🍎</div>
-            <span>Продукты</span>
-        </div>
-        <div class="category-item" data-cat="Техника">
-            <div class="cat-icon">📱</div>
-            <span>Техника</span>
-        </div>
         <div class="category-item" data-cat="Транспорт">
             <div class="cat-icon">🚗</div>
             <span>Транспорт</span>
@@ -295,13 +404,13 @@
             <div class="cat-icon">🏠</div>
             <span>Жилье</span>
         </div>
-        <div class="category-item" data-cat="Одежда">
-            <div class="cat-icon">👕</div>
-            <span>Одежда</span>
+        <div class="category-item" data-cat="Бытовая техника и Электроника">
+            <div class="cat-icon">📱</div>
+            <span>Техника</span>
         </div>
-        <div class="category-item" data-cat="Для дома">
-            <div class="cat-icon">🛋️</div>
-            <span>Для дома</span>
+        <div class="category-item" data-cat="Компьютеры и Оргтехника">
+            <div class="cat-icon">💻</div>
+            <span>Компьютеры</span>
         </div>
         <div class="category-item" data-cat="Услуги">
             <div class="cat-icon">🛠️</div>
@@ -310,6 +419,22 @@
         <div class="category-item" data-cat="Работа">
             <div class="cat-icon">💼</div>
             <span>Работа</span>
+        </div>
+        <div class="category-item" data-cat="Все для дома">
+            <div class="cat-icon">🛋️</div>
+            <span>Дом</span>
+        </div>
+        <div class="category-item" data-cat="Одежда и Обувь">
+            <div class="cat-icon">👕</div>
+            <span>Одежда</span>
+        </div>
+        <div class="category-item" data-cat="Детский мир">
+            <div class="cat-icon">🧸</div>
+            <span>Детям</span>
+        </div>
+        <div class="category-item" data-cat="Животные и Растения">
+            <div class="cat-icon">🐾</div>
+            <span>Животные</span>
         </div>
     </div>
 
@@ -337,6 +462,7 @@
 <script type="module">
     import { getAds, getCurrentUser } from './js/storage.js';
 
+    // Элементы управления
     const adsContainer = document.getElementById('ads-container');
     const searchInput = document.getElementById('search-input');
     const regionFilter = document.getElementById('region-filter');
@@ -344,16 +470,15 @@
     const themeBtn = document.getElementById('theme-toggle');
     const catItems = document.querySelectorAll('.category-item');
     
-    // Доп фильтры
+    // Фильтры транспорта
     const transportFilters = document.getElementById('transport-filters');
     const filterBrand = document.getElementById('filter-brand');
-    const filterType = document.getElementById('filter-type');
     const filterFuel = document.getElementById('filter-fuel');
     const priceToFilter = document.getElementById('price-to');
 
     let generatedCode = null;
 
-    // ВХОД ЧЕРЕЗ ТЕЛЕГРАМ
+    // --- ФУНКЦИИ АВТОРИЗАЦИИ ---
     function startTgAuth() {
         generatedCode = Math.floor(10000 + Math.random() * 90000);
         window.open(`https://t.me/RoguntjBot?start=${generatedCode}`, '_blank'); 
@@ -361,8 +486,8 @@
     }
 
     document.getElementById('verify-btn').onclick = function() {
-        const userEntered = document.getElementById('input-tg-code').value;
-        if (userEntered == generatedCode) {
+        const val = document.getElementById('input-tg-code').value;
+        if (val == generatedCode) {
             alert("✅ Успешный вход!");
             document.getElementById('tg-modal').style.display = 'none';
         } else {
@@ -380,7 +505,7 @@
         }
     }
 
-    // РЕНДЕР ОБЪЯВЛЕНИЙ
+    // --- ФУНКЦИЯ ОБНОВЛЕНИЯ СПИСКА ---
     function updateAds() {
         const allAds = getAds() || [];
         const searchText = searchInput.value.toLowerCase();
@@ -388,7 +513,6 @@
         const activeItem = document.querySelector('.category-item.active');
         const selectedCategory = activeItem ? activeItem.dataset.cat : "";
         
-        // Значения под-фильтров
         const brand = filterBrand.value;
         const fuel = filterFuel.value;
         const maxPrice = parseFloat(priceToFilter.value) || Infinity;
@@ -397,11 +521,11 @@
             const matchesSearch = ad.title.toLowerCase().includes(searchText);
             const matchesRegion = !selectedRegion || ad.region === selectedRegion;
             const matchesCategory = !selectedCategory || ad.category === selectedCategory;
-            
-            // Фильтрация по параметрам (если это транспорт)
             const matchesPrice = Number(ad.price) <= maxPrice;
-            const matchesBrand = !brand || (ad.params && ad.params.brand === brand);
-            const matchesFuel = !fuel || (ad.params && ad.params.fuel === fuel);
+            
+            // Проверка параметров (марка и топливо)
+            const matchesBrand = !brand || (ad.params && (ad.params.brand === brand || ad.params["Марка и модель"] === brand));
+            const matchesFuel = !fuel || (ad.params && (ad.params.fuel === fuel || ad.params["Топливо"] === fuel));
 
             return matchesSearch && matchesRegion && matchesCategory && matchesPrice && matchesBrand && matchesFuel;
         });
@@ -414,11 +538,11 @@
         }
 
         filtered.sort((a, b) => b.id - a.id).forEach(ad => {
-            const imageSrc = ad.images && ad.images.length > 0 ? ad.images[0] : 'https://via.placeholder.com/300x200?text=Нет+фото';
+            const image = ad.images?.[0] || 'https://via.placeholder.com/300x200?text=Нет+фото';
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                <img src="${imageSrc}" alt="${ad.title}" loading="lazy">
+                <img src="${image}" alt="${ad.title}" loading="lazy">
                 <div class="info">
                     <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
                     <div class="title" style="font-weight:600; font-size:14px; margin:5px 0;">${ad.title}</div>
@@ -430,23 +554,22 @@
         });
     }
 
+    // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
     catItems.forEach(item => {
         item.onclick = () => {
             catItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             
-            // Показываем/скрываем блок фильтров Somon Style
+            // Управление видимостью фильтров
             if (item.dataset.cat === 'Транспорт') {
                 transportFilters.style.display = 'grid';
             } else {
                 transportFilters.style.display = 'none';
             }
-            
             updateAds();
         };
     });
 
-    // Слушатели для всех фильтров
     searchInput.oninput = updateAds;
     regionFilter.onchange = updateAds;
     filterBrand.onchange = updateAds;
@@ -460,13 +583,16 @@
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     };
 
+    // Проверка темы при загрузке
     if(localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         themeBtn.textContent = "☀️";
     }
 
+    // Запуск инициализации
     renderUserMenu();
     updateAds();
 </script>
+
 </body>
 </html>

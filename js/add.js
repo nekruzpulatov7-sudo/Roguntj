@@ -1,85 +1,99 @@
 import { getCurrentUser } from './auth.js';
-import { getAds, saveAds } from './storage.js';
+import { saveAd, SOMON_STRUCTURE, getAds, saveAds } from './storage.js';
 
+// 1. ПРОВЕРКА АВТОРИЗАЦИИ
 const user = getCurrentUser();
-// Если пользователь не авторизован — отправляем на вход
-if (!user) window.location.href = 'login.html';
+if (!user) {
+    window.location.href = 'login.html';
+}
 
+// 2. ЭЛЕМЕНТЫ ФОРМЫ
 const form = document.getElementById('add-form');
-const categorySelect = document.getElementById('category');
-const dynamicContainer = document.getElementById('dynamic-params');
+const categorySelect = document.getElementById('category'); // Основной Select в HTML
+const dynamicContainer = document.getElementById('dynamic-params'); // Контейнер для новых списков
 const imageInput = document.getElementById('image');
 
 /**
- * 1. КОНФИГУРАЦИЯ УМНЫХ ПОЛЕЙ (Somon Style)
+ * 3. ЗАПОЛНЕНИЕ ОСНОВНЫХ КАТЕГОРИЙ ПРИ ЗАГРУЗКЕ
  */
-const categoryConfig = {
-    "Транспорт": [
-        { label: "Марка и модель", id: "model", type: "text", placeholder: "Напр: Toyota Camry" },
-        { label: "Год выпуска", id: "year", type: "number", placeholder: "2022" },
-        { label: "Тип кузова", id: "body", type: "select", options: ["Седан", "Внедорожник", "Хэтчбек", "Микроавтобус", "Купе"] },
-        { label: "Пробег (км)", id: "mileage", type: "number" },
-        { label: "Топливо", id: "fuel", type: "select", options: ["Бензин", "Дизель", "Газ", "Гибрид", "Электро"] },
-        { label: "Коробка передач", id: "transmission", type: "select", options: ["Автомат", "Механика"] }
-    ],
-    "Недвижимость": [
-        { label: "Тип объекта", id: "realty_type", type: "select", options: ["Квартира", "Дом / Дача", "Участок", "Офис / Магазин"] },
-        { label: "Количество комнат", id: "rooms", type: "select", options: ["1", "2", "3", "4", "5+"] },
-        { label: "Этаж", id: "floor", type: "text", placeholder: "Напр: 3 из 9" },
-        { label: "Общая площадь (м²)", id: "area", type: "number" }
-    ],
-    "Электроника и Бытовая Техника": [
-        { label: "Состояние", id: "condition", type: "select", options: ["Новый", "Б/У (в идеале)", "Б/У (среднее)"] },
-        { label: "Объем памяти", id: "memory", type: "text", placeholder: "Напр: 256 GB" },
-        { label: "Цвет", id: "color", type: "text" }
-    ],
-    "Магазин Одежда": [
-        { label: "Тип", id: "clothing_type", type: "select", options: ["Мужская", "Женская", "Детская"] },
-        { label: "Размер", id: "size", type: "text", placeholder: "Напр: L или 42" }
-    ],
-    "Строительство и Ремонт": [
-        { label: "Тип товара", id: "build_type", type: "text", placeholder: "Напр: Цемент, Кирпич" },
-        { label: "Доставка", id: "delivery", type: "select", options: ["Есть доставка", "Самовывоз"] }
-    ],
-    "Животные": [
-        { label: "Вид животного", id: "animal_kind", type: "text", placeholder: "Напр: Породистый бык" },
-        { label: "Возраст", id: "animal_age", type: "text" }
-    ],
-    "Услуги и Вакансии": [
-        { label: "Опыт работы", id: "experience", type: "select", options: ["Без опыта", "1-3 года", "Более 5 лет"] },
-        { label: "График", id: "schedule", type: "select", options: ["Полный день", "Удаленно", "Подработка"] }
-    ]
-};
+function initCategories() {
+    categorySelect.innerHTML = '<option value="">-- Выберите категорию --</option>';
+    Object.keys(SOMON_STRUCTURE).forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+    });
+}
 
 /**
- * 2. ЛОГИКА ОРИСОВКИ ДИНАМИЧЕСКИХ ПОЛЕЙ
+ * 4. ЛОГИКА ДИНАМИЧЕСКИХ СПИСКОВ (Цепочка выбора)
  */
 categorySelect.addEventListener('change', (e) => {
-    const category = e.target.value;
-    dynamicContainer.innerHTML = ''; // Очищаем старые поля
+    const mainCat = e.target.value;
+    dynamicContainer.innerHTML = ''; // Чистим всё, что было создано ниже
 
-    if (categoryConfig[category]) {
-        categoryConfig[category].forEach(param => {
-            const div = document.createElement('div');
-            div.className = 'form-group';
-            
-            let inputHtml = '';
-            if (param.type === 'select') {
-                inputHtml = `<select class="param-input" data-label="${param.label}">
-                    ${param.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                </select>`;
-            } else {
-                inputHtml = `<input type="${param.type}" class="param-input" data-label="${param.label}" placeholder="${param.placeholder || ''}">`;
-            }
-
-            div.innerHTML = `<label>${param.label}</label>${inputHtml}`;
-            dynamicContainer.appendChild(div);
-        });
+    if (mainCat && SOMON_STRUCTURE[mainCat]) {
+        renderSubCategories(mainCat);
     }
 });
 
+// Рендер второго уровня (например: Легковые автомобили, Смартфоны)
+function renderSubCategories(mainCat) {
+    const subData = SOMON_STRUCTURE[mainCat];
+    
+    const div = document.createElement('div');
+    div.className = 'form-group';
+    div.innerHTML = `
+        <label>Подкатегория</label>
+        <select id="sub-category" required>
+            <option value="">-- Выберите подкатегорию --</option>
+            ${Object.keys(subData).map(sub => `<option value="${sub}">${sub}</option>`).join('')}
+        </select>
+    `;
+
+    dynamicContainer.appendChild(div);
+
+    const subSelect = div.querySelector('select');
+    subSelect.addEventListener('change', (e) => {
+        const subCat = e.target.value;
+        // Удаляем третий уровень, если он уже был отрисован
+        const existingThird = document.getElementById('third-level-wrapper');
+        if (existingThird) existingThird.remove();
+
+        if (subCat && subData[subCat]) {
+            renderThirdLevel(mainCat, subCat);
+        }
+    });
+}
+
+// Рендер третьего уровня (например: Toyota, Samsung, или Размеры одежды)
+function renderThirdLevel(mainCat, subCat) {
+    const items = SOMON_STRUCTURE[mainCat][subCat];
+    if (!items || items.length === 0) return;
+
+    const div = document.createElement('div');
+    div.id = 'third-level-wrapper';
+    div.className = 'form-group';
+    
+    // Определяем заголовок в зависимости от категории
+    let labelText = "Марка / Тип";
+    if (mainCat === "Магазин Одежда") labelText = "Размер";
+    if (mainCat === "Недвижимость") labelText = "Количество комнат";
+
+    div.innerHTML = `
+        <label>${labelText}</label>
+        <select id="specific-item" class="param-input" data-label="${labelText}">
+            <option value="">-- Выберите из списка --</option>
+            ${items.map(item => `<option value="${item}">${item}</option>`).join('')}
+        </select>
+    `;
+
+    dynamicContainer.appendChild(div);
+}
+
 /**
- * 3. СЖАТИЕ ИЗОБРАЖЕНИЙ
+ * 5. СЖАТИЕ ФОТО
  */
 async function compressImage(base64Str) {
     return new Promise((resolve) => {
@@ -99,32 +113,32 @@ async function compressImage(base64Str) {
 }
 
 /**
- * 4. ОБРАБОТКА ФОРМЫ
+ * 6. ОТПРАВКА ФОРМЫ
  */
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Публикация...";
 
-    // Основные данные
     const title = document.getElementById('title').value.trim();
     const price = document.getElementById('price').value.trim();
     const category = categorySelect.value;
+    const subCategory = document.getElementById('sub-category')?.value || '';
+    const specificItem = document.getElementById('specific-item')?.value || '';
     const region = document.getElementById('region').value;
     const phone = document.getElementById('phone').value.trim();
     const description = document.getElementById('description').value.trim();
 
-    // Валидация телефона
+    // Валидация телефона (Таджикистан)
     const phoneRegex = /^(?:\+992|992)?\d{9}$/;
     if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
         alert("Введите корректный номер телефона (например, 900112233)");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Опубликовать";
         return;
     }
-
-    // Собираем умные поля
-    const extraParams = {};
-    document.querySelectorAll('.param-input').forEach(input => {
-        const label = input.getAttribute('data-label');
-        if (input.value) extraParams[label] = input.value;
-    });
 
     // Обработка фото
     let imgData = '';
@@ -138,17 +152,17 @@ form.addEventListener('submit', async (e) => {
         imgData = await compressImage(base64);
     }
 
-    // Создаем объект объявления
-    const ads = getAds();
+    // Собираем объект
     const newAd = {
         id: Date.now(),
         title,
         price: Number(price),
         category,
+        subCategory, // Сохраняем подкатегорию
+        specificItem, // Сохраняем марку/модель
         region,
         phone,
         description,
-        params: extraParams, // Умные поля уходят сюда
         images: imgData ? [imgData] : ['https://via.placeholder.com/600x400?text=Нет+фото'],
         ownerId: user.id,
         createdAt: new Date().toLocaleDateString('ru-RU'),
@@ -156,11 +170,15 @@ form.addEventListener('submit', async (e) => {
     };
 
     try {
-        ads.push(newAd);
-        saveAds(ads);
+        saveAd(newAd); // Используем функцию из storage.js
         alert("Объявление успешно опубликовано!");
         window.location.href = 'index.html';
     } catch (err) {
-        alert("Ошибка сохранения. Возможно, фото слишком большое.");
+        alert("Ошибка сохранения. Лимит памяти браузера исчерпан.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Опубликовать";
     }
 });
+
+// Запуск при загрузке страницы
+initCategories();

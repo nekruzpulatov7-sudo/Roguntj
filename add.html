@@ -11,105 +11,125 @@
             background-attachment: fixed;
             min-height: 100vh;
             margin: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             padding-bottom: 80px; 
         }
         
+        /* СТИЛЬ КАРТОЧКИ ФОРМЫ */
         .form-card { 
-            background: white; 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(10px);
             padding: 30px; 
             border-radius: 24px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.07); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
             margin: 20px auto;
             max-width: 700px;
         }
 
         .dark-mode .form-card { background: #1f1f3a; color: white; border: 1px solid rgba(255,255,255,0.05); }
 
-        h2 { margin-bottom: 25px; font-weight: 800; color: #007bff; text-align: center; }
+        h2 { margin-bottom: 25px; font-weight: 800; color: #007bff; text-align: center; font-size: 28px; }
 
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; opacity: 0.8; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
+        .dark-mode label { color: #ccc; }
 
         input, select, textarea { 
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; 
-            box-sizing: border-box; font-size: 16px; transition: 0.3s;
-            background: #fdfdfd;
+            width: 100%; padding: 14px; border-radius: 14px; border: 1px solid #ddd; 
+            box-sizing: border-box; font-size: 16px; transition: all 0.3s ease;
+            background: #fff;
         }
+
+        input:focus, select:focus, textarea:focus { border-color: #007bff; box-shadow: 0 0 0 4px rgba(0,123,255,0.1); outline: none; }
 
         .dark-mode input, .dark-mode select, .dark-mode textarea { 
             background: #252545; border-color: #3d3d5d; color: white; 
         }
 
+        /* ДИНАМИЧЕСКИЕ СЕКЦИИ */
         .dynamic-section {
-            background: #f0f4f8; padding: 20px; border-radius: 15px; 
+            background: #f0f4f8; padding: 20px; border-radius: 18px; 
             margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s ease; border: 1px solid #e1e8ef;
         }
-        .dark-mode .dynamic-section { background: #2a2a4a; }
+        .dark-mode .dynamic-section { background: #2a2a4a; border-color: #3d3d5d; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* ЗАГРУЗКА ФОТО */
         .photo-upload-label {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px dashed #007bff; border-radius: 15px; padding: 30px;
+            border: 2px dashed #007bff; border-radius: 18px; padding: 30px;
             cursor: pointer; background: rgba(0,123,255,0.02); transition: 0.3s;
         }
+        .photo-upload-label:hover { background: rgba(0,123,255,0.08); }
         
-        #preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
-        .preview-item { position: relative; height: 100px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; }
+        #preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 15px; }
+        .preview-item { position: relative; height: 110px; border-radius: 14px; overflow: hidden; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .preview-item img { width: 100%; height: 100%; object-fit: cover; }
         .remove-btn { 
             position: absolute; top: 5px; right: 5px; background: #ff4757; 
-            color: white; border: none; border-radius: 50%; width: 24px; height: 24px; 
-            cursor: pointer; font-size: 14px; font-weight: bold;
+            color: white; border: none; border-radius: 50%; width: 26px; height: 26px; 
+            cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
         }
 
         .btn-submit { 
-            background: #28a745; color: white; border: none; padding: 18px; 
-            width: 100%; border-radius: 14px; font-size: 18px; font-weight: 800; 
+            background: linear-gradient(to right, #28a745, #218838); color: white; border: none; padding: 18px; 
+            width: 100%; border-radius: 16px; font-size: 18px; font-weight: 800; 
             cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(40,167,69,0.3);
+            margin-top: 10px;
         }
+        .btn-submit:active { transform: scale(0.98); }
 
+        /* НАВИГАЦИЯ */
         .mobile-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
             background: white; display: flex; justify-content: space-around;
-            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+            align-items: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
         }
         .dark-mode .mobile-nav { background: #1a1a2e; border-top: 1px solid #333; }
-        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 12px; }
-        .add-icon-circle { width: 50px; height: 50px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: -30px; border: 5px solid #f4f7f6; }
+        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; }
+        .add-icon-circle { width: 55px; height: 55px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: -35px; border: 5px solid #f5f7fa; box-shadow: 0 5px 15px rgba(40,167,69,0.4); }
+        .dark-mode .add-icon-circle { border-color: #1a1a2e; }
+
+        @media (max-width: 600px) {
+            .dynamic-section { grid-template-columns: 1fr; }
+            .form-card { padding: 20px; border-radius: 0; margin: 0; }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-container" style="display:flex; justify-content: space-between; align-items: center; padding: 15px 20px; background:white; position: sticky; top:0; z-index:1001;">
-        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; color:#007bff; font-size: 24px;">Rogun<span style="color:#28a745">.tj</span></h1>
-        <a href="index.html" style="text-decoration:none; color:#666; font-weight:600;">← Отмена</a>
+<header style="background:white; position: sticky; top:0; z-index:1001; border-bottom: 1px solid #eee;">
+    <div style="display:flex; justify-content: space-between; align-items: center; padding: 12px 20px; max-width: 1100px; margin: 0 auto;">
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; color:#007bff; font-size: 22px; font-weight: 800;">Rogun<span style="color:#28a745">.tj</span></h1>
+        <a href="index.html" style="text-decoration:none; color:#dc3545; font-weight:700; font-size: 14px;">ОТМЕНИТЬ</a>
     </div>
 </header>
 
-<main class="container">
+<main>
     <div class="form-card">
-        <h2>Подать объявление</h2>
+        <h2>🚀 Новое объявление</h2>
         <form id="add-ad-form">
             <div class="form-group">
-                <label>Название товара</label>
-                <input type="text" id="title" placeholder="Например: Продаю iPhone 15" required maxlength="60">
+                <label>Название товара или услуги</label>
+                <input type="text" id="title" placeholder="Что вы продаете?" required maxlength="60">
             </div>
 
             <div class="form-group">
                 <label>Категория</label>
                 <select id="category" required>
                     <option value="">Выберите категорию</option>
-                    <option value="Техника">📱 Техника</option>
-                    <option value="Транспорт">🚗 Транспорт (Авто)</option>
-                    <option value="Недвижимость">🏠 Недвижимость</option>
-                    <option value="Продукты">🍎 Продукты питания</option>
-                    <option value="Одежда">👕 Одежда и обувь</option>
-                    <option value="Для дома">🛋️ Мебель и декор</option>
-                    <option value="Услуги">🛠️ Услуги и специалисты</option>
-                    <option value="Работа">💼 Работа / Вакансии</option>
+                    <option value="Транспорт">🚗 Транспорт</option>
+                    <option value="Недвижимость">🏠 Жилье (Недвижимость)</option>
+                    <option value="Бытовая техника и Электроника">📱 Техника</option>
+                    <option value="Компьютеры и Оргтехника">💻 Компьютеры</option>
+                    <option value="Услуги">🛠️ Услуги</option>
+                    <option value="Работа">💼 Работа</option>
+                    <option value="Все для дома">🛋️ Для дома</option>
+                    <option value="Одежда и Обувь">👕 Одежда</option>
+                    <option value="Детский мир">🧸 Детям</option>
+                    <option value="Животные и Растения">🐾 Животные</option>
                 </select>
             </div>
 
@@ -117,50 +137,32 @@
 
             <div class="form-group">
                 <label>Цена (Сомони)</label>
-                <input type="number" id="price" placeholder="Сумма" required min="0">
+                <input type="number" id="price" placeholder="Укажите цену" required min="0">
             </div>
 
             <div class="form-group">
-                <label>Ваш номер телефона</label>
+                <label>Ваш номер для связи</label>
                 <input type="text" id="phone" placeholder="+992 (__) ___-__-__" required>
             </div>
 
             <div class="form-group">
-                <label>Регион</label>
+                <label>Регион продажи</label>
                 <select id="region" required>
-                    <option value="">Выберите город/район</option>
+                    <option value="">Где находится товар?</option>
                     <optgroup label="Основные города">
                         <option value="Рогун">Рогун</option>
                         <option value="Душанбе">Душанбе</option>
                         <option value="Худжанд">Худжанд</option>
-                        <option value="Бохтар">Бохтар</option>
-                        <option value="Куляб">Куляб</option>
                         <option value="Вахдат">Вахдат</option>
-                        <option value="Истаравшан">Истаравшан</option>
-                        <option value="Гиссар">Гиссар</option>
-                        <option value="Турсунзаде">Турсунзаде</option>
-                        <option value="Канибадам">Канибадам</option>
-                        <option value="Исфара">Исфара</option>
-                        <option value="Пенджикент">Пенджикент</option>
-                        <option value="Норак">Норак</option>
-                        <option value="Хоруг">Хоруг</option>
+                        <option value="Куляб">Куляб</option>
+                        <option value="Бохтар">Бохтар</option>
                     </optgroup>
-                    <optgroup label="Районы и поселки">
+                    <optgroup label="Районы">
                         <option value="Нуробод">Нуробод</option>
                         <option value="Файзобод">Файзобод</option>
-                        <option value="Рашт">Рашт (Гарм)</option>
+                        <option value="Рашт">Рашт</option>
                         <option value="Варзоб">Варзоб</option>
-                        <option value="Айни">Айни</option>
                         <option value="Дангара">Дангара</option>
-                        <option value="Яван">Яван</option>
-                        <option value="Рудаки">Рудаки</option>
-                        <option value="Шахринав">Шахринав</option>
-                        <option value="Лахш">Лахш</option>
-                        <option value="Сангвор">Сангвор</option>
-                        <option value="Таджикабад">Таджикабад</option>
-                        <option value="Восеъ">Восеъ</option>
-                        <option value="Фархор">Фархор</option>
-                        <option value="Мургаб">Мургаб</option>
                     </optgroup>
                 </select>
             </div>
@@ -168,19 +170,19 @@
             <div class="form-group">
                 <label>Фотографии (макс. 5)</label>
                 <label for="photo-input" class="photo-upload-label">
-                    <span style="font-size: 32px;">📸</span>
-                    <span style="margin-top: 10px; font-weight: 600;">Нажмите для загрузки</span>
+                    <span style="font-size: 40px;">📸</span>
+                    <span style="margin-top: 10px; font-weight: 700; color: #007bff;">Добавить фото</span>
                     <input type="file" id="photo-input" accept="image/*" multiple style="display:none">
                 </label>
                 <div id="preview-container"></div>
             </div>
 
             <div class="form-group">
-                <label>Описание</label>
-                <textarea id="description" rows="5" placeholder="Опишите ваш товар..." required></textarea>
+                <label>Подробное описание</label>
+                <textarea id="description" rows="5" placeholder="Расскажите о состоянии товара, торге и т.д." required></textarea>
             </div>
 
-            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать</button>
+            <button type="submit" class="btn-submit" id="submit-btn">Опубликовать сейчас</button>
         </form>
     </div>
 </main>
@@ -196,8 +198,9 @@
     import { saveAd, getCurrentUser } from './js/storage.js';
 
     const user = getCurrentUser();
+    // Если пользователя нет, перекидываем на главную для входа
     if (!user) {
-        alert("Пожалуйста, войдите в аккаунт.");
+        alert("Для подачи объявления нужно войти в аккаунт.");
         window.location.href = "index.html";
     }
 
@@ -209,18 +212,21 @@
     const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
 
-    // База данных марок и моделей (такая же как в index.html)
+    // База авто (Mercedes, BMW, Toyota, Opel, Lexus, Hyundai, Kia)
     const carData = {
         "Mercedes-Benz": ["C-Class", "E-Class", "S-Class", "ML", "G-Class"],
         "BMW": ["3 Series", "5 Series", "7 Series", "X5", "X6"],
         "Toyota": ["Camry", "Corolla", "Land Cruiser", "Prado", "RAV4"],
         "Opel": ["Astra", "Zafira", "Vectra", "Corsa"],
-        "Hyundai": ["Elantra", "Sonata", "Santa Fe", "Tucson"]
+        "Lexus": ["RX", "LX", "GX", "IS", "ES"],
+        "Hyundai": ["Elantra", "Sonata", "Santa Fe", "Tucson"],
+        "Kia": ["Optima", "K5", "Sportage", "Sorento"]
     };
 
+    // Предзаполнение номера телефона
     if (user && user.phone) phoneInput.value = user.phone;
 
-    // Маска телефона
+    // Умная маска телефона
     phoneInput.addEventListener('input', (e) => {
         let val = e.target.value.replace(/\D/g, '');
         if (val.length > 0 && !val.startsWith('992')) val = '992' + val;
@@ -228,7 +234,7 @@
         e.target.value = !x[2] ? `+${x[1]}` : `+${x[1]} (${x[2]}) ` + x[3] + (x[4] ? `-${x[4]}` : '') + (x[5] ? `-${x[5]}` : '');
     });
 
-    // Изменение динамических полей
+    // Логика динамических полей под новые категории
     categorySelect.addEventListener('change', () => {
         const cat = categorySelect.value;
         dynamicContainer.innerHTML = '';
@@ -236,18 +242,12 @@
         if (cat === 'Транспорт') {
             dynamicContainer.innerHTML = `
                 <div class="dynamic-section">
-                    <select id="type" class="param-input" required>
-                        <option value="">Тип кузова</option>
-                        <option value="Седан">Седан</option>
-                        <option value="Внедорожник">Внедорожник</option>
-                        <option value="Хэтчбек">Хэтчбек</option>
-                    </select>
                     <select id="brand" class="param-input" required>
-                        <option value="">Выберите марку</option>
+                        <option value="">Марка</option>
                         ${Object.keys(carData).map(b => `<option value="${b}">${b}</option>`).join('')}
                     </select>
                     <select id="model" class="param-input" required disabled>
-                        <option value="">Выберите модель</option>
+                        <option value="">Модель</option>
                     </select>
                     <select id="fuel" class="param-input" required>
                         <option value="">Топливо</option>
@@ -255,37 +255,33 @@
                         <option value="Дизель">Дизель</option>
                         <option value="Газ">Газ</option>
                     </select>
+                    <input type="number" id="year" placeholder="Год выпуска" class="param-input" required>
                 </div>
             `;
-
-            // Логика подгрузки моделей
-            const brandSel = document.getElementById('brand');
-            const modelSel = document.getElementById('model');
-            brandSel.onchange = () => {
-                modelSel.innerHTML = '<option value="">Выберите модель</option>';
-                if (carData[brandSel.value]) {
-                    carData[brandSel.value].forEach(m => {
-                        modelSel.innerHTML += `<option value="${m}">${m}</option>`;
-                    });
-                    modelSel.disabled = false;
-                } else {
-                    modelSel.disabled = true;
-                }
+            
+            const bSel = document.getElementById('brand');
+            const mSel = document.getElementById('model');
+            bSel.onchange = () => {
+                mSel.innerHTML = '<option value="">Модель</option>';
+                if (carData[bSel.value]) {
+                    carData[bSel.value].forEach(m => mSel.innerHTML += `<option value="${m}">${m}</option>`);
+                    mSel.disabled = false;
+                } else mSel.disabled = true;
             };
         } else if (cat === 'Недвижимость') {
             dynamicContainer.innerHTML = `
                 <div class="dynamic-section">
-                    <input type="number" id="rooms" placeholder="Кол-во комнат" class="param-input" required>
+                    <input type="number" id="rooms" placeholder="Комнат" class="param-input" required>
                     <input type="number" id="area" placeholder="Площадь м²" class="param-input" required>
                 </div>
             `;
         }
     });
 
-    // Фото
+    // Обработка фотографий
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фото.");
+        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фотографий!");
         
         files.forEach(file => {
             const reader = new FileReader();
@@ -304,44 +300,44 @@
         });
     });
 
-    // Отправка формы
+    // Сохранение объявления
     form.onsubmit = (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.textContent = "Публикация...";
+        btn.innerHTML = "⏳ Публикация...";
 
-        const extraParams = {};
-        document.querySelectorAll('.param-input').forEach(input => {
-            extraParams[input.id] = input.value;
-        });
+        const params = {};
+        document.querySelectorAll('.param-input').forEach(el => params[el.id] = el.value);
 
-        const newAd = {
+        const adData = {
             id: Date.now(),
+            userId: user.id,
             title: document.getElementById('title').value,
             category: categorySelect.value,
             price: document.getElementById('price').value,
             region: document.getElementById('region').value,
             description: document.getElementById('description').value,
-            params: extraParams,
+            phone: document.getElementById('phone').value,
+            params: params,
             images: uploadedImages.length > 0 ? uploadedImages : ['https://via.placeholder.com/600x400?text=Нет+фото'],
-            phone: phoneInput.value,
-            createdAt: new Date().toLocaleDateString('ru-RU'),
-            userId: user.id
+            date: new Date().toLocaleDateString('ru-RU')
         };
 
         try {
-            saveAd(newAd);
-            alert("Объявление успешно опубликовано!");
+            saveAd(adData);
+            alert("✅ Ваше объявление успешно добавлено!");
             window.location.href = "index.html";
         } catch (err) {
-            alert("Ошибка: память браузера переполнена. Попробуйте загрузить фото меньшего размера.");
+            alert("❌ Ошибка: фото слишком тяжелые. Попробуйте выбрать другие.");
             btn.disabled = false;
-            btn.textContent = "Опубликовать";
+            btn.innerHTML = "Опубликовать сейчас";
         }
     };
 
+    // Применяем темную тему если нужно
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 </script>
+
 </body>
 </html>

@@ -1,157 +1,162 @@
-import { getAds } from './storage.js';
-import { getFavorites, toggleFavorite } from './favorites.js';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр объявления — Rogun.tj</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --dark-bg: #1a1a2e;
+            --card-bg: #ffffff;
+            --text: #333;
+        }
 
-let currentAd = null;
-let currentSlide = 0;
-let allAds = [];
+        body {
+            background-color: #f4f7f6;
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0; padding-bottom: 50px;
+        }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Инициализация темы перед рендером
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+        body.dark-mode {
+            background-color: #121212;
+            --card-bg: #1f1f3a;
+            --text: #eee;
+        }
 
-    // 2. Получение ID из URL
-    const params = new URLSearchParams(window.location.search);
-    const adId = parseInt(params.get('id'));
-    
-    allAds = getAds();
-    currentAd = allAds.find(a => a.id === adId);
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 
-    // 3. Проверка существования объявления
-    if (!currentAd) {
-        document.querySelector('.container').innerHTML = `
-            <div style="text-align:center; padding:100px 20px;">
-                <h1>Объявление не найдено</h1>
-                <a href="index.html" class="btn" style="display:inline-block; margin-top:20px;">На главную</a>
-            </div>`;
-        return;
-    }
+        /* СЛАЙДЕР */
+        .gallery-section { display: flex; flex-direction: column; gap: 15px; }
+        .main-img-container { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 4/3; 
+            background: #e9ecef; 
+            border-radius: 20px; 
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        #main-photo { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        
+        .nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.8); border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold;
+        }
+        .nav-btn:hover { background: #fff; }
+        .prev-btn { left: 15px; }
+        .next-btn { right: 15px; }
 
-    // 4. Отрисовка
-    renderDetail();
-    renderSimilarAds();
-    updateFavButton();
-});
+        .thumbnails { display: flex; gap: 10px; overflow-x: auto; padding: 5px; }
+        .thumb { 
+            width: 80px; height: 60px; object-fit: cover; border-radius: 10px; 
+            cursor: pointer; opacity: 0.6; border: 2px solid transparent; 
+        }
+        .thumb.active { opacity: 1; border-color: var(--primary); }
 
-function renderDetail() {
-    // Основная информация
-    document.getElementById('ad-title').innerText = currentAd.title;
-    document.getElementById('ad-price').innerText = Number(currentAd.price).toLocaleString() + " TJS";
-    document.getElementById('ad-description').innerText = currentAd.description || "Описание отсутствует.";
-    
-    // Регион и дата (если есть в объекте)
-    const regionEl = document.getElementById('ad-region');
-    if (regionEl) regionEl.innerText = currentAd.region || "Рогун";
+        /* ИНФО КАРТОЧКА */
+        .ad-info-card {
+            background: var(--card-bg); padding: 25px; border-radius: 24px;
+            margin-top: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ad-price { font-size: 32px; font-weight: 800; color: var(--success); }
+        .fav-btn { cursor: pointer; background: none; border: none; font-size: 24px; transition: 0.3s; }
 
-    // Рендер фото
-    const mainPhoto = document.getElementById('main-photo');
-    if (currentAd.images && currentAd.images.length > 0) {
-        mainPhoto.src = currentAd.images[0];
+        .ad-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+        .meta-info { color: #888; font-size: 14px; margin-bottom: 20px; }
 
-        const thumbContainer = document.getElementById('thumbnails');
-        thumbContainer.innerHTML = currentAd.images.map((img, index) => `
-            <img src="${img}" class="thumb ${index === 0 ? 'active' : ''}" onclick="setSlide(${index})">
-        `).join('');
-    }
+        /* ПАРАМЕТРЫ */
+        .params-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 15px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px; margin-bottom: 20px;
+        }
+        .param-item { font-size: 15px; }
 
-    // Рендер доп. параметров
-    const paramsDiv = document.getElementById('ad-params');
-    if (currentAd.params && Object.keys(currentAd.params).length > 0) {
-        paramsDiv.innerHTML = Object.entries(currentAd.params)
-            .map(([key, val]) => val ? `<div class="param-item"><b>${key}:</b> ${val}</div>` : '')
-            .join('');
-    }
-}
+        .description { line-height: 1.6; white-space: pre-line; margin-bottom: 30px; }
 
-/**
- * СЛАЙДЕР
- */
-window.setSlide = function(index) {
-    if (!currentAd.images[index]) return;
-    currentSlide = index;
-    document.getElementById('main-photo').src = currentAd.images[index];
-    
-    const thumbs = document.querySelectorAll('.thumb');
-    thumbs.forEach((t, i) => {
-        t.classList.toggle('active', i === index);
-    });
-};
+        /* КНОПКА СВЯЗИ */
+        .contact-box {
+            position: sticky; bottom: 20px; background: var(--card-bg);
+            padding: 15px; border-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            display: flex; gap: 10px; z-index: 100;
+        }
+        .btn-call {
+            flex: 1; background: var(--success); color: white; border: none;
+            padding: 18px; border-radius: 15px; font-size: 18px; font-weight: 700;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
 
-window.changeSlide = function(step) {
-    let next = currentSlide + step;
-    if (next >= currentAd.images.length) next = 0;
-    if (next < 0) next = currentAd.images.length - 1;
-    setSlide(next);
-};
+        /* ПОХОЖИЕ */
+        .similar-section { margin-top: 40px; }
+        .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 15px; }
 
-/**
- * КОНТАКТЫ
- */
-window.revealPhone = function() {
-    const btn = document.getElementById('show-phone-btn');
-    const text = document.getElementById('phone-text');
-    if (currentAd.phone) {
-        text.innerText = currentAd.phone;
-        btn.classList.add('revealed');
-        btn.style.background = "#e2e8f0";
-        btn.style.color = "#475569";
-        btn.onclick = null;
-    }
-};
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .ad-price { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
 
-/**
- * ИЗБРАННОЕ
- */
-window.toggleFav = function() {
-    toggleFavorite(currentAd.id);
-    updateFavButton();
-};
+<header style="background:var(--card-bg); padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+    <div style="max-width:1000px; margin:0 auto; display:flex; align-items:center; gap:15px;">
+        <button onclick="history.back()" style="background:none; border:none; font-size:20px; cursor:pointer;">←</button>
+        <h1 onclick="location.href='index.html'" style="margin:0; font-size:20px; color:var(--primary); cursor:pointer;">Rogun<span style="color:var(--success)">.tj</span></h1>
+    </div>
+</header>
 
-function updateFavButton() {
-    const favBtn = document.getElementById('fav-btn');
-    if (!favBtn) return;
-    
-    const isFav = getFavorites().includes(currentAd.id);
-    const icon = favBtn.querySelector('svg') || favBtn; // если в кнопке есть иконка
-    
-    if (isFav) {
-        favBtn.classList.add('active');
-        favBtn.style.color = "#ff4757";
-        // Если используете текст вместо иконки:
-        // favBtn.innerText = "❤️ В избранном";
-    } else {
-        favBtn.classList.remove('active');
-        favBtn.style.color = "currentColor";
-        // favBtn.innerText = "🤍 В избранное";
-    }
-}
+<main class="container">
+    <div class="gallery-section">
+        <div class="main-img-container">
+            <img id="main-photo" src="" alt="Фото товара">
+            <button class="nav-btn prev-btn" onclick="changeSlide(-1)">❮</button>
+            <button class="nav-btn next-btn" onclick="changeSlide(1)">❯</button>
+        </div>
+        <div class="thumbnails" id="thumbnails"></div>
+    </div>
 
-/**
- * ПОХОЖИЕ ОБЪЯВЛЕНИЯ
- */
-function renderSimilarAds() {
-    const list = document.getElementById('similar-ads-list');
-    const section = document.getElementById('similar-section');
-    if (!list) return;
+    <div class="ad-info-card">
+        <div class="price-row">
+            <div class="ad-price" id="ad-price">... TJS</div>
+            <button class="fav-btn" id="fav-btn" onclick="toggleFav()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
+        </div>
 
-    const similar = allAds
-        .filter(item => item.category === currentAd.category && item.id !== currentAd.id)
-        .slice(0, 4);
+        <h1 class="ad-title" id="ad-title">Загрузка...</h1>
+        <div class="meta-info">
+            <span id="ad-region">📍 Рогун</span> • <span id="ad-date">Сегодня</span>
+        </div>
 
-    if (similar.length > 0) {
-        if (section) section.style.display = 'block';
-        list.innerHTML = similar.map(item => `
-            <div class="similar-card" onclick="location.href='detail.html?id=${item.id}'" 
-                 style="background: var(--card-bg, #fff); border-radius:15px; cursor:pointer; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-                <img src="${item.images[0]}" style="width:100%; height:140px; object-fit:cover;">
-                <div style="padding:10px;">
-                    <div style="color:#28a745; font-weight:800;">${Number(item.price).toLocaleString()} TJS</div>
-                    <div style="font-size:13px; margin:5px 0; height:32px; overflow:hidden;">${item.title}</div>
-                </div>
+        <div class="params-grid" id="ad-params">
             </div>
-        `).join('');
-    } else if (section) {
-        section.style.display = 'none';
-    }
-}
+
+        <h3 style="margin-bottom: 10px;">Описание</h3>
+        <div class="description" id="ad-description">
+            Загрузка описания...
+        </div>
+    </div>
+
+    <section class="similar-section" id="similar-section" style="display:none;">
+        <h3 style="margin-bottom:15px;">Похожие объявления</h3>
+        <div class="similar-grid" id="similar-ads-list"></div>
+    </section>
+</main>
+
+<div class="contact-box">
+    <button class="btn-call" id="show-phone-btn" onclick="revealPhone()">
+        <span>📞</span> <span id="phone-text">Показать номер</span>
+    </button>
+</div>
+
+<script type="module" src="js/detail.js"></script>
+
+</body>
+</html>
