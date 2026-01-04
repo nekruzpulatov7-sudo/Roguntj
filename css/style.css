@@ -29,7 +29,8 @@ body.dark-mode .category-item,
 body.dark-mode .modal-content,
 body.dark-mode .my-ad-card,
 body.dark-mode .profile-header,
-body.dark-mode .empty-state {
+body.dark-mode .empty-state,
+body.dark-mode .search-glass-box {
     background: #1f1f3a;
     color: #eee;
     box-shadow: 0 6px 18px rgba(0,0,0,0.4);
@@ -244,34 +245,35 @@ input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,
     padding-top: 10px;
 }
 
-.category-tag {
-    font-size: 11px;
-    color: #888;
-    background: #f0f2f5;
-    padding: 2px 8px;
-    border-radius: 10px;
+/* =========================================
+   ИЗБРАННОЕ (СЕРДЕЧКО)
+========================================= */
+.fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    z-index: 10;
+    cursor: pointer;
+    border: none;
+    font-size: 18px;
+    transition: transform 0.2s ease;
 }
 
-.region-tag {
-    font-size: 12px;
-    font-weight: 600;
-    color: #007bff;
-}
+.fav-btn:hover { transform: scale(1.15); }
+.fav-btn.active { color: #ff4757; }
 
-/* Кнопки */
-.btn-add-main { 
-    background: #28a745; 
-    color: white; 
-    padding: 12px 20px; 
-    border-radius: 12px; 
-    text-decoration: none; 
-    font-weight: bold; 
-    transition: 0.3s; 
-    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-    text-align: center;
+.dark-mode .fav-btn { 
+    background: rgba(31, 31, 58, 0.9); 
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
-
-.btn-add-main:hover { background: #218838; transform: scale(1.02); }
 
 /* =========================================
    МОБИЛЬНОЕ МЕНЮ (НИЖНЯЯ ПАНЕЛЬ)
@@ -337,26 +339,8 @@ input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,
 }
 
 /* =========================================
-   ИЗБРАННОЕ (СЕРДЕЧКО) И МОДАЛКИ
+   МОДАЛЬНЫЕ ОКНА
 ========================================= */
-.fav-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(255, 255, 255, 0.9);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    z-index: 10;
-    cursor: pointer;
-}
-
-.dark-mode .fav-btn { background: rgba(31, 31, 58, 0.9); }
-
 .modal-tg {
     display: none;
     position: fixed;
@@ -378,6 +362,7 @@ input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,
     max-width: 320px;
     text-align: center;
     position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
 /* =========================================

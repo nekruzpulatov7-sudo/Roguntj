@@ -3,61 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Избранное — Мои объявления</title>
+    <title>Избранное — Rogun.tj</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
-    <div class="header-container">
-        <h1 onclick="location.href='index.html'">SOMON.ROGUN</h1>
-        <nav>
-            <a href="index.html">Главная</a>
-            <a href="favorites.html" class="active">Избранное</a>
-            <a href="add.html" class="btn">Подать объявление</a>
-            <button onclick="toggleTheme()" class="btn-theme">🌙</button>
-        </nav>
+    <div class="container header-content">
+        <h1 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 24px; letter-spacing: -1px; color:#007bff;">Rogun<span style="color:#28a745">.tj</span></h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="user-menu"></div> 
+            <button id="theme-toggle" style="cursor:pointer; border:none; background:none; font-size:22px;">🌙</button>
+        </div>
     </div>
 </header>
 
 <div class="container">
-    <h2 style="margin: 20px 0;">Мои избранные объявления (<span id="ads-count">0</span>)</h2>
-    <div id="ads-list" class="ads-grid">
-        </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 20px 0;">
+        <h2 style="margin: 0;">Избранное ❤️</h2>
+        <span id="ads-count" style="background: #007bff; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">0</span>
+    </div>
+
+    <main id="ads-container" class="ads-grid">
+        </main>
+</div>
+
+<div class="mobile-nav">
+    <a href="index.html" class="nav-item">
+        <span>🏠</span>
+        <span>Главная</span>
+    </a>
+    <a href="favorites.html" class="nav-item active">
+        <span>❤️</span>
+        <span>Избранное</span>
+    </a>
+    <a href="add.html" class="nav-item">
+        <div class="add-icon-circle">➕</div>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <span>👤</span>
+        <span>Профиль</span>
+    </a>
 </div>
 
 <script type="module">
-    import { getAds } from './js/storage.js';
-    import { renderAds } from './js/script.js';
+    import { getAds, getCurrentUser, toggleFavorite, isFavorite } from './js/storage.js';
 
-    // Специальная функция для страницы избранного
+    const adsContainer = document.getElementById('ads-container');
+    const countDisplay = document.getElementById('ads-count');
+    const themeBtn = document.getElementById('theme-toggle');
+    const userMenu = document.getElementById('user-menu');
+
     function renderFavorites() {
-        const ads = getAds();
-        const favIds = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const allAds = getAds() || [];
+        // Фильтруем объявления: оставляем только те, что в избранном
+        const favAds = allAds.filter(ad => isFavorite(ad.id));
         
-        // Фильтруем: оставляем только те объявления, чей ID есть в списке избранного
-        const favAds = ads.filter(ad => favIds.includes(ad.id));
-        
-        // Используем твой готовый renderAds, но подменяем данные (через localStorage или передачу аргументов)
-        // Но проще написать небольшой фильтр прямо здесь:
-        const list = document.getElementById('ads-list');
-        const count = document.getElementById('ads-count');
-        
+        countDisplay.innerText = favAds.length;
+        adsContainer.innerHTML = '';
+
         if (favAds.length === 0) {
-            list.innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding: 50px;">У вас пока нет избранных объявлений.</p>`;
-            count.innerText = "0";
+            adsContainer.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; color: #888;">
+                    <div style="font-size: 50px; margin-bottom: 10px;">❤️</div>
+                    <h3>У вас пока нет избранных объявлений</h3>
+                    <p>Нажимайте на сердечко в объявлениях, чтобы сохранить их здесь.</p>
+                    <a href="index.html" style="display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; font-weight: bold;">На главную</a>
+                </div>`;
             return;
         }
 
-        // Мы можем временно подменить функцию получения данных, 
-        // но самый простой способ — очистить список и вызвать создание карточек вручную
-        // (логика уже есть в твоем script.js)
+        // Отрисовка списка избранного (аналогично главной странице)
+        favAds.sort((a, b) => b.id - a.id).forEach(ad => {
+            const image = ad.images?.[0] || 'https://via.placeholder.com/300x200?text=Нет+фото';
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            card.innerHTML = `
+                <button class="fav-btn active" data-id="${ad.id}">❤️</button>
+                <img src="${image}" alt="${ad.title}" loading="lazy">
+                <div class="info">
+                    <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
+                    <div class="title" style="font-weight:600; font-size:14px; margin:5px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ad.title}</div>
+                    <div style="font-size:12px; color:#888;">📍 ${ad.region || 'Рогун'}</div>
+                </div>
+            `;
+
+            // Логика удаления из избранного прямо на этой странице
+            const favBtn = card.querySelector('.fav-btn');
+            favBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(ad.id);
+                renderFavorites(); // Перерисовываем список сразу после удаления
+            };
+
+            card.onclick = () => window.location.href = `detail.html?id=${ad.id}`;
+            adsContainer.appendChild(card);
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Мы просто вызываем renderAds, но внутри script.js добавим проверку на URL
-        // Чтобы на этой странице он фильтровал только избранные.
-    });
+    // Рендер меню пользователя (как в index.html)
+    function renderUserMenu() {
+        const user = getCurrentUser();
+        if (user) {
+            userMenu.innerHTML = `<a href="profile.html" style="text-decoration:none; color:#007bff; font-weight:600;">👤 Кабинет</a>`;
+        } else {
+            userMenu.innerHTML = `<a href="index.html" style="text-decoration:none; color:#007bff; font-weight:600;">Войти</a>`;
+        }
+    }
+
+    // Логика темной темы
+    themeBtn.onclick = () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        themeBtn.textContent = isDark ? "☀️" : "🌙";
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    };
+
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeBtn.textContent = "☀️";
+    }
+
+    renderUserMenu();
+    renderFavorites();
 </script>
 
 </body>

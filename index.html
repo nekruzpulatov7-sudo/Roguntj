@@ -169,6 +169,7 @@
             padding-bottom: 40px; 
         }
 
+        /* КАРТОЧКА ТОВАРА С ИЗБРАННЫМ */
         .product-card { 
             background: white; 
             border-radius: 18px; 
@@ -178,6 +179,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .dark-mode .product-card { 
@@ -189,6 +191,28 @@
             height: 180px; 
             object-fit: cover; 
         }
+
+        /* КНОПКА СЕРДЕЧКА */
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+        .fav-btn:hover { transform: scale(1.1); }
+        .fav-btn.active { color: #ff4757; }
 
         .product-card .info { 
             padding: 15px; 
@@ -249,12 +273,12 @@
             justify-content: center; 
             font-size: 24px; 
             margin-top: -35px; 
-            border: 5px solid #f4f7f6;
+            border: 5px solid #f5f7fa;
             box-shadow: 0 4px 10px rgba(40,167,69,0.3);
         }
 
         .dark-mode .add-icon-circle { 
-            border-color: #121225; 
+            border-color: #1a1a2e; 
         }
 
         .modal-tg {
@@ -455,7 +479,7 @@
 </div>
 
 <script type="module">
-    import { getAds, getCurrentUser } from './js/storage.js';
+    import { getAds, getCurrentUser, toggleFavorite, isFavorite } from './js/storage.js';
 
     const adsContainer = document.getElementById('ads-container');
     const searchInput = document.getElementById('search-input');
@@ -513,21 +537,13 @@
         const maxPrice = parseFloat(priceToFilter.value) || Infinity;
 
         const filtered = allAds.filter(ad => {
-            // 1. Поиск по тексту
             const matchesSearch = !searchText || 
                                 ad.title.toLowerCase().includes(searchText) || 
                                 (ad.description && ad.description.toLowerCase().includes(searchText));
-            
-            // 2. По региону
             const matchesRegion = !selectedRegion || ad.region === selectedRegion;
-            
-            // 3. По категории
             const matchesCategory = !selectedCategory || ad.category === selectedCategory;
-            
-            // 4. По цене
             const matchesPrice = (parseFloat(ad.price) || 0) <= maxPrice;
 
-            // 5. Спец. фильтр транспорта
             let matchesTransport = true;
             if (selectedCategory === "Транспорт") {
                 const adBrand = ad.params?.brand || "";
@@ -552,9 +568,14 @@
 
         ads.sort((a, b) => b.id - a.id).forEach(ad => {
             const image = ad.images?.[0] || 'https://via.placeholder.com/300x200?text=Нет+фото';
+            const isFav = isFavorite(ad.id);
             const card = document.createElement('div');
             card.className = 'product-card';
+            
             card.innerHTML = `
+                <button class="fav-btn ${isFav ? 'active' : ''}" data-id="${ad.id}">
+                    ${isFav ? '❤️' : '🤍'}
+                </button>
                 <img src="${image}" alt="${ad.title}" loading="lazy">
                 <div class="info">
                     <div class="price">${Number(ad.price).toLocaleString()} TJS</div>
@@ -562,6 +583,18 @@
                     <div style="font-size:12px; color:#888;">📍 ${ad.region || 'Рогун'}</div>
                 </div>
             `;
+
+            // Клик на сердечко
+            const favBtn = card.querySelector('.fav-btn');
+            favBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(ad.id);
+                const nowFav = isFavorite(ad.id);
+                favBtn.classList.toggle('active', nowFav);
+                favBtn.innerHTML = nowFav ? '❤️' : '🤍';
+            };
+
+            // Клик на карточку (переход)
             card.onclick = () => window.location.href = `detail.html?id=${ad.id}`;
             adsContainer.appendChild(card);
         });
@@ -573,7 +606,6 @@
             catItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             
-            // Показываем расширенные фильтры только для Транспорта
             if (item.dataset.cat === 'Транспорт') {
                 transportFilters.style.display = 'grid';
             } else {

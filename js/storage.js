@@ -1,9 +1,9 @@
 /**
  * Rogun.tj - Модуль управления данными (LocalStorage)
- * Версия: 3.1 (Синхронизировано с категорией "Телефон и связь")
+ * Версия: 4.5 (Полная структура + Избранное)
  */
 
-// 1. ПОЛНАЯ СТРУКТУРА КАТЕГОРИЙ
+// 1. ПОЛНАЯ СТРУКТУРА КАТЕГОРИЙ (Все 19 категорий восстановлены)
 export const SOMON_STRUCTURE = {
     "Транспорт": {
         "Легковые автомобили": ["Mercedes-Benz", "Opel", "Toyota", "Hyundai", "BMW", "LADA", "Kia", "Honda", "Nexia"],
@@ -96,7 +96,6 @@ export const SOMON_STRUCTURE = {
 
 // --- ОБЪЯВЛЕНИЯ (ADS) ---
 
-/** Получить все объявления из LocalStorage */
 export function getAds() {
     try {
         const data = localStorage.getItem('ads');
@@ -108,7 +107,6 @@ export function getAds() {
     }
 }
 
-/** Сохранить весь массив объявлений */
 export function saveAds(ads) {
     try {
         localStorage.setItem('ads', JSON.stringify(ads));
@@ -116,11 +114,9 @@ export function saveAds(ads) {
         if (e.name === 'QuotaExceededError') {
             alert('Ошибка: Память браузера переполнена! Попробуйте загрузить меньше фото.');
         }
-        console.error("Ошибка записи объявлений:", e);
     }
 }
 
-/** Добавить одно новое объявление */
 export function saveAd(newAd) {
     const ads = getAds();
     if (!newAd.id) newAd.id = Date.now();
@@ -132,11 +128,45 @@ export function saveAd(newAd) {
     return newAd.id;
 }
 
-/** Удалить объявление по ID */
 export function deleteAd(adId) {
     let ads = getAds();
     ads = ads.filter(ad => ad.id !== Number(adId));
     saveAds(ads);
+    removeFromFavorites(adId);
+}
+
+// --- ИЗБРАННОЕ (FAVORITES) ---
+
+export function getFavorites() {
+    try {
+        const data = localStorage.getItem('favorites');
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+export function toggleFavorite(adId) {
+    let favorites = getFavorites();
+    const id = Number(adId);
+    const index = favorites.indexOf(id);
+    if (index === -1) {
+        favorites.push(id);
+    } else {
+        favorites.splice(index, 1);
+    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    return favorites;
+}
+
+export function isFavorite(adId) {
+    return getFavorites().includes(Number(adId));
+}
+
+function removeFromFavorites(adId) {
+    let favorites = getFavorites();
+    favorites = favorites.filter(id => id !== Number(adId));
+    localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
 // --- ПОЛЬЗОВАТЕЛИ (USERS) ---
@@ -144,20 +174,14 @@ export function deleteAd(adId) {
 export function getUsers() {
     try {
         const data = localStorage.getItem('users');
-        if (!data || data === "undefined" || data === "null") return [];
-        return JSON.parse(data);
+        return data ? JSON.parse(data) : [];
     } catch (e) {
-        console.error("Ошибка чтения списка пользователей:", e);
         return [];
     }
 }
 
 export function saveUsers(users) {
-    try {
-        localStorage.setItem('users', JSON.stringify(users));
-    } catch (e) {
-        console.error("Ошибка сохранения пользователей:", e);
-    }
+    localStorage.setItem('users', JSON.stringify(users));
 }
 
 // --- СЕССИЯ (АВТОРИЗАЦИЯ) ---
@@ -168,7 +192,6 @@ export function getCurrentUser() {
         if (!data || data === "undefined" || data === "null") return null;
         return JSON.parse(data);
     } catch (e) {
-        console.error("Ошибка получения текущего пользователя:", e);
         return null;
     }
 }
