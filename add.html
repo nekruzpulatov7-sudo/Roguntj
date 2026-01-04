@@ -100,28 +100,30 @@
         <h2>🚀 Новое объявление</h2>
         <form id="add-ad-form">
             <div class="form-group">
-                <label>Название товара или услуги</label>
-                <input type="text" id="title" placeholder="Что вы продаете?" required maxlength="60">
-            </div>
-
-            <div class="form-group">
                 <label>Категория</label>
                 <select id="category" required>
                     <option value="">Выберите категорию</option>
                     <option value="Транспорт">🚗 Транспорт</option>
-                    <option value="Недвижимость">🏠 Жилье (Недвижимость)</option>
-                    <option value="Бытовая техника и Электроника">📱 Техника</option>
-                    <option value="Компьютеры и Оргтехника">💻 Компьютеры</option>
+                    <option value="Недвижимость">🏠 Недвижимость</option>
+                    <option value="Телефон и связь">📱 Телефон и связь</option>
+                    <option value="Компьютеры и Оргтехника">💻 Компьютеры и Оргтехника</option>
                     <option value="Услуги">🛠️ Услуги</option>
                     <option value="Работа">💼 Работа</option>
-                    <option value="Все для дома">🛋️ Для дома</option>
-                    <option value="Одежда и Обувь">👕 Одежда</option>
-                    <option value="Детский мир">🧸 Детям</option>
-                    <option value="Животные и Растения">🐾 Животные</option>
+                    <option value="Все для дома">🛋️ Все для дома</option>
+                    <option value="Одежда и Обувь">👕 Одежда и Обувь</option>
+                    <option value="Животные и Растения">🐾 Животные и Растения</option>
+                    <option value="Детский мир">🧸 Детский мир</option>
+                    <option value="Строительство и Ремонт">🏗️ Строительство и Ремонт</option>
+                    <option value="Спорт и Музыка">⚽ Спорт и Музыка</option>
                 </select>
             </div>
 
             <div id="dynamic-params-container"></div>
+
+            <div class="form-group">
+                <label>Название товара или услуги</label>
+                <input type="text" id="title" placeholder="Что вы продаете?" required maxlength="60">
+            </div>
 
             <div class="form-group">
                 <label>Цена (Сомони)</label>
@@ -163,11 +165,7 @@
                         <option value="Рудаки">Рудаки</option>
                         <option value="Шахринав">Шахринав</option>
                         <option value="Лахш">Лахш</option>
-                        <option value="Сангвор">Сангвор</option>
-                        <option value="Таджикабад">Таджикабад</option>
                         <option value="Восеъ">Восеъ</option>
-                        <option value="Фархор">Фархор</option>
-                        <option value="Мургаб">Мургаб</option>
                     </optgroup>
                 </select>
             </div>
@@ -184,7 +182,7 @@
 
             <div class="form-group">
                 <label>Подробное описание</label>
-                <textarea id="description" rows="5" placeholder="Расскажите о состоянии товара, торге и т.д." required></textarea>
+                <textarea id="description" rows="5" placeholder="Расскажите о состоянии товара..." required></textarea>
             </div>
 
             <button type="submit" class="btn-submit" id="submit-btn">Опубликовать сейчас</button>
@@ -192,22 +190,10 @@
     </div>
 </main>
 
-<div class="mobile-nav">
-    <a href="index.html" class="nav-item"><span>🏠</span><span>Главная</span></a>
-    <a href="profile.html?tab=favs" class="nav-item"><span>❤️</span><span>Избранное</span></a>
-    <a href="add.html" class="nav-item"><div class="add-icon-circle">➕</div></a>
-    <a href="profile.html" class="nav-item"><span>👤</span><span>Профиль</span></a>
-</div>
-
 <script type="module">
-    import { saveAd, getCurrentUser } from './js/storage.js';
+    import { saveAds, getAds, getCurrentUser } from './js/storage.js';
 
     const user = getCurrentUser();
-    if (!user) {
-        alert("Для подачи объявления нужно войти в аккаунт.");
-        window.location.href = "index.html";
-    }
-
     const form = document.getElementById('add-ad-form');
     const categorySelect = document.getElementById('category');
     const dynamicContainer = document.getElementById('dynamic-params-container');
@@ -216,26 +202,20 @@
     const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
 
+    // Данные для марок машин
     const carData = {
-        "Mercedes-Benz": ["C-Class", "E-Class", "S-Class", "ML", "G-Class"],
-        "BMW": ["3 Series", "5 Series", "7 Series", "X5", "X6"],
-        "Toyota": ["Camry", "Corolla", "Land Cruiser", "Prado", "RAV4"],
-        "Opel": ["Astra", "Zafira", "Vectra", "Corsa"],
-        "Lexus": ["RX", "LX", "GX", "IS", "ES"],
-        "Hyundai": ["Elantra", "Sonata", "Santa Fe", "Tucson"],
-        "Kia": ["Optima", "K5", "Sportage", "Sorento"]
+        "Mercedes-Benz": ["C-Class", "E-Class", "S-Class", "G-Class"],
+        "Toyota": ["Camry", "Corolla", "Land Cruiser"],
+        "Opel": ["Astra", "Zafira", "Vectra"],
+        "BMW": ["3-серия", "5-серия", "X5"],
+        "Hyundai": ["Elantra", "Sonata"],
+        "LADA": ["Vesta", "Priora"]
     };
 
+    // Предзаполнение телефона
     if (user && user.phone) phoneInput.value = user.phone;
 
-    phoneInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val.length > 0 && !val.startsWith('992')) val = '992' + val;
-        let x = val.match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
-        if (!x) return;
-        e.target.value = !x[2] ? `+${x[1]}` : `+${x[1]} (${x[2]}) ` + x[3] + (x[4] ? `-${x[4]}` : '') + (x[5] ? `-${x[5]}` : '');
-    });
-
+    // Динамические поля в зависимости от категории
     categorySelect.addEventListener('change', () => {
         const cat = categorySelect.value;
         dynamicContainer.innerHTML = '';
@@ -247,9 +227,6 @@
                         <option value="">Марка</option>
                         ${Object.keys(carData).map(b => `<option value="${b}">${b}</option>`).join('')}
                     </select>
-                    <select id="model" class="param-input" required disabled>
-                        <option value="">Модель</option>
-                    </select>
                     <select id="fuel" class="param-input" required>
                         <option value="">Топливо</option>
                         <option value="Бензин">Бензин</option>
@@ -257,38 +234,38 @@
                         <option value="Газ">Газ</option>
                     </select>
                     <input type="number" id="year" placeholder="Год выпуска" class="param-input" required>
-                </div>
-            `;
-            const bSel = document.getElementById('brand');
-            const mSel = document.getElementById('model');
-            bSel.onchange = () => {
-                mSel.innerHTML = '<option value="">Модель</option>';
-                if (carData[bSel.value]) {
-                    carData[bSel.value].forEach(m => mSel.innerHTML += `<option value="${m}">${m}</option>`);
-                    mSel.disabled = false;
-                } else mSel.disabled = true;
-            };
+                </div>`;
+        } else if (cat === 'Телефон и связь') {
+            dynamicContainer.innerHTML = `
+                <div class="dynamic-section">
+                    <select id="brand" class="param-input" required>
+                        <option value="">Марка</option>
+                        <option value="iPhone">iPhone</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                    </select>
+                    <select id="condition" class="param-input" required>
+                        <option value="Новый">Новый</option>
+                        <option value="Б/у">Б/у</option>
+                    </select>
+                </div>`;
         } else if (cat === 'Недвижимость') {
             dynamicContainer.innerHTML = `
                 <div class="dynamic-section">
-                    <select id="rooms" class="param-input" required>
-                        <option value="">Комнат</option>
-                        <option value="1">1-комнатная</option>
-                        <option value="2">2-комнатная</option>
-                        <option value="3">3-комнатная</option>
-                        <option value="4">4+ комнаты</option>
-                    </select>
+                    <input type="number" id="rooms" placeholder="Кол-во комнат" class="param-input" required>
                     <input type="number" id="area" placeholder="Площадь м²" class="param-input" required>
-                    <input type="number" id="floor" placeholder="Этаж" class="param-input" required>
-                </div>
-            `;
+                </div>`;
         }
     });
 
+    // Обработка фото
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
-        if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фотографий!");
+        if (uploadedImages.length + files.length > 5) return alert("Макс. 5 фото");
+        
         files.forEach(file => {
+            if (file.size > 2 * 1024 * 1024) return alert("Файл " + file.name + " слишком большой (макс 2МБ)");
+            
             const reader = new FileReader();
             reader.onload = (ev) => {
                 uploadedImages.push(ev.target.result);
@@ -305,20 +282,18 @@
         });
     });
 
+    // Сохранение объявления
     form.onsubmit = (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.innerHTML = "⏳ Публикация...";
 
+        const ads = getAds() || [];
         const params = {};
-        document.querySelectorAll('.param-input').forEach(el => {
-            params[el.id] = el.value;
-        });
+        document.querySelectorAll('.param-input').forEach(el => { params[el.id] = el.value; });
 
         const adData = {
             id: Date.now(),
-            userId: user.id,
             title: document.getElementById('title').value,
             category: categorySelect.value,
             price: document.getElementById('price').value,
@@ -327,17 +302,18 @@
             phone: document.getElementById('phone').value,
             params: params,
             images: uploadedImages.length > 0 ? uploadedImages : ['https://via.placeholder.com/600x400?text=Нет+фото'],
-            date: new Date().toLocaleDateString('ru-RU')
+            createdAt: new Date().toLocaleDateString('ru-RU')
         };
 
+        ads.push(adData);
+        
         try {
-            saveAd(adData);
-            alert("✅ Объявление успешно добавлено!");
+            saveAds(ads);
+            alert("✅ Объявление опубликовано!");
             window.location.href = "index.html";
         } catch (err) {
-            alert("❌ Ошибка: фото слишком большие.");
+            alert("❌ Ошибка: Слишком много данных или фото слишком тяжелые. Попробуйте загрузить меньше фото.");
             btn.disabled = false;
-            btn.innerHTML = "Опубликовать сейчас";
         }
     };
 

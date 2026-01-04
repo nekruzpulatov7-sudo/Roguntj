@@ -1,14 +1,18 @@
 /**
  * Rogun.tj - Главный скрипт отрисовки и интерфейса
- * Версия: 2.4 (Полная фильтрация: Категории + Транспорт + Цена)
+ * Версия: 2.5 (Синхронизировано с HTML-разметкой)
  */
-import { getAds, saveAds, getCurrentUser } from './storage.js';
+import { getAds, getCurrentUser } from './storage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. ТЕМА ---
     const savedTheme = localStorage.getItem('theme');
     const themeBtn = document.getElementById('theme-toggle');
-    if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+    
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeBtn) themeBtn.textContent = "☀️";
+    }
     
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
@@ -18,33 +22,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 2. ИНИЦИАЛИЗАЦИЯ ФИЛЬТРОВ ---
+    // --- 2. ИНИЦИАЛИЗАЦИЯ ФИЛЬТРОВ (Исправлены ID под ваш HTML) ---
     const searchInput = document.getElementById('search-input');
     const regionFilter = document.getElementById('region-filter');
-    const brandFilter = document.getElementById('brand-filter'); // Селектор Марка
-    const fuelFilter = document.getElementById('fuel-filter');   // Селектор Топливо
-    const priceToFilter = document.getElementById('price-to');   // Поле Цена до
+    const brandFilter = document.getElementById('filter-brand'); // Исправлено: filter-brand
+    const fuelFilter = document.getElementById('filter-fuel');   // Исправлено: filter-fuel
+    const priceToFilter = document.getElementById('price-to');
+    const transportBlock = document.getElementById('transport-filters');
     const categoryItems = document.querySelectorAll('.category-item');
 
-    // Навешиваем обработчики на все элементы управления
-    const allControls = [searchInput, regionFilter, brandFilter, fuelFilter, priceToFilter];
-    allControls.forEach(control => {
+    // Навешиваем обработчики
+    const controls = [searchInput, regionFilter, brandFilter, fuelFilter, priceToFilter];
+    controls.forEach(control => {
         if (control) {
-            // 'input' для текста и чисел, 'change' для списков
+            // Используем input для мгновенной реакции на всё
             control.addEventListener('input', () => debounceRender());
-            control.addEventListener('change', () => renderAds());
         }
     });
 
-    // Клик по категориям (рубрикам)
+    // Клик по категориям
     categoryItems.forEach(item => {
         item.addEventListener('click', () => {
-            if (item.classList.contains('active')) {
-                item.classList.remove('active');
-            } else {
-                categoryItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+            // Переключение активного класса
+            categoryItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // Показываем/скрываем блок авто-фильтров
+            if (transportBlock) {
+                if (item.dataset.cat === 'Транспорт') {
+                    transportBlock.style.display = 'grid';
+                } else {
+                    transportBlock.style.display = 'none';
+                    // Сбрасываем значения, если ушли из транспорта
+                    if (brandFilter) brandFilter.value = "";
+                    if (fuelFilter) fuelFilter.value = "";
+                }
             }
+            
             renderAds();
         });
     });
@@ -60,66 +74,55 @@ function debounceRender() {
 }
 
 /**
- * ГЛАВНАЯ ФУНКЦИЯ ФИЛЬТРАЦИИ И ОТРИСОВКИ
+ * ГЛАВНАЯ ФУНКЦИЯ ФИЛЬТРАЦИИ
  */
 export function renderAds() {
-    let ads = getAds() || [];
-    const list = document.getElementById('ads-list') || document.getElementById('ads-container');
-    const countLabel = document.getElementById('ads-count');
-
+    const ads = getAds() || [];
+    const list = document.getElementById('ads-container') || document.getElementById('ads-list');
+    
     if (!list) return;
 
-    // Читаем текущие значения фильтров
+    // Считываем значения (с защитой от отсутствия элементов)
     const query = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
     const region = document.getElementById('region-filter')?.value || '';
-    const brand = document.getElementById('brand-filter')?.value || '';
-    const fuel = document.getElementById('fuel-filter')?.value || '';
+    const brand = document.getElementById('filter-brand')?.value || '';
+    const fuel = document.getElementById('filter-fuel')?.value || '';
     const priceTo = parseFloat(document.getElementById('price-to')?.value) || Infinity;
     
     const activeCatItem = document.querySelector('.category-item.active');
     const category = activeCatItem ? activeCatItem.dataset.cat : '';
 
-    // Фильтруем массив объявлений
     const filteredAds = ads.filter(ad => {
-        // 1. Поиск по названию
-        const matchesSearch = ad.title.toLowerCase().includes(query);
-        
-        // 2. Поиск по региону
+        const matchesSearch = ad.title.toLowerCase().includes(query) || 
+                             (ad.description && ad.description.toLowerCase().includes(query));
         const matchesRegion = !region || ad.region === region;
-        
-        // 3. Поиск по категории (рубрике)
         const matchesCategory = !category || ad.category === category;
-        
-        // 4. Поиск по цене (Цена ДО)
         const adPrice = parseFloat(ad.price) || 0;
         const matchesPrice = adPrice <= priceTo;
 
-        // 5. СПЕЦИФИЧЕСКИЕ ФИЛЬТРЫ (Марка и Топливо)
-        // Они срабатывают только если выбрана марка/топливо в фильтре
-        const matchesBrand = !brand || (ad.params && ad.params.brand === brand);
-        const matchesFuel = !fuel || (ad.params && ad.params.fuel === fuel);
+        // Фильтры для авто
+        let matchesAuto = true;
+        if (category === 'Транспорт') {
+            const matchesBrand = !brand || (ad.params && ad.params.brand === brand);
+            const matchesFuel = !fuel || (ad.params && ad.params.fuel === fuel);
+            matchesAuto = matchesBrand && matchesFuel;
+        }
 
-        return matchesSearch && matchesRegion && matchesCategory && matchesPrice && matchesBrand && matchesFuel;
+        return matchesSearch && matchesRegion && matchesCategory && matchesPrice && matchesAuto;
     });
 
-    // Очистка списка
     list.innerHTML = '';
 
-    // Если ничего не нашли
     if (filteredAds.length === 0) {
         list.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px; opacity: 0.5;">
-                <div style="font-size: 50px;">🔍</div>
-                <h3>Ничего не нашли</h3>
-                <p>Попробуйте сбросить фильтры или изменить запрос</p>
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: gray;">
+                <div style="font-size: 40px;">🔍</div>
+                <p>Ничего не найдено</p>
             </div>`;
-        if (countLabel) countLabel.innerText = "0";
         return;
     }
 
-    if (countLabel) countLabel.innerText = filteredAds.length;
-
-    // Сортировка (сначала новые) и отрисовка
+    // Сортировка и рендер
     [...filteredAds]
         .sort((a, b) => (b.id || 0) - (a.id || 0))
         .forEach((ad, index) => {
@@ -130,16 +133,15 @@ export function renderAds() {
 }
 
 /**
- * СОЗДАНИЕ КАРТОЧКИ ОБЪЯВЛЕНИЯ
+ * СОЗДАНИЕ КАРТОЧКИ
  */
 function createAdCard(ad) {
     const card = document.createElement('div');
-    card.className = 'product-card animate-card';
+    card.className = 'product-card';
 
     const isFav = getFavorites().includes(ad.id);
     const imageSrc = ad.images && ad.images[0] ? ad.images[0] : 'https://via.placeholder.com/400x300?text=Нет+фото';
     
-    // Превью параметров (Марка • Модель • Год)
     let paramsPreview = "";
     if (ad.params) {
         paramsPreview = Object.values(ad.params)
@@ -149,39 +151,30 @@ function createAdCard(ad) {
     }
 
     card.innerHTML = `
-        <div class="fav-btn ${isFav ? 'active' : ''}" data-id="${ad.id}">
-            <svg viewBox="0 0 24 24" fill="${isFav ? '#ff4757' : 'rgba(0,0,0,0.2)'}" stroke="${isFav ? '#ff4757' : '#fff'}" stroke-width="2" width="22" height="22">
+        <div class="fav-btn ${isFav ? 'active' : ''}" data-id="${ad.id}" style="position: absolute; right: 10px; top: 10px; z-index: 10; background: rgba(255,255,255,0.8); border-radius: 50%; padding: 5px; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="${isFav ? '#ff4757' : 'none'}" stroke="${isFav ? '#ff4757' : '#888'}" stroke-width="2" width="20" height="20">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
         </div>
-        <div class="card-clickable-area" onclick="location.href='detail.html?id=${ad.id}'">
-            <div class="image-container">
-                <img src="${imageSrc}" alt="${ad.title}">
-                <div class="region-badge">📍 ${ad.region || 'Рогун'}</div>
-            </div>
-            <div class="info">
-                <div class="price">${Number(ad.price || 0).toLocaleString()} <span>TJS</span></div>
-                <div class="title">${ad.title}</div>
-                ${paramsPreview ? `<div class="params-preview">${paramsPreview}</div>` : ''}
-                <div class="card-footer">
-                    <span class="cat-name">${ad.category || 'Разное'}</span>
-                    <span class="date">${ad.createdAt || ''}</span>
-                </div>
+        <div onclick="location.href='detail.html?id=${ad.id}'">
+            <img src="${imageSrc}" alt="${ad.title}" style="width:100%; height:160px; object-fit:cover;">
+            <div class="info" style="padding: 12px;">
+                <div class="price" style="color: #28a745; font-weight: 800; font-size: 17px;">${Number(ad.price || 0).toLocaleString()} TJS</div>
+                <div class="title" style="font-size: 14px; margin: 4px 0; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${ad.title}</div>
+                <div style="font-size: 11px; color: #888;">📍 ${ad.region || 'Рогун'} ${paramsPreview ? '• ' + paramsPreview : ''}</div>
             </div>
         </div>
     `;
 
-    // Обработка кнопки избранного
-    card.querySelector('.fav-btn').addEventListener('click', (e) => {
+    card.querySelector('.fav-btn').onclick = (e) => {
         e.stopPropagation();
         toggleFavorite(ad.id);
-        renderAds(); // Обновляем экран
-    });
+        renderAds();
+    };
 
     return card;
 }
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 function getFavorites() {
     return JSON.parse(localStorage.getItem('favorites') || '[]');
 }

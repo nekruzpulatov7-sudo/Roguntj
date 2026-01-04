@@ -1,9 +1,9 @@
 /**
  * Rogun.tj - Модуль управления данными (LocalStorage)
- * Версия: 3.0 (Полная структура категорий SomonStyle + Методы управления)
+ * Версия: 3.1 (Синхронизировано с категорией "Телефон и связь")
  */
 
-// 1. ПОЛНАЯ СТРУКТУРА КАТЕГОРИЙ (База данных рубрик для выпадающих списков)
+// 1. ПОЛНАЯ СТРУКТУРА КАТЕГОРИЙ
 export const SOMON_STRUCTURE = {
     "Транспорт": {
         "Легковые автомобили": ["Mercedes-Benz", "Opel", "Toyota", "Hyundai", "BMW", "LADA", "Kia", "Honda", "Nexia"],
@@ -16,6 +16,11 @@ export const SOMON_STRUCTURE = {
         "Дома и Дачи": ["Продажа", "Аренда"],
         "Земля": ["Для бизнеса", "Для жилья"]
     },
+    "Телефон и связь": {
+        "Мобильные телефоны": ["iPhone", "Samsung", "Xiaomi", "Redmi", "Poco", "Huawei", "Realme", "Nokia"],
+        "Аксессуары": ["Чехлы", "Зарядные устройства", "Наушники", "Power Bank"],
+        "Номера и связь": ["Сим-карты", "Модемы", "Роутеры"]
+    },
     "Компьютеры и Оргтехника": {
         "Ноутбуки": ["Apple MacBook", "HP", "Acer", "Asus", "Lenovo"],
         "Настольные ПК": ["Игровые", "Для офиса"],
@@ -23,10 +28,10 @@ export const SOMON_STRUCTURE = {
         "Комплектующие": ["Видеокарты", "Процессоры", "SSD"]
     },
     "Бытовая техника и Электроника": {
-        "Телефоны": ["iPhone", "Samsung", "Xiaomi", "Redmi"],
         "Телевизоры": ["Samsung", "LG", "Sony", "Artel"],
         "Холодильники": ["Beko", "LG", "Indesit"],
-        "Стиральные машины": ["Samsung", "Bosch", "LG"]
+        "Стиральные машины": ["Samsung", "Bosch", "LG"],
+        "Мелкая техника": ["Микроволновки", "Пылесосы", "Утюги"]
     },
     "Услуги": {
         "Транспортные услуги": ["Такси", "Грузоперевозки"],
@@ -103,13 +108,13 @@ export function getAds() {
     }
 }
 
-/** Сохранить весь массив объявлений (перезапись) */
+/** Сохранить весь массив объявлений */
 export function saveAds(ads) {
     try {
         localStorage.setItem('ads', JSON.stringify(ads));
     } catch (e) {
         if (e.name === 'QuotaExceededError') {
-            alert('Ошибка: Память браузера переполнена! Попробуйте загрузить меньше фото или уменьшить их размер.');
+            alert('Ошибка: Память браузера переполнена! Попробуйте загрузить меньше фото.');
         }
         console.error("Ошибка записи объявлений:", e);
     }
@@ -119,7 +124,9 @@ export function saveAds(ads) {
 export function saveAd(newAd) {
     const ads = getAds();
     if (!newAd.id) newAd.id = Date.now();
-    if (!newAd.createdAt) newAd.createdAt = new Date().toLocaleDateString('ru-RU');
+    if (!newAd.createdAt) {
+        newAd.createdAt = new Date().toLocaleDateString('ru-RU');
+    }
     ads.push(newAd);
     saveAds(ads);
     return newAd.id;
@@ -134,7 +141,6 @@ export function deleteAd(adId) {
 
 // --- ПОЛЬЗОВАТЕЛИ (USERS) ---
 
-/** Получить список всех зарегистрированных пользователей */
 export function getUsers() {
     try {
         const data = localStorage.getItem('users');
@@ -146,7 +152,6 @@ export function getUsers() {
     }
 }
 
-/** Сохранить список пользователей */
 export function saveUsers(users) {
     try {
         localStorage.setItem('users', JSON.stringify(users));
@@ -157,7 +162,6 @@ export function saveUsers(users) {
 
 // --- СЕССИЯ (АВТОРИЗАЦИЯ) ---
 
-/** Получить данные текущего вошедшего пользователя */
 export function getCurrentUser() {
     try {
         const data = localStorage.getItem('currentUser');
@@ -169,7 +173,6 @@ export function getCurrentUser() {
     }
 }
 
-/** Установить (войти) или удалить (выйти) текущего пользователя */
 export function setCurrentUser(user) {
     if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -178,12 +181,10 @@ export function setCurrentUser(user) {
     }
 }
 
-/** Псевдоним для совместимости с кодом регистрации */
 export function saveCurrentUser(user) {
     setCurrentUser(user);
 }
 
-/** Функция выхода из системы */
 export function logout() {
     localStorage.removeItem('currentUser');
     window.location.href = 'index.html';
