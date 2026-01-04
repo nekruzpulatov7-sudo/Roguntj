@@ -198,7 +198,7 @@
     const user = getCurrentUser();
     if (!user) {
         alert("Пожалуйста, войдите в аккаунт.");
-        window.location.href = "login.html";
+        window.location.href = "index.html";
     }
 
     const form = document.getElementById('add-ad-form');
@@ -209,9 +209,18 @@
     const phoneInput = document.getElementById('phone');
     let uploadedImages = [];
 
+    // База данных марок и моделей (такая же как в index.html)
+    const carData = {
+        "Mercedes-Benz": ["C-Class", "E-Class", "S-Class", "ML", "G-Class"],
+        "BMW": ["3 Series", "5 Series", "7 Series", "X5", "X6"],
+        "Toyota": ["Camry", "Corolla", "Land Cruiser", "Prado", "RAV4"],
+        "Opel": ["Astra", "Zafira", "Vectra", "Corsa"],
+        "Hyundai": ["Elantra", "Sonata", "Santa Fe", "Tucson"]
+    };
+
     if (user && user.phone) phoneInput.value = user.phone;
 
-    // Маска телефона +992
+    // Маска телефона
     phoneInput.addEventListener('input', (e) => {
         let val = e.target.value.replace(/\D/g, '');
         if (val.length > 0 && !val.startsWith('992')) val = '992' + val;
@@ -219,24 +228,61 @@
         e.target.value = !x[2] ? `+${x[1]}` : `+${x[1]} (${x[2]}) ` + x[3] + (x[4] ? `-${x[4]}` : '') + (x[5] ? `-${x[5]}` : '');
     });
 
-    // Динамические параметры
+    // Изменение динамических полей
     categorySelect.addEventListener('change', () => {
         const cat = categorySelect.value;
         dynamicContainer.innerHTML = '';
+
         if (cat === 'Транспорт') {
-            dynamicContainer.innerHTML = `<div class="dynamic-section">
-                <input type="text" id="brand" placeholder="Марка (напр. Toyota)" class="param-input" required>
-                <input type="number" id="year" placeholder="Год выпуска" class="param-input" required>
-            </div>`;
+            dynamicContainer.innerHTML = `
+                <div class="dynamic-section">
+                    <select id="type" class="param-input" required>
+                        <option value="">Тип кузова</option>
+                        <option value="Седан">Седан</option>
+                        <option value="Внедорожник">Внедорожник</option>
+                        <option value="Хэтчбек">Хэтчбек</option>
+                    </select>
+                    <select id="brand" class="param-input" required>
+                        <option value="">Выберите марку</option>
+                        ${Object.keys(carData).map(b => `<option value="${b}">${b}</option>`).join('')}
+                    </select>
+                    <select id="model" class="param-input" required disabled>
+                        <option value="">Выберите модель</option>
+                    </select>
+                    <select id="fuel" class="param-input" required>
+                        <option value="">Топливо</option>
+                        <option value="Бензин">Бензин</option>
+                        <option value="Дизель">Дизель</option>
+                        <option value="Газ">Газ</option>
+                    </select>
+                </div>
+            `;
+
+            // Логика подгрузки моделей
+            const brandSel = document.getElementById('brand');
+            const modelSel = document.getElementById('model');
+            brandSel.onchange = () => {
+                modelSel.innerHTML = '<option value="">Выберите модель</option>';
+                if (carData[brandSel.value]) {
+                    carData[brandSel.value].forEach(m => {
+                        modelSel.innerHTML += `<option value="${m}">${m}</option>`;
+                    });
+                    modelSel.disabled = false;
+                } else {
+                    modelSel.disabled = true;
+                }
+            };
         } else if (cat === 'Недвижимость') {
-            dynamicContainer.innerHTML = `<div class="dynamic-section">
-                <input type="number" id="rooms" placeholder="Комнат" class="param-input" required>
-                <input type="number" id="area" placeholder="Площадь м²" class="param-input" required>
-            </div>`;
+            dynamicContainer.innerHTML = `
+                <div class="dynamic-section">
+                    <input type="number" id="rooms" placeholder="Кол-во комнат" class="param-input" required>
+                    <input type="number" id="area" placeholder="Площадь м²" class="param-input" required>
+                </div>
+            `;
         }
     });
 
-    // Работа с фото
+    // Фото
     photoInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
         if (uploadedImages.length + files.length > 5) return alert("Максимум 5 фото.");
@@ -258,15 +304,17 @@
         });
     });
 
-    // Отправка
+    // Отправка формы
     form.onsubmit = (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.textContent = "Загрузка...";
+        btn.textContent = "Публикация...";
 
         const extraParams = {};
-        document.querySelectorAll('.param-input').forEach(input => extraParams[input.id] = input.value);
+        document.querySelectorAll('.param-input').forEach(input => {
+            extraParams[input.id] = input.value;
+        });
 
         const newAd = {
             id: Date.now(),
@@ -284,10 +332,10 @@
 
         try {
             saveAd(newAd);
-            alert("Опубликовано!");
+            alert("Объявление успешно опубликовано!");
             window.location.href = "index.html";
         } catch (err) {
-            alert("Ошибка сохранения. Возможно, фото слишком большие.");
+            alert("Ошибка: память браузера переполнена. Попробуйте загрузить фото меньшего размера.");
             btn.disabled = false;
             btn.textContent = "Опубликовать";
         }

@@ -82,6 +82,16 @@
         }
         .dark-mode input, .dark-mode select { background: #1f1f3a; color: white; border-color: #333; }
 
+        /* СТИЛИ ДЛЯ ПОД-ФИЛЬТРОВ (Somon Style) */
+        .advanced-filters {
+            margin-top: 15px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -165,7 +175,6 @@
             .hero-banner h2 { font-size: 22px; }
             .search-box { flex-direction: column; }
             .categories-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .btn-add-main { display: none; } /* Скрываем кнопку в шапке на мобилках, так как есть плюс внизу */
         }
     </style>
 </head>
@@ -225,6 +234,31 @@
             </select>
             
             <a href="add.html" class="btn-add-main" style="background: #28a745; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: bold;">+ Подать</a>
+        </div>
+
+        <div id="transport-filters" class="advanced-filters">
+            <select id="filter-brand">
+                <option value="">Марка (Все)</option>
+                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                <option value="BMW">BMW</option>
+                <option value="Toyota">Toyota</option>
+                <option value="Opel">Opel</option>
+                <option value="Lexus">Lexus</option>
+                <option value="Hyundai">Hyundai</option>
+            </select>
+            <select id="filter-type">
+                <option value="">Тип авто</option>
+                <option value="Седан">Седан</option>
+                <option value="Внедорожник">Внедорожник</option>
+                <option value="Хэтчбек">Хэтчбек</option>
+            </select>
+            <select id="filter-fuel">
+                <option value="">Топливо</option>
+                <option value="Бензин">Бензин</option>
+                <option value="Дизель">Дизель</option>
+                <option value="Газ">Газ</option>
+            </select>
+            <input type="number" id="price-to" placeholder="Цена до (TJS)">
         </div>
     </div>
 </section>
@@ -309,6 +343,13 @@
     const userMenu = document.getElementById('user-menu');
     const themeBtn = document.getElementById('theme-toggle');
     const catItems = document.querySelectorAll('.category-item');
+    
+    // Доп фильтры
+    const transportFilters = document.getElementById('transport-filters');
+    const filterBrand = document.getElementById('filter-brand');
+    const filterType = document.getElementById('filter-type');
+    const filterFuel = document.getElementById('filter-fuel');
+    const priceToFilter = document.getElementById('price-to');
 
     let generatedCode = null;
 
@@ -346,12 +387,23 @@
         const selectedRegion = regionFilter.value;
         const activeItem = document.querySelector('.category-item.active');
         const selectedCategory = activeItem ? activeItem.dataset.cat : "";
+        
+        // Значения под-фильтров
+        const brand = filterBrand.value;
+        const fuel = filterFuel.value;
+        const maxPrice = parseFloat(priceToFilter.value) || Infinity;
 
         const filtered = allAds.filter(ad => {
             const matchesSearch = ad.title.toLowerCase().includes(searchText);
             const matchesRegion = !selectedRegion || ad.region === selectedRegion;
             const matchesCategory = !selectedCategory || ad.category === selectedCategory;
-            return matchesSearch && matchesRegion && matchesCategory;
+            
+            // Фильтрация по параметрам (если это транспорт)
+            const matchesPrice = Number(ad.price) <= maxPrice;
+            const matchesBrand = !brand || (ad.params && ad.params.brand === brand);
+            const matchesFuel = !fuel || (ad.params && ad.params.fuel === fuel);
+
+            return matchesSearch && matchesRegion && matchesCategory && matchesPrice && matchesBrand && matchesFuel;
         });
 
         adsContainer.innerHTML = '';
@@ -382,12 +434,24 @@
         item.onclick = () => {
             catItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+            
+            // Показываем/скрываем блок фильтров Somon Style
+            if (item.dataset.cat === 'Транспорт') {
+                transportFilters.style.display = 'grid';
+            } else {
+                transportFilters.style.display = 'none';
+            }
+            
             updateAds();
         };
     });
 
+    // Слушатели для всех фильтров
     searchInput.oninput = updateAds;
     regionFilter.onchange = updateAds;
+    filterBrand.onchange = updateAds;
+    filterFuel.onchange = updateAds;
+    priceToFilter.oninput = updateAds;
     
     themeBtn.onclick = () => {
         document.body.classList.toggle('dark-mode');
